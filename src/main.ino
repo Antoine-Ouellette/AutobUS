@@ -1,53 +1,40 @@
-/*
-Projet: Le nom du script
-Equipe: Votre numero d'equipe
-Auteurs: Les membres auteurs du script
-Description: Breve description du script
-Date: Derniere date de modification
-*/
+/**
+ * Projet: AutobUS
+ * Equipe: P-12
+ * Auteurs: Aimeric Bouillon, Mathieu Cabana, Samuel Houle, William Larouche, Alexi Ledoux, Antoine Ouellette, Adam Turcotte, Samy Yamouni
+ * Description: Boucle principale du robot. S'occupe des états du robot (avancer, arrêt, tourner).
+ * Date: 2025-10-02
+ */
+#include <LibRobus.h> // Essentielle pour utiliser RobUS.
 
-/* ****************************************************************************
-Inclure les librairies de functions que vous voulez utiliser
-**************************************************************************** */
-
-#include <LibRobus.h> // Essentielle pour utiliser RobUS
-
-
-
-/* ****************************************************************************
-Variables globales et defines
-**************************************************************************** */
-// -> defines...
-// L'ensemble des fonctions y ont acces
+/******************************************************************************
+Variables globales et #define
+L'ensemble des fonctions y ont accès.
+******************************************************************************/
 
 
+/******************************************************************************
+Fonctions
+Les fonctions doivent être déclarées avant d'être utilisées.
+******************************************************************************/
 
-/* ****************************************************************************
-Vos propres fonctions sont creees ici
-**************************************************************************** */
-void maFonction(){
-  // code
+
+/**
+ * Fonction d'initialisation (Setup)
+ * Exécutée une seule fois lorsque le robot est allumé.
+ * Initialise les capteurs et prépare ce qui doit être prêt avant la loop().
+ */
+void setup() {
+    BoardInit(); // Initialisation de la carte RobUS.
 }
 
-
-/* ****************************************************************************
-Fonctions d'initialisation (setup)
-**************************************************************************** */
-// -> Se fait appeler au debut du programme
-// -> Se fait appeler seulement un fois
-// -> Generalement on y initilise les varibbles globales
-
-void setup(){
-  BoardInit();
-}
-
-
-/* ****************************************************************************
-Fonctions de boucle infini (loop())
-**************************************************************************** */
-// -> Se fait appeler perpetuellement suite au "setup"
-
+/**
+ * Fonctions de boucle infinie
+ * Se fait appeler perpétuellement après que le setup() soit terminé.
+ * Quand la fonction atteint la fin, elle recommence au début.
+ * @note: Ne pas ajouter de delay() dans cette boucle.
+ */
 void loop() {
-  // SOFT_TIMER_Update(); // A decommenter pour utiliser des compteurs logiciels
-  delay(10);// Delais pour décharger le CPU
+    
+    delay(10); // délai pour décharger le CPU.
 }
