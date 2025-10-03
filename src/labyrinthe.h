@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: Fonctions d'action dans le labyrinthe
-Date: 2 octobre 2025
+Date: 3 octobre 2025
 */
 
 #ifndef AUTOBUS_LABYRINTHE_H

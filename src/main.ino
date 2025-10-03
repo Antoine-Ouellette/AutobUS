@@ -3,7 +3,7 @@
  * Equipe: P-12
  * Auteurs: Aimeric Bouillon, Mathieu Cabana, Samuel Houle, William Larouche, Alexi Ledoux, Antoine Ouellette, Adam Turcotte, Samy Yamouni
  * Description: Boucle principale du robot. S'occupe des états du robot (avancer, arrêt, tourner, penser).
- * Date: 2025-10-02
+ * Date: 2025-10-03
  */
 
 #include <LibRobus.h> // Essentielle pour utiliser les fonctions RobUS.
@@ -11,10 +11,16 @@
 #include "moteur.h" // Fichier pour controller les moteurs.
 #include "labyrinthe.h" // Fichier qui se souvient des pos et prend les décisions dans le labyrinthe.
 
+//Donner des valeurs aux variables globales
+Etat currentEtat = ARRET;
+Etat previousEtat = ARRET;
+int nbCaseAvance = 0;
+unsigned long startMillis = 0;
+
 bool bumperArr;
 
 /**
-    Fonction qui fait beep
+ * Fonction qui fait beep
  */
 void beep(const int count) {
     for (int i = 0; i < count; i++) {
@@ -80,6 +86,7 @@ void loop() {
             case TOURNER_DROITE:
             case TOURNER_GAUCHE:
             case TOURNER_180:
+                ajusteVitesse();
                 effectueDeplacement();
                 break;
             case PRISE_DECISION:

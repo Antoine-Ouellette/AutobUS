@@ -3,10 +3,23 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Antoine Ouellette, Adam Turcotte
 Description: Fonction de contrôle des moteurs et des encodeurs
-Date: 2 octobre 2025
+Date: 3 octobre 2025
 */
 #ifndef AUTOBUS_MOTEUR_H
 #define AUTOBUS_MOTEUR_H
+
+//Variables moteurs
+extern float vitesseReel; //Vitesse réelle selon la fonction smooth
+extern int side[2]; //Sense dans lequel la roue tourne -1 = arriere, 1 = avant
+extern float mult_v_g; //Multiplicateur de vitesse gauche
+extern float mult_v_d; //Multiplicateur de vitesse droit
+
+//Encodeurs
+extern int encoderRightGoal; //Objectif de pulse de l'encodeur droit
+extern int encoderLeftGoal; //Objectif de pulse de l'encodeur gauche
+extern double encoderRightCompletion; //Pourcentage de completion de l'objectif de pulse
+extern double encoderLeftCompletion; //Pourcentage de completion de l'objectif de pulse
+
 
 /**
  * Détermine si au moins un des deux encodeurs a atteint son objectif.

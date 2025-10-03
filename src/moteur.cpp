@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: fonction de contrôle des moteurs et des encodeurs
-Date: 2 octobre 2025
+Date: 3 octobre 2025
 */
 
 #include <LibRobus.h>
@@ -14,16 +14,16 @@ Date: 2 octobre 2025
 
 
 //Variables moteurs
-float vitesseReel = 0.40; //Vitesse réelle selon la fonction smooth
-int side[2] = {1, 1}; //Sense dans lequel la roue tourne -1 = arriere, 1 = avant
-float mult_v_g = 1; //Multiplicateur de vitesse gauche
-float mult_v_d = 1; //Multiplicateur de vitesse droit
+float vitesseReel = 0.40;
+int side[2] = {1, 1};
+float mult_v_g = 1;
+float mult_v_d = 1;
 
 //Encodeurs
-int encoderRightGoal = 0; //Objectif de pulse de l'encodeur droit
-int encoderLeftGoal = 0; //Objectif de pulse de l'encodeur gauche
-double encoderRightCompletion = 1.0; //Pourcentage de completion de l'objectif de pulse
-double encoderLeftCompletion = 1.0; //Pourcentage de completion de l'objectif de pulse
+int encoderRightGoal = 0;
+int encoderLeftGoal = 0;
+double encoderRightCompletion = 1.0;
+double encoderLeftCompletion = 1.0;
 
 /**
  * Vérifie si les moteurs ont atteint le nb de tour voulut
@@ -104,8 +104,13 @@ void ajusteVitesse() {
     if (encoderLeftCompletion < 0) encoderLeftCompletion = 0;
     if (encoderRightCompletion < 0) encoderRightCompletion = 0;
 
-    vitesseReel = vitesseMax * easeInOutCustom(encoderRightCompletion);
+    vitesseReel = vitesseMax * easeInOutGausse(encoderRightCompletion);
 
+    Serial.print(vitesseReel);
+    Serial.print(" ");
+    Serial.print(encoderRightCompletion);
+    Serial.print(" ");
+    Serial.println(easeInOutGausse(encoderRightCompletion));
     //Donne le nb de pulse qui devrait être fait depuis le début du mouvement.
     double supposedCount = vitesseReel * ppmMax * (currentTime - startMillis);
 

@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Antoine Ouellette, Adam Turcotte
 Description: Constante nécessaire pour
-Date: 2 octobre 2025
+Date: 3 octobre 2025
 */
 #ifndef AUTOBUS_CONSTANTES_H
 #define AUTOBUS_CONSTANTES_H
@@ -20,7 +20,7 @@ Date: 2 octobre 2025
  * C'est le pourcentage de la vitesse maximale.
  * Doit être entre 0 et 1. ex: 0.5 = 50%.
  */
-constexpr float vitesseMax  = 0.5;
+constexpr float vitesseMax  = .5;
 
 /**
  * Nombre de pulse par millis seconde maximal que le moteur le plus lent est capable d'atteindre.
@@ -29,7 +29,7 @@ constexpr float ppmMax = 5.55;
 
 constexpr int l_case = 50; //Longueur de la case en cm
 constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
-constexpr double degToCm = PI * 17.1 / 360; //Ratio qui converti les degrés en cm
+constexpr double degToCm = PI * 19.5 / 360; //Ratio qui converti les degrés en cm
 constexpr float angle = 90; //Angle pour tourner (degré)
 
 constexpr int pinVert = 48;

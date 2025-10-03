@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: Fonction d'action et de contrôl dans le labyrinthe
-Date: 2 octobre 2025
+Date: 3 octobre 2025
 */
 #include <LibRobus.h>
 

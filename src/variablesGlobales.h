@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Antoine Ouellette, Adam Turcotte
 Description: Contient les variables globales du projet
-Date: 2 octobre 2025
+Date: 3 octobre 2025
 */
 
 #ifndef AUTOBUS_VARIABLESGLOBALES_H
@@ -18,18 +18,20 @@ Date: 2 octobre 2025
  * TOURNER_180: Le robot tourne de 180° vers la gauche.
  * PRISE_DECISION: Le robot décide le prochain mouvement à effectuer.
  */
-enum Etat { ARRET, AVANCER, TOURNER_DROITE, TOURNER_GAUCHE, TOURNER_180, PRISE_DECISION };
+ enum Etat { ARRET, AVANCER, TOURNER_DROITE, TOURNER_GAUCHE, TOURNER_180, PRISE_DECISION };
 
 // État actuel du robot.
-Etat currentEtat = ARRET; // Au départ, le robot est à l'arrêt.
+extern Etat currentEtat; // Au départ, le robot est à l'arrêt.
 
 // État du robot dans l'itération précédente de loop().
-Etat previousEtat = ARRET;
+extern Etat previousEtat;
 
 // Nombre de case que le robot doit avancer durant le prochain déplacement.
-int nbCaseAvance = 0;
+extern int nbCaseAvance;
 
 //Temps en millis seconde au début du mouvement (Etat).
-unsigned long startMillis = 0;
+extern unsigned long startMillis;
+
+
 
 #endif //AUTOBUS_VARIABLESGLOBALES_H
