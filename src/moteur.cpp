@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: fonction de contrôle des moteurs et des encodeurs
-Date: 3 octobre 2025
+Date: 7 octobre 2025
 */
 
 #include <LibRobus.h>
@@ -20,10 +20,10 @@ float mult_v_g = 1;
 float mult_v_d = 1;
 
 //Encodeurs
-int encoderRightGoal = 0;
-int encoderLeftGoal = 0;
-double encoderRightCompletion = 1.0;
-double encoderLeftCompletion = 1.0;
+long encoderRightGoal = 0;
+long encoderLeftGoal = 0;
+double encoderRightCompletion = 0.0;
+double encoderLeftCompletion = 0.0;
 
 /**
  * Vérifie si les moteurs ont atteint le nb de tour voulut
@@ -35,7 +35,7 @@ bool isGoal() {
         encoderRightCompletion = ENCODER_Read(RIGHT) / (double) encoderRightGoal;
         encoderLeftCompletion = ENCODER_Read(LEFT) / (double) encoderLeftGoal;
 
-        if (encoderRightCompletion > 0.97 || encoderLeftCompletion > 0.97) {
+        if (encoderRightCompletion > completionGoal || encoderLeftCompletion > completionGoal) {
             return true;
         }
     }
@@ -52,34 +52,39 @@ void resetEncoders() {
     ENCODER_Reset(RIGHT);
 }
 
+void resetMultiplicateur() {
+    mult_v_d = 1;
+    mult_v_g = 1;
+}
+
 void calculateGoals() {
     switch (currentEtat) {
         case 1: //Avance
             side[LEFT] = 1;
             side[RIGHT] = 1;
-            encoderRightGoal = (int) (l_case * cmToPulse * nbCaseAvance);
+            encoderRightGoal = l_case * cmToPulse * nbCaseAvance;
             encoderLeftGoal = encoderRightGoal;
             break;
 
         case 2: //Tourne droite
             side[LEFT] = 1;
             side[RIGHT] = -1;
-            encoderLeftGoal = int(angle * degToCm * cmToPulse);
-            encoderRightGoal = -int(angle * degToCm * cmToPulse);
+            encoderLeftGoal = angle * degToCmDroit * cmToPulse;
+            encoderRightGoal = -angle * degToCmDroit * cmToPulse;
             break;
 
         case 3: //Tourne gauche
             side[LEFT] = -1;
             side[RIGHT] = 1;
-            encoderLeftGoal = -int(angle * degToCm * cmToPulse);
-            encoderRightGoal = int(angle * degToCm * cmToPulse);
+            encoderLeftGoal = -angle * degToCmGauche * cmToPulse;
+            encoderRightGoal = angle * degToCmGauche * cmToPulse;
             break;
 
         case 4: //Faire un 180
             side[LEFT] = -1;
             side[RIGHT] = 1;
-            encoderLeftGoal = -int(180 * degToCm * cmToPulse);
-            encoderRightGoal = int(180 * degToCm * cmToPulse);
+            encoderLeftGoal = -180 * degToCmGauche * cmToPulse;
+            encoderRightGoal = 180 * degToCmGauche * cmToPulse;
             break;
 
         default:
@@ -99,18 +104,21 @@ void arret() {
 
 void ajusteVitesse() {
     const unsigned long currentTime = millis();
-    if (!ENCODER_Read(RIGHT) || !ENCODER_Read(LEFT))return;
+    if (!ENCODER_Read(RIGHT) || !ENCODER_Read(LEFT)) return;
 
     if (encoderLeftCompletion < 0) encoderLeftCompletion = 0;
     if (encoderRightCompletion < 0) encoderRightCompletion = 0;
 
-    vitesseReel = vitesseMax * easeInOutGausse(encoderRightCompletion);
+    // Change la courbe de vitesse pour tourner ou pour avancer
+    if (currentEtat == AVANCER) {
+        vitesseReel = vitesseMax * easeInOutGausse(encoderRightCompletion);
+    } else {
+        vitesseReel = vitesseMax * easeInOutCos(encoderRightCompletion);
+    }
 
-    Serial.print(vitesseReel);
-    Serial.print(" ");
-    Serial.print(encoderRightCompletion);
-    Serial.print(" ");
-    Serial.println(easeInOutGausse(encoderRightCompletion));
+    // Vitesse minimal de 20%
+    if (vitesseReel < .20) vitesseReel = .20;
+
     //Donne le nb de pulse qui devrait être fait depuis le début du mouvement.
     double supposedCount = vitesseReel * ppmMax * (currentTime - startMillis);
 
@@ -119,12 +127,12 @@ void ajusteVitesse() {
     mult_v_g = supposedCount / (ENCODER_Read(LEFT) * side[LEFT]);
 
 
-    //Si un moteur est rendu plus loin que l'autre ajuste rend l'autre un peu plus vite.
+    //Si un moteur est rendu plus loin que l'autre ajuste rend l'autre un peu plus lent.
     if (encoderLeftCompletion > 0 && encoderRightCompletion > 0) {
-        if (encoderLeftCompletion < encoderRightCompletion) {
-            mult_v_g *= (encoderRightCompletion / encoderLeftCompletion) * 1.05;
-        } else if (encoderRightCompletion < encoderLeftCompletion) {
-            mult_v_d *= (encoderLeftCompletion / encoderRightCompletion) * 1.05;
+        if (encoderLeftCompletion > encoderRightCompletion) {
+            mult_v_g *= (encoderRightCompletion / encoderLeftCompletion) * .85;
+        } else if (encoderRightCompletion > encoderLeftCompletion) {
+            mult_v_d *= (encoderLeftCompletion / encoderRightCompletion) * .85;
         }
     }
 

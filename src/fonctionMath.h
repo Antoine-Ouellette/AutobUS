@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: Fonction easeInOut
-Date: 3 octobre 2025
+Date: 7 octobre 2025
 */
 
 #ifndef AUTOBUS_FONCTIONMATH_H
@@ -17,8 +17,10 @@ Date: 3 octobre 2025
  */
 double easeInOutCustom(float x);
 
-double easeInOutSin(const float x);
+double easeInOutSin(float x);
 
-double easeInOutGausse(const float x);
+double easeInOutCos(float x);
+
+double easeInOutGausse(float x);
 
 #endif //AUTOBUS_FONCTIONMATH_H

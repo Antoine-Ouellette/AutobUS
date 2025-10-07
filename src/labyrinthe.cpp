@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: Fonction d'action et de contrôl dans le labyrinthe
-Date: 3 octobre 2025
+Date: 7 octobre 2025
 */
 #include <LibRobus.h>
 
@@ -32,12 +32,13 @@ uint8_t maze[longueurY][longueurX] = {
     {0b00101, 0b00101, 0b00101},
     {0b00011, 0b10010, 0b00110}
 };
-uint8_t currentCell = maze[posY][posX];
 uint8_t orientation = NORD;
+uint8_t currentCell = maze[posY][posX];
 
 void endMouvement() {
     resetEncoders();
     resetGoals();
+    resetMultiplicateur();
 
     switch (currentEtat) {
         case 1: //deplacement
@@ -107,19 +108,19 @@ void endMouvement() {
 void ajouteMurEnFace() {
     switch (orientation) {
         case NORD:
-            if (posY > 0) return;
+            if (posY < 1) return;
             maze[posY - 1][posX] |= SUD;
             break;
         case EST:
-            if (posX < longueurX - 1) return;
+            if (posX >= longueurX - 1) return;
             maze[posY][posX + 1] |= OUEST;
             break;
         case SUD:
-            if (posY < longueurY - 1) return;
+            if (posY >= longueurY - 1) return;
             maze[posY + 1][posX] |= NORD;
             break;
         case OUEST:
-            if (posX > 0) return;
+            if (posX < 1) return;
             maze[posY][posX - 1] |= EST;
             break;
         default: break;
@@ -130,19 +131,30 @@ void updateWall() {
     if (!digitalRead(pinVert) || !digitalRead(pinRouge)) {
         // si devant un mur
         maze[posY][posX] |= orientation; //Ajoute le mur dans la matrice du labyrinthe
-
         ajouteMurEnFace(); //Ajoute le mur équivalent dans la case en face
     }
 }
 
 void findNextMove() {
-    if (posY == 0) {
+    if (posY == -1) {
         //Le robot est rendu à la fin.
         currentEtat = ARRET;
         return;
     }
+    if (posY == 0) {
+        //Le robot est rendu à la fin. Dépasser la dernière case.
+        currentEtat = AVANCER;
+        return;
+    }
 
-    //Il n'y a pas de mur au nord.
+    //Si on regarde une case vide y aller, vu que y'a jamais de cus de sac
+    if (!(maze[posY][posX] & orientation) && !(maze[posY][posX] & VISITE)) {
+        currentEtat = AVANCER;
+        calculateGoals();
+        return;
+    }
+
+    // S'il n'y a pas de mur au nord.
     if (!(maze[posY][posX] & NORD)) {
         if (orientation == OUEST) {
             currentEtat = TOURNER_DROITE;
@@ -162,7 +174,7 @@ void findNextMove() {
         return;
     }
 
-    //Il n'y a pas de mur à l'est et que la case à l'est n'est pas visité.
+    // S'il n'y a pas de mur à l'est et que la case à l'est n'est pas visité.
     if (!(maze[posY][posX] & EST) && !(maze[posY][posX + 1] & VISITE)) {
         if (orientation == NORD) {
             currentEtat = TOURNER_DROITE;
@@ -176,8 +188,8 @@ void findNextMove() {
         return;
     }
 
-    //La case à droite ne monte pas et la case du milieu est déjà visitée.
-    // avance de deux case à gauche
+    // Si la case à droite ne monte pas et la case du milieu est déjà visitée
+    // avance de deux case à gauche.
     if (!(maze[posY][posX] & OUEST) && maze[posY][posX - 1] & VISITE) {
         if (orientation == NORD) {
             currentEtat = TOURNER_GAUCHE;
@@ -191,7 +203,7 @@ void findNextMove() {
         return;
     }
 
-    //Il n'y a pas de mur à l'ouest.
+    // S'il n'y a pas de mur à l'ouest.
     if (!(maze[posY][posX] & OUEST)) {
         if (orientation == NORD) {
             currentEtat = TOURNER_GAUCHE;

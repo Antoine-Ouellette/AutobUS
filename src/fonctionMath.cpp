@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Adam Turcotte
 Description: Fonction easeInOut
-Date: 3 octobre 2025
+Date: 7 octobre 2025
 */
 
 #include "fonctionMath.h"
@@ -22,10 +22,18 @@ double easeInOutSin(const float x) {
     return (sin(in) / 2) + 0.5;
 }
 
+double easeInOutCos(float x) {
+    return (-cos(PI * 2 * x) / 2.5) + (1 / 2.2);
+}
+
 double easeInOutGausse(const float x) {
-    if (x < .4)
-        return pow(2.71828, -pow(x - .4, 2) / (2 * pow(.37, 2)));
-    if (x < .6)
+    const float a = 0.70;
+    const float b = 0.40;
+    const float c = 0.17;
+    const float d = 0.25;
+    if (x < b)
+        return pow(.9 * 2.71828, -pow(x - .3, 2) / (1 * pow(0.126, 2))) + 1 - a;
+    if (x < b + d)
         return 1;
-    return pow(2.71828, -pow(x - .6, 2) / (2 * pow(.37, 2)));
+    return pow(a * 2.71828, -pow(x - (b + d), 2) / (1 * pow(c, 2))) + 1 - a;
 }

@@ -3,10 +3,13 @@
  * Equipe: P-12
  * Auteurs: Aimeric Bouillon, Mathieu Cabana, Samuel Houle, William Larouche, Alexi Ledoux, Antoine Ouellette, Adam Turcotte, Samy Yamouni
  * Description: Boucle principale du robot. S'occupe des états du robot (avancer, arrêt, tourner, penser).
- * Date: 2025-10-03
+ * Date: 2025-10-07
  */
 
+
 #include <LibRobus.h> // Essentielle pour utiliser les fonctions RobUS.
+
+#include "constantes.h"
 #include "variablesGlobales.h" // Variables globales utilisées par le programme
 #include "moteur.h" // Fichier pour controller les moteurs.
 #include "labyrinthe.h" // Fichier qui se souvient des pos et prend les décisions dans le labyrinthe.
@@ -14,10 +17,14 @@
 //Donner des valeurs aux variables globales
 Etat currentEtat = ARRET;
 Etat previousEtat = ARRET;
-int nbCaseAvance = 0;
+int nbCaseAvance = 1;
 unsigned long startMillis = 0;
 
 bool bumperArr;
+
+// Todo : Remove before final code version
+int nbTours = 1;
+int coteTour = 0;
 
 /**
  * Fonction qui fait beep
@@ -42,6 +49,11 @@ void setup() {
     beep(1);
 }
 
+
+//***************************
+//IMPORTANT Avant de compiler le code, changer pour le bon model de robot dans les constantes.
+//***************************
+
 /**
  * Fonctions de boucle infinie
  * Se fait appeler perpétuellement après que le setup() soit terminé.
@@ -51,15 +63,29 @@ void setup() {
 void loop() {
     previousEtat = currentEtat;
 
+
     //Todo : changer le départ pour le sifflet
-    bumperArr = ROBUS_IsBumper(REAR);
-    if (bumperArr) {
+    if (ROBUS_IsBumper(REAR)) {
         if (currentEtat == 0) {
             beep(2);
             currentEtat = PRISE_DECISION;
-        } else {
-            beep(1);
-            currentEtat = ARRET;
+        }
+    }
+
+    //Tourne a gauche et a droite pour des testes.
+    if (ROBUS_IsBumper(RIGHT)) {
+        if (currentEtat == 0) {
+            coteTour = 1;
+            nbTours = 1;
+            currentEtat = TOURNER_DROITE;
+            calculateGoals();
+        }
+    } else if (ROBUS_IsBumper(LEFT)) {
+        if (currentEtat == 0) {
+            coteTour = -1;
+            nbTours = 1;
+            currentEtat = TOURNER_GAUCHE;
+            calculateGoals();
         }
     }
 
@@ -67,7 +93,37 @@ void loop() {
         //Si on est rendu, compute le mouvement et cherche le prochain
         endMouvement();
         currentEtat = PRISE_DECISION;
+
+
+        // Todo : Remove before final code version
+        // Pour faire les tests de tourner
+        if (coteTour != 0) {
+            if (nbTours < 4 * 2) {
+                if (coteTour == 1) currentEtat = TOURNER_DROITE;
+                else if (coteTour == -1) currentEtat = TOURNER_GAUCHE;
+                calculateGoals();
+                nbTours++;
+            } else {
+                coteTour = 0;
+                currentEtat = ARRET;
+            }
+        }
     }
+
+    // Todo : Remove before final code version
+    // Serial.print("Completion : ");
+    // Serial.print(encoderLeftCompletion);
+    // Serial.print(" : ");
+    // Serial.print(encoderRightCompletion);
+    // Serial.print(" ;; pulse :");
+    // Serial.print(ENCODER_Read(LEFT));
+    // Serial.print(" , ");
+    // Serial.print(ENCODER_Read(RIGHT));
+    // Serial.print(" ; goal :");
+    // Serial.print(encoderLeftGoal);
+    // Serial.print(" , ");
+    // Serial.println(encoderRightGoal);
+    //
 
     if (previousEtat != currentEtat) {
         /* Si le mouvement change, prendre une pause
@@ -80,7 +136,7 @@ void loop() {
     } else {
         switch (currentEtat) {
             case ARRET:
-                arret();
+                //Rien à faire, il arrête déjà quand il change.
                 break;
             case AVANCER:
             case TOURNER_DROITE:

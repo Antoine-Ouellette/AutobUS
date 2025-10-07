@@ -3,7 +3,7 @@ Projet: AutobUS
 Equipe: P-12
 Auteurs: Antoine Ouellette, Adam Turcotte
 Description: Fonction de contrôle des moteurs et des encodeurs
-Date: 3 octobre 2025
+Date: 7 octobre 2025
 */
 #ifndef AUTOBUS_MOTEUR_H
 #define AUTOBUS_MOTEUR_H
@@ -15,8 +15,8 @@ extern float mult_v_g; //Multiplicateur de vitesse gauche
 extern float mult_v_d; //Multiplicateur de vitesse droit
 
 //Encodeurs
-extern int encoderRightGoal; //Objectif de pulse de l'encodeur droit
-extern int encoderLeftGoal; //Objectif de pulse de l'encodeur gauche
+extern long encoderRightGoal; //Objectif de pulse de l'encodeur droit
+extern long encoderLeftGoal; //Objectif de pulse de l'encodeur gauche
 extern double encoderRightCompletion; //Pourcentage de completion de l'objectif de pulse
 extern double encoderLeftCompletion; //Pourcentage de completion de l'objectif de pulse
 
@@ -36,6 +36,11 @@ void resetGoals();
  * Permet de réinitialiser la distance enregistrée par les encodeurs des roues.
  */
 void resetEncoders();
+
+/**
+ * Permet de réinitialiser les multiplicateurs pour les deux moteurs.
+ */
+void resetMultiplicateur();
 
 /**
  * Calcule les objectifs, en pulse, pour chaque encodeur.
