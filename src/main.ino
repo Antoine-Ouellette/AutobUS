@@ -13,6 +13,7 @@
 #include "variablesGlobales.h" // Variables globales utilisées par le programme
 #include "moteur.h" // Fichier pour controller les moteurs.
 #include "labyrinthe.h" // Fichier qui se souvient des pos et prend les décisions dans le labyrinthe.
+#include "sifflet.h" 
 
 //Donner des valeurs aux variables globales
 Etat currentEtat = ARRET;
@@ -46,6 +47,7 @@ void beep(const int count) {
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
+    init_sifflet();
     beep(1);
 }
 
@@ -61,6 +63,9 @@ void setup() {
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
 void loop() {
+    if (currentEtat == ARRET && detection_sifflet()) {
+        currentEtat = PRISE_DECISION;
+    }
     previousEtat = currentEtat;
 
 
