@@ -23,6 +23,7 @@ void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
     SUIVEUR_init(); // Initialisation du suiveur de ligne.
     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+    init_sifflet();
 
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
 
