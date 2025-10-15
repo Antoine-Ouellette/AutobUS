@@ -138,82 +138,128 @@ void updateWall() {
 void findNextMove() {
     if (posY == -1) {
         //Le robot est rendu à la fin.
-        currentEtat = ARRET;
+        if (posX == 0) {
+            allerEst();
+        } else if (posX == 2) {
+            allerOuest();
+        } else {
+            allerSud();
+        }
         return;
     }
     if (posY == 0) {
         //Le robot est rendu à la fin. Dépasser la dernière case.
         currentEtat = AVANCER;
-        return;
-    }
-
-    //Si on regarde une case vide y aller, vu que y'a jamais de cus de sac
-    if (!(maze[posY][posX] & orientation) && !(maze[posY][posX] & VISITE)) {
-        currentEtat = AVANCER;
         calculateGoals();
         return;
     }
+
+    // //Si on regarde une case vide y aller, vu que y'a jamais de cus de sac
+    // if (!(maze[posY][posX] & orientation) && !(maze[posY][posX] & VISITE)) {
+    //     currentEtat = AVANCER;
+    //     nbCaseAvance = 1;
+    //     calculateGoals();
+    //     return;
+    // }
 
     // S'il n'y a pas de mur au nord.
     if (!(maze[posY][posX] & NORD)) {
-        if (orientation == OUEST) {
-            currentEtat = TOURNER_DROITE;
-        } else if (orientation == EST) {
-            currentEtat = TOURNER_GAUCHE;
-        } else {
-            currentEtat = AVANCER;
-        }
-        if (posY > 1 && posY % 2 == 1) {
-            //Si la case est impaire, on va être vis-à-vis un tape, donc avancer une autre case
-            nbCaseAvance = 2;
-        } else {
-            nbCaseAvance = 1;
-        }
-
-        calculateGoals();
+        allerNord();
         return;
     }
 
     // S'il n'y a pas de mur à l'est et que la case à l'est n'est pas visité.
     if (!(maze[posY][posX] & EST) && !(maze[posY][posX + 1] & VISITE)) {
-        if (orientation == NORD) {
-            currentEtat = TOURNER_DROITE;
-        } else if (orientation == OUEST) {
-            currentEtat = TOURNER_180;
-        } else {
-            currentEtat = AVANCER;
-        }
-        nbCaseAvance = 1;
-        calculateGoals();
+        allerEst();
         return;
     }
 
-    // Si la case à droite ne monte pas et la case du milieu est déjà visitée
-    // avance de deux case à gauche.
-    if (!(maze[posY][posX] & OUEST) && maze[posY][posX - 1] & VISITE) {
-        if (orientation == NORD) {
-            currentEtat = TOURNER_GAUCHE;
-        } else if (orientation == EST) {
-            currentEtat = TOURNER_180;
-        } else {
-            currentEtat = AVANCER;
-        }
-        nbCaseAvance = 2; //On avance de deux case parce qu'on connait déjà la case du centre
-        calculateGoals();
-        return;
-    }
+    //**************
+    //Pas nécessaire pour le parcours
+    //*************
+    // // Si la case à droite ne monte pas et la case du milieu est déjà visitée
+    // // avance de deux case à gauche.
+    // if (!(maze[posY][posX] & OUEST) && maze[posY][posX - 1] & VISITE) {
+    //     if (orientation == NORD) {
+    //         currentEtat = TOURNER_GAUCHE;
+    //     } else if (orientation == EST) {
+    //         currentEtat = TOURNER_180;
+    //     } else {
+    //         currentEtat = AVANCER;
+    //     }
+    //     nbCaseAvance = 2; //On avance de deux case parce qu'on connait déjà la case du centre
+    //     calculateGoals();
+    //     return;
+    // }
 
     // S'il n'y a pas de mur à l'ouest.
     if (!(maze[posY][posX] & OUEST)) {
-        if (orientation == NORD) {
-            currentEtat = TOURNER_GAUCHE;
-        } else if (orientation == EST) {
-            currentEtat = TOURNER_180;
-        } else {
-            currentEtat = AVANCER;
-        }
-        nbCaseAvance = 1;
-        calculateGoals();
+        allerOuest();
         return;
     }
+}
+
+void allerNord() {
+    if (orientation == OUEST) {
+        currentEtat = TOURNER_DROITE;
+    } else if (orientation == EST) {
+        currentEtat = TOURNER_GAUCHE;
+    } else {
+        currentEtat = AVANCER;
+    }
+    if (posY > 1 && posY % 2 == 1) {
+        //Si la case est impaire, on va être vis-à-vis un tape, donc avancer une autre case
+        nbCaseAvance = 2;
+    } else {
+        nbCaseAvance = 1;
+    }
+
+    calculateGoals();
+    return;
+}
+
+void allerEst() {
+    if (orientation == NORD) {
+        currentEtat = TOURNER_DROITE;
+    } else if (orientation == OUEST) {
+        currentEtat = TOURNER_180;
+    } else {
+        currentEtat = AVANCER;
+    }
+
+    if (posY > 1 && (posY < longueurY - 1 || posX != 1)) nbCaseAvance = 2;
+    else nbCaseAvance = 1;
+
+    calculateGoals();
+    return;
+}
+
+void allerOuest() {
+    if (orientation == NORD) {
+        currentEtat = TOURNER_GAUCHE;
+    } else if (orientation == EST) {
+        currentEtat = TOURNER_180;
+    } else {
+        currentEtat = AVANCER;
+    }
+
+    if (posY > 1 && (posY < longueurY - 1 || posX != 1)) nbCaseAvance = 2;
+    else nbCaseAvance = 1;
+
+    calculateGoals();
+    return;
+}
+
+void allerSud() {
+    if (orientation == NORD) {
+        currentEtat = TOURNER_180;
+    } else if (orientation == EST) {
+        currentEtat = TOURNER_DROITE;
+    } else if (orientation == OUEST) {
+        currentEtat = TOURNER_GAUCHE;
+    } else {
+        currentEtat = AVANCER;
+    }
+    nbCaseAvance = 10;
+    calculateGoals();
 }

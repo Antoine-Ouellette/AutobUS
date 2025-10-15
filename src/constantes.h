@@ -18,7 +18,7 @@ Date: 7 octobre 2025
 //Constantes qui sont spécifiques au différent robot.
 #define ROBOTA 1
 #define ROBOTB 2
-#define MODEL ROBOTA //changer entre A et B dépendant du robot utilisé
+#define MODEL ROBOTB //changer entre A et B dépendant du robot utilisé
 
 #if MODEL == ROBOTB
 //Robot B

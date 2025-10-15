@@ -24,4 +24,9 @@ void updateWall() ;
  */
 void findNextMove();
 
+void allerNord();
+void allerOuest();
+void allerEst();
+void allerSud();
+
 #endif //AUTOBUS_LABYRINTHE_H

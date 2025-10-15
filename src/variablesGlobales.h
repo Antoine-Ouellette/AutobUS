@@ -18,7 +18,7 @@ Date: 3 octobre 2025
  * TOURNER_180: Le robot tourne de 180° vers la gauche.
  * PRISE_DECISION: Le robot décide le prochain mouvement à effectuer.
  */
- enum Etat { ARRET, AVANCER, TOURNER_DROITE, TOURNER_GAUCHE, TOURNER_180, PRISE_DECISION };
+ enum Etat { ARRET, AVANCER, TOURNER_DROITE, TOURNER_GAUCHE, TOURNER_180, PRISE_DECISION};
 
 // État actuel du robot.
 extern Etat currentEtat; // Au départ, le robot est à l'arrêt.
