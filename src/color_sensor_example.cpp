@@ -1,7 +1,7 @@
 /**
-* Projet: AutobUS
+ * Projet: AutobUS
  * Equipe: P-12
- * Auteurs: Aimeric Bouillon, Mathieu Cabana, Samuel Houle, William Larouche, Alexi Ledoux, Antoine Ouellette, Adam Turcotte, Samy Yamouni
+ * Auteur: Adam Turcotte
  * Description: Boucle principale du robot. S'occupe des états du robot (avancer, arrêt, tourner).
  * Date: 2025-10-02
  */
