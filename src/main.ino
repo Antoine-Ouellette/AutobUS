@@ -28,17 +28,19 @@ Les fonctions doivent être déclarées avant d'être utilisées.
  */
 void lireCapteurs() {
     // Vérifier si on est sur une station de bus.
-    if (lireCapteurCouleur() && currentEtat != STATION_BUS) {
+    if (currentEtat != STATION_BUS && lireCapteurCouleur()) {
+        // Débuter l'état STATION_BUS.
         currentEtat = STATION_BUS;
         // Enregistrer quand le robot est arrivé à la station.
         tempsDebutTimerEtatRobot = millis();
     }
     // Vérifier s'il y a un obstacle devant le robot.
-    else if (lireCapteurProximite() && currentEtat != CONTOURNER_OBSTACLE) {
+    else if (currentEtat != CONTOURNER_OBSTACLE && lireCapteurProximite()) {
+        // Débuter l'état CONTOURNER_OBSTACLE.
         currentEtat = CONTOURNER_OBSTACLE;
     }
     // Vérifier si le bouton Arrêt demandé est appuyé.
-    else if (lireBoutonArretDemande() && !isArreterProchaineStation) {
+    else if (!isArreterProchaineStation && lireBoutonArretDemande()) {
         // Indiquer qu'il faut s'arrêter quand on va atteindre la prochaine station.
         isArreterProchaineStation = true;
     }
@@ -77,7 +79,7 @@ void loop() {
         arreter();
     }
 
-    switch (currentEtat) {        
+    switch (currentEtat) {
         case SUIVRE_LIGNE:
             suivreLigne();
             break;
