@@ -8,12 +8,36 @@
 // Variable pour le timer de rotation.
 unsigned long millisTourner = 0;
 
-// Constantes PID.
-//...
 
-/**
- * Arrêter le déplacement du robot.
- */
+enum MODE { LIGNE, AUTONOME };
+
+MODE mode_PID = LIGNE; // Mode du PID pour faire l'ajustement.
+
+// Constantes PID pour avancer sans la ligne.
+// PID {Gauche, Droit}
+int k_p[2] = {1, 1}; // Facteur p
+int k_i[2] = {0, 0}; // Facteur i
+int k_d[2] = {0, 0}; // Facteur d
+int error_PID[2] = {0, 0}; // Erreur a corrigé
+int error_previous_PID[2] = {0, 0}; // Erreur de la fois précédente
+int output_PID[2] = {0, 0}; // Vitesse réelle pour les deux moteurs
+unsigned long millisLastPID[2] = {0, 0}; // Temps du dernier ajustement
+
+
+void setGoal(int vitesse, MOUVEMENT mouvement, int distance) {
+    //TODO : coder les goals en pulse pour les moteurs
+}
+
+
+void ajustementPIDAutonome() {
+    //TODO : (par adam) Implementer la formule du PID
+}
+
+void ajustementPIDLigne() {
+    // TODO : (par adam) Implémenter la fonction pour ajuster selon la ligne vu
+}
+
+
 void arreter() {
     // Mettre les vitesses des deux moteurs à 0%.
     MOTOR_SetSpeed(LEFT, 0);
@@ -72,8 +96,17 @@ void tourner(bool direction, int degres, float vitesse) {
     currentMillis = millis();
 
     // Si le temps de rotation est écoulé.
-    if (currentMillis - millisTourner >= 8000*degres/360) { // ex: 8 secondes pour un tour complet.
+    if (currentMillis - millisTourner >= 8000 * degres / 360) {
+        // ex: 8 secondes pour un tour complet.
         // Arrêter de tourner.
         arreter();
+    }
+}
+
+void ajusteVitesse() {
+    if (mode_PID == LIGNE) {
+        ajustementPIDLigne();
+    } else {
+        ajustementPIDAutonome();
     }
 }
