@@ -1,0 +1,36 @@
+/**
+ * @file Fonction en lien avec le suiveur de ligne
+ * Inclue la lecture du capteur et la conversion vers une valeur binaire
+ */
+
+#include "suiveur_ligne.h"
+#include <Arduino.h>
+#include <pins_arduino.h>
+
+#include "variables_globales.h"
+
+int pins[3] = {A3, A4, A5}; //Pins du suiveur {gauche, centre, droit}
+
+
+float seuil_centre = 0; // Seuil de luminosité qui représente la ligne
+float seuil_extern = 0; // Seuil de luminosité qui représente le sol
+float incertitude = 0; // Écart accepté du seuil
+
+uint8_t resultat = 0b000;
+
+void initialisation_seuils() {
+    seuil_centre = analogRead(pins[1]);
+    seuil_extern = (analogRead(pins[0]) + analogRead(pins[2])) / 2;
+    incertitude = abs(seuil_extern - seuil_centre) / 4;
+}
+
+uint8_t SUIVEUR_Read() {
+    int lecture = 0;
+
+    for (int i = 0; i < 3; i++) {
+        lecture = analogRead(pins[i]);
+        resultat = (seuil_centre - incertitude < lecture && lecture < seuil_centre + incertitude) << i;
+    }
+
+    return resultat;
+}
