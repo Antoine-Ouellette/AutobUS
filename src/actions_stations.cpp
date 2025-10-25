@@ -3,8 +3,10 @@
  * Ce sont les procédures à faire lorsque la station est rencontrée.
  */
 
+#include "actions_stations.h"
+#include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include "moteur.cpp" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
 
 /**
  * Fonction pour seulement avancer jusqu'à retrouver la ligne.
@@ -14,7 +16,6 @@
  * L'état du robot est changé à SUIVRE_LIGNE pour continuer le défi.
  */
 void retrouverLigne() {
-    
 }
 
 /**
@@ -31,7 +32,6 @@ void retrouverLigne() {
  * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
  */
 void avancerTrouverLigne() {
-    
 }
 
 /**
@@ -49,7 +49,6 @@ void avancerTrouverLigne() {
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void renverserQuille() {
-
 }
 
 /**
@@ -63,7 +62,6 @@ void renverserQuille() {
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void contournerObstacle() {
-    
 }
 
 /**

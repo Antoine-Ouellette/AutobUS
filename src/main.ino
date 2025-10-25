@@ -7,8 +7,8 @@
  */
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include "actions_stations.cpp" // Inclure les actions à faire pour chaque station.
-#include "moteur.cpp" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "actions_stations.h" // Inclure les actions à faire pour chaque station.
+#include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
 
 /**
  * Fonction d'initialisation (Setup)
