@@ -14,14 +14,14 @@ int pins[3] = {A3, A4, A5}; //Pins du suiveur {gauche, centre, droit}
 
 float seuil_centre = 0; // Seuil de luminosité qui représente la ligne
 float seuil_extern = 0; // Seuil de luminosité qui représente le sol
-float incertitude = 0; // Écart accepté du seuil
+float incertitude_SL = 0; // Écart accepté du seuil (incertitude suiveur de ligne)
 
 uint8_t resultat = 0b000;
 
 void initialisation_seuils() {
     seuil_centre = analogRead(pins[1]);
     seuil_extern = (analogRead(pins[0]) + analogRead(pins[2])) / 2;
-    incertitude = abs(seuil_extern - seuil_centre) / 4;
+    incertitude_SL = abs(seuil_extern - seuil_centre) / 4;
 }
 
 uint8_t SUIVEUR_Read() {
@@ -29,7 +29,7 @@ uint8_t SUIVEUR_Read() {
 
     for (int i = 0; i < 3; i++) {
         lecture = analogRead(pins[i]);
-        resultat = (seuil_centre - incertitude < lecture && lecture < seuil_centre + incertitude) << i;
+        resultat = (seuil_centre - incertitude_SL < lecture && lecture < seuil_centre + incertitude_SL) << i;
     }
 
     return resultat;
