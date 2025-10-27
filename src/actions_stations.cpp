@@ -7,6 +7,9 @@
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "suiveur_ligne.h" // Inclure les fonctions en lien avec le suiveur de ligne.
+
+double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
 
 /**
  * Fonction pour seulement avancer jusqu'à retrouver la ligne.
@@ -31,8 +34,72 @@ void retrouverLigne() {
  * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
  * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
  */
-void avancerTrouverLigne() {
+void suivreLigne() {
+    switch (SUIVEUR_Read()){
+        #define ANGLE_CORRECTION_FAIBLE 15 //Angle de correction pour retrouver la ligne
+        #define ANGLE_CORRECTION_ELEVEE 40 //Angle de correction pour retrouver la ligne
+    case 0b010: //centré sur la ligne
+        avancer(0.8);
+        break;
+    case 0b110: //légèrement à gauche
+        tourner(LEFT, ANGLE_CORRECTION_FAIBLE, 0.5);
+        break;
+
+    case 0b100: //beaucoup à gauche
+        tourner(LEFT, ANGLE_CORRECTION_ELEVEE, 0.5);
+        break;
+
+    case 0b011: //légèrement à droite
+        tourner(RIGHT, ANGLE_CORRECTION_FAIBLE, 0.5);
+        break;
+
+    case 0b001: //beaucoup à droite
+        tourner(RIGHT, ANGLE_CORRECTION_ELEVEE, 0.5);
+        break;
+
+    case 0b111: //Perpendiculaire à la ligne
+        arreter();
+        ENCODER_Reset(0); //Reset des encodeurs
+        ENCODER_Reset(1);
+        while (ENCODER_Read(0) >= 4.7 * cmToPulse){ //Avance pour aligner le suiveur à la ligne une fois tourné
+            avancer(0.2);
+        }
+        arreter();
+        tourner(LEFT, 90, 0.5);
+        break;
+
+    case 0b000: //ligne perdue
+        //TODO Samuel
+        break;
+
+    default:
+        break;
+    }
 }
+ void avancerTrouverLigne() {
+    const int distance = 80; //Distancce en cm à avancer
+    uint8_t OutputSuiveur = SUIVEUR_Read();
+
+    if (OutputSuiveur == 0b111) { 
+        //Détection de la ligne perpendiculaire
+        arreter(); // prend une pause
+        ENCODER_Reset(0); //Reset des encodeurs
+        ENCODER_Reset(1);
+            
+        while (ENCODER_Read(0) <= distance * cmToPulse){ 
+            //Avance jusqu'à la distance spécifiée
+            avancer(0.8);
+        }
+                
+        if(ENCODER_Read(0) >= distance * cmToPulse){ 
+            //Vérification de la distance atteinte
+            arreter();
+        }
+
+    suivreLigne();
+    }
+}
+
 
 /**
  * Action à faire lorsque la station de la quille est atteinte.
