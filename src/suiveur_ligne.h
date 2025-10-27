@@ -10,7 +10,7 @@
 /**
  * Ajuste les seuils de détections selon ce qu'il voit sous lui
  */
-void initialisation_seuils();
+void SUIVEUR_init();
 
 /**
  *
