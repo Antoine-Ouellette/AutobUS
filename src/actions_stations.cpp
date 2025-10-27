@@ -65,7 +65,7 @@ void suivreLigne() {
             avancer(0.2);
         }
         arreter();
-        tourner(LEFT, 90, 0.5);
+        tourner(LEFT, 90, 0.5); //Probléatique si vient du dessous
         break;
 
     case 0b000: //ligne perdue
