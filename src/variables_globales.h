@@ -8,7 +8,12 @@
 #ifndef VARIABLES_GLOBALES_H
 #define VARIABLES_GLOBALES_H
 
+#include "Arduino.h"
+
 // Constantes
+
+constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
+constexpr float degToCm = (PI * 19.5 / 360); //Ratio qui converti les degrés en cm
 
 /**
  * Valeurs possibles de l'état du robot.
