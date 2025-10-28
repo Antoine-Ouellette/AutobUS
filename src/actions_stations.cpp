@@ -36,25 +36,29 @@ void retrouverLigne() {
  */
 void suivreLigne() {
     switch (SUIVEUR_Read()){
-        #define ANGLE_CORRECTION_FAIBLE 15 //Angle de correction pour retrouver la ligne
-        #define ANGLE_CORRECTION_ELEVEE 40 //Angle de correction pour retrouver la ligne
+        
+        #define VITESSE_AVANCE 0.8          //Vitesse d'avancement en ligne droite normale
+        const int VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.9; //Vitesse de correction pour retrouver la ligne
+        const int VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.75; //Vitesse de correction pour retrouver la ligne
+    
     case 0b010: //centré sur la ligne
-        avancer(0.8);
+        avancer(VITESSE_AVANCE);
         break;
+
     case 0b110: //légèrement à gauche
-        tourner(LEFT, ANGLE_CORRECTION_FAIBLE, 0.5);
+        MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_FAIBLE);
         break;
 
     case 0b100: //beaucoup à gauche
-        tourner(LEFT, ANGLE_CORRECTION_ELEVEE, 0.5);
+        MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
         break;
 
     case 0b011: //légèrement à droite
-        tourner(RIGHT, ANGLE_CORRECTION_FAIBLE, 0.5);
+        MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_FAIBLE);
         break;
 
     case 0b001: //beaucoup à droite
-        tourner(RIGHT, ANGLE_CORRECTION_ELEVEE, 0.5);
+        MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
         break;
 
     case 0b111: //Perpendiculaire à la ligne
@@ -66,10 +70,11 @@ void suivreLigne() {
         }
         arreter();
         tourner(LEFT, 90, 0.5); //Probléatique si vient du dessous
+        
         break;
 
     case 0b000: //ligne perdue
-        //TODO Samuel
+        retrouverLigne();
         break;
 
     default:
