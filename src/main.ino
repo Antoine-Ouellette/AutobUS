@@ -17,6 +17,7 @@
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
+    Serial.begin(9600); // Initialisation de la communication série pour le débogage.
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
@@ -25,6 +26,7 @@ void setup() {
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     // TODO: Remplacer par la detection du sifflet.
     while (!ROBUS_IsBumper(REAR));
+    currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
 }
 
 /**
@@ -43,7 +45,7 @@ void loop() {
                 // arreter();
                 break;
             case SUIVRE_LIGNE:
-                //suivreLigne();
+                suivreLigne();
                 break;
             case CONTOURNER_OBSTACLE:
                 //contournerObstacle();

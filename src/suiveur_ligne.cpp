@@ -9,7 +9,7 @@
 
 #include "variables_globales.h"
 
-int pins[3] = {A3, A4, A5}; //Pins du suiveur {gauche, centre, droit}
+int pins[3] = {A8, A9, A10}; //Pins du suiveur {gauche, centre, droit}
 
 
 float seuil_centre = 0; // Seuil de luminosité qui représente la ligne

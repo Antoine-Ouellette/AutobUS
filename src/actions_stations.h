@@ -7,6 +7,8 @@
 
 void retrouverLigne();
 
+void suivreLigne();
+
 void avancerTrouverLigne();
 
 void renverserQuille();
