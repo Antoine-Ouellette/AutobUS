@@ -3,8 +3,10 @@
  * Ce sont les procédures à faire lorsque la station est rencontrée.
  */
 
+#include "actions_stations.h"
+#include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include "moteur.cpp"           // Inclure les fonctions en lien avec les moteurs des roues.
+#include "moteur.h"           // Inclure les fonctions en lien avec les moteurs des roues.
 
 /**
  * Fonction pour seulement avancer jusqu'à retrouver la ligne.
