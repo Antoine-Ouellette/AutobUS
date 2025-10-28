@@ -7,8 +7,9 @@
  */
 #include <LibRobus.h>           // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include "actions_stations.h"   // Inclure les actions à faire pour chaque station.
-#include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
+#include "actions_stations.h" // Inclure les actions à faire pour chaque station.
+#include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 
 /**
@@ -16,11 +17,12 @@
  * Exécutée une seule fois lorsque le robot est allumé.
  * Initialise les capteurs et prépare ce qui doit être prêt avant la loop().
  */
-void setup()
-{
-    BoardInit();        // Initialisation de la carte RobUS.
+void setup() {
+    BoardInit(); // Initialisation de la carte RobUS.
     SUIVEUR_init();     // Initialisation du suiveur de ligne.
+    initColorSensor(); // Initialisation du détecteur de couleur.
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
+
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
@@ -39,10 +41,9 @@ void setup()
  * Quand la fonction atteint la fin, elle recommence au début.
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
-void loop()
+void loop() 
 {
     // currentMillis = millis(); // Mettre à jour le temps actuel en millisecondes.
-
     // Si l'état a changé.
     if (previousEtat != currentEtat)
     {
@@ -71,8 +72,8 @@ void loop()
         break;
     }
 
-    // À la fin, enregistrer le nouvel état précédent.
+        // À la fin, enregistrer le nouvel état précédent.
     previousEtat = currentEtat;
-
+    
     delay(10); // Délai pour décharger le CPU.
 }
