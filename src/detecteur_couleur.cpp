@@ -14,15 +14,15 @@ Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 // TODO : ajuster pour les vraies valeurs des couleurs
 uint16_t couleurs[nbCouleurs][3] = {
     {0, 0, 0}, // Noir
-    {60000, 0, 0}, // Rouge
-    {0, 60000, 0}, // Vert
-    {0, 0, 60000}, // Bleu
-    {60000, 60000, 60000} // Blanc
+    {255, 242, 212}, // Rouge
+    {221, 293, 218}, // Vert
+    {204, 265, 222}, // Bleu
+    {281, 301, 204} // Jaune
 
 };
 
 // TODO : ajuster pour les vraies valeurs
-int incertitude_DC = 1000; // Écart accepté (incertitude détecteur couleur)
+int incertitude_DC = 20; // Écart accepté (incertitude détecteur couleur)
 
 void initColorSensor() {
     colorSensor.begin();
@@ -63,7 +63,7 @@ COULEURS intToColor(const int n) {
         case 3:
             return BLEU;
         case 4:
-            return BLANC;
+            return JAUNE;
         default: return NOIR;
     }
 }

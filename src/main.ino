@@ -9,6 +9,7 @@
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "actions_stations.h" // Inclure les actions à faire pour chaque station.
 #include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
 
 /**
  * Fonction d'initialisation (Setup)
@@ -17,6 +18,8 @@
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
+    initColorSensor(); // Initialisation du détecteur de couleur.
+    Serial.begin(9600); // Initialisation de la communication série à 9600 bauds.
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
@@ -34,8 +37,10 @@ void setup() {
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
 void loop() {
+    COULEURS x = COLORSENSOR_Read(); // Lire la couleur détectée.
+    Serial.println(x);
     // currentMillis = millis(); // Mettre à jour le temps actuel en millisecondes.
-
+/*
     // Si l'état a changé.
     if (previousEtat != currentEtat) {
         switch (currentEtat) {
@@ -62,6 +67,6 @@ void loop() {
         // À la fin, enregistrer le nouvel état précédent.
         previousEtat = currentEtat;
     } else { }
-    
+*/
     delay(10); // Délai pour décharger le CPU.
 }
