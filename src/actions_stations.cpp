@@ -11,13 +11,8 @@
 
 double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
 
-/**
- * Fonction pour seulement avancer jusqu'à retrouver la ligne.
- * 
- * Le robot avance tout droit.
- * Si la ligne est détectée, il se tourne parallèle à la ligne.
- * L'état du robot est changé à SUIVRE_LIGNE pour continuer le défi.
- */
+// Fonction pour seulement avancer jusqu'à retrouver la ligne.
+ 
 void retrouverLigne() {
 }
 
@@ -38,8 +33,8 @@ void suivreLigne() {
     switch (SUIVEUR_Read()){
         
         #define VITESSE_AVANCE 0.8          //Vitesse d'avancement en ligne droite normale
-        const int VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.9; //Vitesse de correction pour retrouver la ligne
-        const int VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.75; //Vitesse de correction pour retrouver la ligne
+        const float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.9; //Vitesse de correction pour retrouver la ligne
+        const float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.75; //Vitesse de correction pour retrouver la ligne
     
     case 0b010: //centré sur la ligne
         avancer(VITESSE_AVANCE);
@@ -62,10 +57,16 @@ void suivreLigne() {
         break;
 
     case 0b111: //Perpendiculaire à la ligne
-        arreter();
+        
         ENCODER_Reset(0); //Reset des encodeurs
         ENCODER_Reset(1);
-        while (ENCODER_Read(0) >= 4.7 * cmToPulse){ //Avance pour aligner le suiveur à la ligne une fois tourné
+        arreter();
+        int depassement = ENCODER_Read(0); // enregistre la distance dépassée
+        ENCODER_Reset(0); //Reset des encodeurs
+        ENCODER_Reset(1);
+
+        int alignement = depassement - (4.7 * cmToPulse); //Calcule l'alignement à faire après l'arrêt
+        while ( ENCODER_Read(0) >= alignement){ //Avance pour aligner le suiveur à la ligne une fois tourné
             avancer(0.2);
         }
         arreter();

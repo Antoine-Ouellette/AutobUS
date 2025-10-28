@@ -43,10 +43,10 @@ void loop() {
                 // arreter();
                 break;
             case SUIVRE_LIGNE:
-                // suivreLigne();
+                //suivreLigne();
                 break;
             case CONTOURNER_OBSTACLE:
-                // contournerObstacle();
+                //contournerObstacle();
                 break;
             case QUILLE:
                 // renverserQuille();
