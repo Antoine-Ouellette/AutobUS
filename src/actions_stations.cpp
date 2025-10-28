@@ -33,8 +33,8 @@ void suivreLigne() {
     switch (SUIVEUR_Read()){
         
         #define VITESSE_AVANCE 0.8          //Vitesse d'avancement en ligne droite normale
-        const float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.9; //Vitesse de correction pour retrouver la ligne
-        const float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.75; //Vitesse de correction pour retrouver la ligne
+        float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.9; //Vitesse de correction pour retrouver la ligne
+        float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.75; //Vitesse de correction pour retrouver la ligne
     
     case 0b010: //centré sur la ligne
         avancer(VITESSE_AVANCE);
