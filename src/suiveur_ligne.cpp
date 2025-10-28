@@ -5,31 +5,31 @@
 
 #include "suiveur_ligne.h"
 #include <Arduino.h>
-#include <pins_arduino.h>
 
-#include "variables_globales.h"
-
-int pins[3] = {A8, A9, A10}; //Pins du suiveur {gauche, centre, droit}
+constexpr int nbPins =3;
+int pins[nbPins] = {A10, A9, A8}; //Pins du suiveur {gauche, centre, droit}
 
 
 float seuil_centre = 0; // Seuil de luminosité qui représente la ligne
 float seuil_extern = 0; // Seuil de luminosité qui représente le sol
 float incertitude_SL = 0; // Écart accepté du seuil (incertitude suiveur de ligne)
 
-uint8_t resultat = 0b000;
-
-void initialisation_seuils() {
-    seuil_centre = analogRead(pins[1]);
-    seuil_extern = (analogRead(pins[0]) + analogRead(pins[2])) / 2;
-    incertitude_SL = abs(seuil_extern - seuil_centre) / 4;
+void SUIVEUR_init() {
+    for (int i = 0; i < nbPins; i++) {
+        pinMode(pins[i], INPUT);
+    }
+    seuil_centre = analogRead(pins[nbPins/2]);
+    seuil_extern = (analogRead(pins[0]) + analogRead(pins[nbPins-1])) / 2.0f;
+    incertitude_SL = abs(seuil_extern - seuil_centre) / 2.;
 }
 
 uint8_t SUIVEUR_Read() {
-    int lecture = 0;
+    uint8_t resultat = 0b000; //Résultat du sensor
 
-    for (int i = 0; i < 3; i++) {
-        lecture = analogRead(pins[i]);
-        resultat = (seuil_centre - incertitude_SL < lecture && lecture < seuil_centre + incertitude_SL) << i;
+    for (int i = 0; i < nbPins; i++) {
+        const int lecture = analogRead(pins[i]);
+        const bool isCenter = ((seuil_centre - incertitude_SL) < lecture && lecture < (seuil_centre + incertitude_SL));
+        resultat |= isCenter << i;
     }
 
     return resultat;

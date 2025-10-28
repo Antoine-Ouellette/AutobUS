@@ -10,7 +10,7 @@
 /**
  * Ajuste les seuils de détections selon ce qu'il voit sous lui
  */
-void initialisation_seuils();
+void SUIVEUR_init();
 
 /**
  *
@@ -18,7 +18,8 @@ void initialisation_seuils();
  * (ligne, ligne, plancher) = 0b110 \n
  * (plancher, plancher, ligne) = 0b001
 
- * @return Un nombre binaire du résultat de chaque capteur \n
+ * @return Un nombre binaire du résultat de chaque capteur. \n
+ * De 0b000 à 0b111 (=> (int) de 0 à 7)
  */
 uint8_t SUIVEUR_Read() ;
 
