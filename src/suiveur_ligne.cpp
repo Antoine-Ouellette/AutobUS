@@ -7,7 +7,7 @@
 #include <Arduino.h>
 
 constexpr int nbPins =3;
-int pins[nbPins] = {A10, A9, A8}; //Pins du suiveur {gauche, centre, droit}
+int pins[nbPins] = {A8, A9, A10}; //Pins du suiveur {gauche, centre, droit}
 
 
 float seuil_centre = 0; // Seuil de luminosité qui représente la ligne

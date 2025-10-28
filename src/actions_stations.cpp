@@ -9,8 +9,6 @@
 #include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 
-double cmToPulse = 3200 / (7.62 * PI); // Ratio qui converti les cm en pulse pour les moteurs
-
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
 void retrouverLigne()
@@ -32,9 +30,9 @@ void retrouverLigne()
  */
 void suivreLigne(){
     
-    float VITESSE_AVANCE = 0.6;                              // Vitesse d'avancement en ligne droite normale
-    float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.9;  // Vitesse de correction pour retrouver la ligne
-    float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.75; // Vitesse de correction pour retrouver la ligne
+    float VITESSE_AVANCE = 0.2;                              // Vitesse d'avancement en ligne droite normale
+    float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.55;  // Vitesse de correction pour retrouver la ligne
+    float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.55; // Vitesse de correction pour retrouver la ligne
     int depassement;
     int alignement;
 
@@ -70,20 +68,21 @@ void suivreLigne(){
 
     case 0b111: // Perpendiculaire à la ligne
         Serial.println(" PERPENDICULAIRE: ");
+        arreter();        // prend une pause
+        delay(100);        // attend un peu pour stabiliser la lecture
         ENCODER_Reset(0); // Reset des encodeurs
         ENCODER_Reset(1);
-        arreter();
         depassement = ENCODER_Read(0); // enregistre la distance dépassée
         ENCODER_Reset(0);                  // Reset des encodeurs
         ENCODER_Reset(1);
 
         alignement = depassement - (4.7 * cmToPulse); // Calcule l'alignement à faire après l'arrêt
-        while (ENCODER_Read(0) >= alignement)
+        while (ENCODER_Read(0) <= alignement)
         { // Avance pour aligner le suiveur à la ligne une fois tourné
-            avancer(0.2);
+            avancer(0.05);
         }
         arreter();
-        tourner(LEFT, 90, 0.5); // Probléatique si vient du dessous
+        tourner(LEFT, 90, 0.1); // Probléatique si vient du dessous
 
         break;
 
@@ -98,7 +97,7 @@ void avancerTrouverLigne()
     const int distance = 80; // Distancce en cm à avancer
     uint8_t OutputSuiveur = SUIVEUR_Read();
 
-    if (OutputSuiveur == 0b111)
+    if (OutputSuiveur == 0b101) //A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     {
         // Détection de la ligne perpendiculaire
         arreter();        // prend une pause
@@ -108,7 +107,7 @@ void avancerTrouverLigne()
         while (ENCODER_Read(0) <= distance * cmToPulse)
         {
             // Avance jusqu'à la distance spécifiée
-            avancer(0.8);
+            avancer(0.2);
         }
 
         if (ENCODER_Read(0) >= distance * cmToPulse)
