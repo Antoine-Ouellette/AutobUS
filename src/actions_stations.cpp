@@ -9,8 +9,15 @@
 #include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 
-// Fonction pour seulement avancer jusqu'à retrouver la ligne.
+int Etat_mur = 0;
 
+/**
+ * Fonction pour seulement avancer jusqu'à retrouver la ligne.
+ *
+ * Le robot avance tout droit.
+ * Si la ligne est détectée, il se tourne parallèle à la ligne.
+ * L'état du robot est changé à SUIVRE_LIGNE pour continuer le défi.
+ */
 void retrouverLigne()
 {
 }
@@ -29,7 +36,7 @@ void retrouverLigne()
  * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
  */
 void suivreLigne(){
-    
+
     float VITESSE_AVANCE = 0.2;                              // Vitesse d'avancement en ligne droite normale
     float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.55;  // Vitesse de correction pour retrouver la ligne
     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.55; // Vitesse de correction pour retrouver la ligne
@@ -37,7 +44,7 @@ void suivreLigne(){
     int alignement;
 
     Serial.println("SUIVEUR: ");
-    
+
     switch (SUIVEUR_Read())
     {
 
@@ -52,7 +59,7 @@ void suivreLigne(){
         break;
 
     case 0b100: // beaucoup à gauche
-        Serial.println(" FORT GAUCHE: ");    
+        Serial.println(" FORT GAUCHE: ");
         MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
         break;
 
@@ -62,7 +69,7 @@ void suivreLigne(){
         break;
 
     case 0b001: // beaucoup à droite
-        Serial.println(" FORT DROITE: ");    
+        Serial.println(" FORT DROITE: ");
         MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
         break;
 
@@ -134,8 +141,7 @@ void avancerTrouverLigne()
  * Le robot avance jusqu'à retrouver la ligne (utilise la méthode retrouverLigne()).
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
-void renverserQuille()
-{
+void renverserQuille() {
 }
 
 /**
@@ -150,6 +156,137 @@ void renverserQuille()
  */
 void contournerObstacle()
 {
+    uint8_t idCapteur = 0;
+    uint16_t distanceSeuil = 15;
+    uint16_t distanceActuelle = ROBUS_ReadIR(idCapteur);
+    switch (Etat_mur)
+    {
+    case 0:
+    {
+        setGoal(0.2, AVANCE, 30);
+        Etat_mur = 1;
+        break;
+    }
+    case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
+    {
+        distanceActuelle = ROBUS_ReadIR(idCapteur);
+        if (distanceSeuil <= distanceActuelle)
+        {
+            arreter();
+            Etat_mur = 2;
+        }
+        break;
+    }
+
+    case 2: // Avancer plus loin que l'obstacle
+    {
+        tourner(RIGHT, 90, 0.2);
+        Etat_mur = 3;
+        break;
+    }
+
+    case 3:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 4;
+        }
+        break;
+    }
+    case 4:
+    {
+        setGoal(0.2, AVANCE, 30);
+        Etat_mur = 5;
+        break;
+    }
+    case 5:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 6;
+        }
+        break;
+    }
+    case 6:
+    {
+        tourner(LEFT, 90, 0.2);
+        Etat_mur = 7;
+        break;
+    }
+
+    case 7:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 8;
+        }
+        break;
+    }
+    case 8:
+    {
+        setGoal(0.2, AVANCE, 30);
+        Etat_mur = 9;
+        break;
+    }
+    case 9:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 10;
+        }
+        break;
+    }
+    case 10:
+    {
+        tourner(LEFT, 90, 0.2);
+        Etat_mur = 11;
+        break;
+    }
+
+    case 11:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 12;
+        }
+        break;
+    }
+    case 12:
+    {
+        setGoal(0.2, AVANCE, 30);
+        Etat_mur = 13;
+        break;
+    }
+    case 13:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 14;
+        }
+        break;
+    }
+    case 14:
+    {
+        tourner(RIGHT, 90, 0.2);
+        Etat_mur = 15;
+        break;
+    }
+
+    case 15:
+    {
+        if (1 /*isGoal() TODO change*/)
+        {
+            Etat_mur = 16;
+        }
+        break;
+    }
+    case 16:
+    {
+        Etat_mur = 0;
+        currentEtat = SUIVRE_LIGNE;
+        break;
+    }
+    }
 }
 
 /**
