@@ -12,7 +12,6 @@
 #include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 
-int led[3]= {10,11,12};
 unsigned long lastUpdatePID = 0;
 int moves = 0;
 /**
@@ -27,8 +26,8 @@ void setup() {
 
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
 
-    for (int i=0; i<3; i++){
-        pinMode(led[i], OUTPUT);
+    for (int i=0; i<4; i++){
+        pinMode(leds[i], OUTPUT);
     }
 
 

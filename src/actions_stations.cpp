@@ -12,9 +12,7 @@
 int losange = 0;
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
-int leds[3] = {10, 11, 12};
 
-int leds[3] = {10, 11, 12};
 
 void retrouverLigne() {}
 
