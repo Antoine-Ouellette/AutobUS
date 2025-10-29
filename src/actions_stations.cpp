@@ -59,8 +59,6 @@ void suivreLigne()
 
     float VITESSE_AVANCE = 0.25;                            // Vitesse d'avancement en ligne droite normale
     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
-    int depassement;
-    int alignement;
     int i = 0;
 
     Serial.println("SUIVEUR: ");

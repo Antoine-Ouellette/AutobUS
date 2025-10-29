@@ -50,9 +50,7 @@ void setup() {
 void loop() {
     currentMillis = millis(); // Mettre à jour le temps actuel en millisecondes.
     // Si l'état a changé.
-    if (previousEtat != currentEtat) {
-        arreter(); // Arrêter le robot avant de changer d'état.
-    }
+   
 
     if (isMoving) {
         ajusteVitesse();
@@ -62,6 +60,7 @@ void loop() {
     if (isGoal()) {
     //Si on veut faire quelque chose quand il a fini.
     }
+    
     switch (COLORSENSOR_Read()) {
         case ROUGE:
             digitalWrite(leds[1], HIGH);
@@ -84,6 +83,10 @@ void loop() {
                 digitalWrite(leds[i], LOW);
             }
             break;
+    }
+
+     if (previousEtat != currentEtat) {
+        arreter(); // Arrêter le robot avant de changer d'état.
     }
 
     switch (currentEtat) {
