@@ -33,8 +33,7 @@ void setup() {
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     // TODO: Remplacer par la detection du sifflet.
     while (!ROBUS_IsBumper(REAR));
-    // currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
-    setGoal(0.4, AVANCE, 60);
+    currentEtat = CONTOURNER_OBSTACLE; // Définir l'état initial du robot.
 }
 
 /**
@@ -67,7 +66,7 @@ void loop() {
             suivreLigne();
             break;
         case CONTOURNER_OBSTACLE:
-            // contournerObstacle();
+            contournerObstacle();
             break;
         case QUILLE:
             // renverserQuille();
