@@ -139,16 +139,18 @@ void ajusteVitesse() {
 
     calcEncCompletion();
 
-    int32_t distLEFT = ENCODER_Read(LEFT) * side[LEFT];
-    if (distLEFT < ramp_duration) {
-        // Linear ramp from 0.20 to vitesseGoal
-        float ratio = (float) distLEFT / ramp_duration; // 0 → 1
-        vitesseReel = initialSpeed + ratio * (vitesseGoal - initialSpeed);
-    }
-    // Peut décélérer en fait, si la fin est trop proche du début.
-    if (distGoal - distLEFT < ramp_duration) {
-        float ratio = (distGoal - distLEFT) / ramp_duration; // 0 → 1
-        vitesseReel = initialSpeed + ratio * (vitesseReel - initialSpeed);
+    if (distGoal > 15 * cmToPulse) {
+        int32_t distLEFT = ENCODER_Read(LEFT) * side[LEFT];
+        if (distLEFT < ramp_duration) {
+            // Linear ramp from 0.20 to vitesseGoal
+            float ratio = (float) distLEFT / ramp_duration; // 0 → 1
+            vitesseReel = initialSpeed + ratio * (vitesseGoal - initialSpeed);
+        }
+        // Peut décélérer en fait, si la fin est trop proche du début.
+        if (distGoal - distLEFT < ramp_duration) {
+            float ratio = (distGoal - distLEFT) / ramp_duration; // 0 → 1
+            vitesseReel = initialSpeed + ratio * (vitesseReel - initialSpeed);
+        }
     }
 
     //Donne le nb de pulse qui devrait être fait depuis le début du mouvement.
