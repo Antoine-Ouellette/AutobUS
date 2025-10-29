@@ -7,6 +7,7 @@
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "detecteur_IR.h"
 
 /**
  * Fonction pour seulement avancer jusqu'à retrouver la ligne.
@@ -49,6 +50,50 @@ void avancerTrouverLigne() {
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void renverserQuille() {
+    float degrer;
+ float distance;
+ enum Etat_quille {
+   etat_tours,
+   etat_recherche_quille,
+   etat_avanceQuille,
+   etat_reculer,
+   etat_revenir
+ };
+
+ Etat_quille etat_quille = etat_tours;
+ switch (etat_quille) {
+  
+     case etat_tours :
+     tourner(LEFT, 360,0.6);
+     degrer= lireDistance_roue();
+     etat_quille= etat_recherche_quille;
+     break;
+     case etat_recherche_quille:
+     distance = lireDistance_quille();
+     if (distance > 25){
+       arreter();
+         etat_quille = etat_avanceQuille;
+     }
+     break;
+     case etat_avanceQuille :
+     setGoal(0.5, AVANCE, distance);
+     etat_quille=etat_reculer;
+     break;
+  
+     case etat_reculer :
+     setGoal(0.5,RECULE, distance);
+     etat_quille = etat_revenir;
+     break;
+     case etat_revenir :
+     tourner(RIGHT,degrer,0.6);
+     break;
+ }
+
+
+
+
+
+
 }
 
 /**
