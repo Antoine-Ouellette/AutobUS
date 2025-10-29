@@ -159,13 +159,13 @@ void renverserQuille()
     {
 
     case etat_tours:
-        setGoal(0.3, TOUR_GAUCHE, 360);
+        setGoal(0.1, TOUR_GAUCHE, 360);
         degrer = lireDistance_roue();
         etat_quille = etat_recherche_quille;
         break;
     case etat_recherche_quille:
         distance = lireDistance_quille();
-        if (distance < 25)
+        if (distance < 35)
         {
             arreter();
             etat_quille = etat_avanceQuille;
@@ -182,7 +182,7 @@ void renverserQuille()
         }
         break;
     case etat_reculer:
-        setGoal(0.1, RECULE, distance);
+        setGoal(0.3, RECULE, distance+5);
         etat_quille = etat_attente_deRevenir;
         break;
 
