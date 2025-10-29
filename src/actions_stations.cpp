@@ -68,7 +68,7 @@ void suivreLigne(){
 
     case 0b111: // Perpendiculaire à la ligne
         Serial.println(" PERPENDICULAIRE: ");
-        arreter();        // prend une pause
+        /*arreter();        // prend une pause
         delay(100);        // attend un peu pour stabiliser la lecture
         ENCODER_Reset(0); // Reset des encodeurs
         ENCODER_Reset(1);
@@ -83,7 +83,8 @@ void suivreLigne(){
         }
         arreter();
         tourner(LEFT, 90, 0.1); // Probléatique si vient du dessous
-
+        */
+    
         break;
 
     case 0b000: // ligne perdue
