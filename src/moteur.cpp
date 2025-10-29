@@ -91,7 +91,7 @@ void setGoal(const float vitesse, const MOUVEMENT mouvement, const float distanc
                 // Appliquer une vitesse aux deux moteurs du robot.
                 side[LEFT] = -1;
                 side[RIGHT] = -1;
-                vitesseGoal = -vitesse;
+                vitesseGoal = vitesse;
                 distGoal = -distance * cmToPulse;
                 break;
         }
@@ -104,9 +104,9 @@ void setGoal(const float vitesse, const MOUVEMENT mouvement, const float distanc
 void calcEncCompletion() {
     const int32_t encLeft = ENCODER_Read(LEFT);
     const int32_t encRight = ENCODER_Read(RIGHT);
-    encCompletion[LEFT] = max(encLeft / distGoal*side[LEFT], 0);
+    encCompletion[LEFT] = max(encLeft / distGoal, 0);
     // On fait le max pour être sûr de ne pas avoir de négatif.
-    encCompletion[RIGHT] = max(encRight / distGoal*side[RIGHT], 0); // Même chose que l'autre ^
+    encCompletion[RIGHT] = max(encRight / distGoal, 0); // Même chose que l'autre ^
 }
 
 bool isGoal() {
@@ -139,19 +139,19 @@ void ajusteVitesse() {
 
     calcEncCompletion();
 
-    if (distGoal > 15 * cmToPulse) {
-        int32_t distLEFT = ENCODER_Read(LEFT) * side[LEFT];
-        if (distLEFT < ramp_duration) {
-            // Linear ramp from 0.20 to vitesseGoal
-            float ratio = (float) distLEFT / ramp_duration; // 0 → 1
-            vitesseReel = initialSpeed + ratio * (vitesseGoal - initialSpeed);
-        }
-        // Peut décélérer en fait, si la fin est trop proche du début.
-        if (distGoal - distLEFT < ramp_duration) {
-            float ratio = (distGoal - distLEFT) / ramp_duration; // 0 → 1
-            vitesseReel = initialSpeed + ratio * (vitesseReel - initialSpeed);
-        }
-    }
+    // if (abs(distGoal) > 15 * cmToPulse) {
+    //     int32_t distLEFT = ENCODER_Read(LEFT) * side[LEFT];
+    //     if (abs(distLEFT) < ramp_duration) {
+    //         // Linear ramp from 0.20 to vitesseGoal
+    //         float ratio = (float) abs(distLEFT) / ramp_duration; // 0 → 1
+    //         vitesseReel = initialSpeed + ratio * (vitesseGoal - initialSpeed);
+    //     }
+    //     // Peut décélérer en fait, si la fin est trop proche du début.
+    //     if (abs(distGoal - distLEFT) < ramp_duration) {
+    //         float ratio = abs(distGoal - distLEFT) / ramp_duration; // 0 → 1
+    //         vitesseReel = initialSpeed + ratio * (vitesseReel - initialSpeed);
+    //     }
+    // }
 
     //Donne le nb de pulse qui devrait être fait depuis le début du mouvement.
     pulseTotalSum[LEFT] += vitesseReel * ppsMax * delta * side[LEFT];
@@ -184,7 +184,21 @@ void ajusteVitesse() {
         old_output_PID[i] = output_PID;
 
         MOTOR_SetSpeed(i, output_PID);
+        //
+        // Serial.print(" P:");
+        // Serial.print(k_p[i] * current_error_PID[i]);
+        // Serial.print(" I:");
+        // Serial.print(k_i[i] * integral_PID[i]);
+        // Serial.print(" D:");
+        // Serial.print(k_d[i] * derivat_PID[i]);
+        // Serial.print(" goalS:");
+        // Serial.print(pulseTotalSum[i]);
+        // Serial.print(" Speed:");
+        // Serial.print(ENCODER_Read(i));
+        // Serial.print(" distGoal:");
+        // Serial.print(distGoal);
     }
+    // Serial.println("");
 }
 
 
