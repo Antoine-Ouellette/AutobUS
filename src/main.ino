@@ -39,7 +39,6 @@ void setup() {
     // TODO: Remplacer par la detection du sifflet.
     while (!ROBUS_IsBumper(REAR));
     // currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
-    setGoal(0.4, AVANCE, 60);
 }
 
 /**
@@ -95,10 +94,10 @@ void loop() {
             suivreLigne();
             break;
         case CONTOURNER_OBSTACLE:
-            // contournerObstacle();
+            contournerObstacle();
             break;
         case QUILLE:
-            // renverserQuille();
+            renverserQuille();
             break;
         case DANSE:
             // danserLosange();
