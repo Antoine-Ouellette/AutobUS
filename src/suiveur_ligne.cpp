@@ -20,7 +20,7 @@ void SUIVEUR_init() {
     }
     seuil_centre = analogRead(pins[nbPins/2]);
     seuil_extern = (analogRead(pins[0]) + analogRead(pins[nbPins-1])) / 2.0f;
-    incertitude_SL = abs(seuil_extern - seuil_centre) / 2.;
+    incertitude_SL = abs(seuil_extern - seuil_centre) / 4.;
 }
 
 uint8_t SUIVEUR_Read() {

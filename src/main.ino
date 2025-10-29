@@ -11,6 +11,7 @@
 #include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
 #include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
+
 unsigned long lastUpdatePID = 0;
 int moves = 0;
 /**
@@ -25,6 +26,10 @@ void setup() {
 
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
 
+    for (int i=0; i<4; i++){
+        pinMode(leds[i], OUTPUT);
+    }
+
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
@@ -34,7 +39,6 @@ void setup() {
     // TODO: Remplacer par la detection du sifflet.
     while (!ROBUS_IsBumper(REAR));
     // currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
-    setGoal(0.4, AVANCE, 60);
 }
 
 /**
@@ -58,6 +62,29 @@ void loop() {
     if (isGoal()) {
     //Si on veut faire quelque chose quand il a fini.
     }
+    switch (COLORSENSOR_Read()) {
+        case ROUGE:
+            digitalWrite(leds[1], HIGH);
+            currentEtat = QUILLE;
+            break;
+        case VERT:
+            digitalWrite(leds[2], HIGH);
+            currentEtat = DANSE;
+            break;
+        case BLEU:
+            digitalWrite(leds[0], HIGH);
+            currentEtat = PAS_LIGNE;
+            break;
+        case JAUNE:
+            digitalWrite(leds[3], HIGH);
+            currentEtat = CONTOURNER_OBSTACLE;
+            break;
+        default:
+            for (int i=0; i<4; i++){
+                digitalWrite(leds[i], LOW);
+            }
+            break;
+    }
 
     switch (currentEtat) {
         case ARRET:
@@ -67,10 +94,10 @@ void loop() {
             suivreLigne();
             break;
         case CONTOURNER_OBSTACLE:
-            // contournerObstacle();
+            contournerObstacle();
             break;
         case QUILLE:
-            // renverserQuille();
+            renverserQuille();
             break;
         case DANSE:
             // danserLosange();

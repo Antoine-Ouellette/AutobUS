@@ -37,6 +37,8 @@ constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en 
 constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti les degrés en cm
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
+constexpr int  leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
+
 
 /**
  * Valeurs possibles de l'état du robot.
