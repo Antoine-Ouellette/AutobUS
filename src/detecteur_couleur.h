@@ -15,12 +15,12 @@ constexpr int nbCouleurs = 5;
  * @brief Enum des couleurs que le capteur pourra détecter :
  * NOIR, ROUGE, VERT, BLEU, BLANC
  */
-enum COULEURS { NOIR, ROUGE, VERT, BLEU, BLANC };
+enum COULEURS { NOIR, ROUGE, VERT, BLEU, JAUNE };
 
 /**
  * Initialise le détecteur de couleurs
  */
-void initColorSensor();
+void COLOR_SENSOR_init();
 
 /**
  * @brief Lit la valeur du capteur et retourne une valeur selon COULEURS
