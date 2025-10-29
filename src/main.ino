@@ -11,6 +11,7 @@
 #include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
 #include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
+
 unsigned long lastUpdatePID = 0;
 int moves = 0;
 /**
@@ -24,6 +25,10 @@ void setup() {
     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
 
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
+
+    for (int i=0; i<4; i++){
+        pinMode(leds[i], OUTPUT);
+    }
 
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
