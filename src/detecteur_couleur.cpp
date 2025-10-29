@@ -24,7 +24,7 @@ uint16_t couleurs[nbCouleurs][3] = {
 // TODO : ajuster pour les vraies valeurs
 int incertitude_DC = 20; // Écart accepté (incertitude détecteur couleur)
 
-void initColorSensor() {
+void COLOR_SENSOR_init() {
     colorSensor.begin();
     //Met la led à ON pour pouvoir la lire
     colorSensor.setInterrupt(false);

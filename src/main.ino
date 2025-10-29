@@ -13,7 +13,8 @@
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 
 int led[3]= {10,11,12};
-
+unsigned long lastUpdatePID = 0;
+int moves = 0;
 /**
  * Fonction d'initialisation (Setup)
  * Exécutée une seule fois lorsque le robot est allumé.
@@ -21,8 +22,9 @@ int led[3]= {10,11,12};
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
-    SUIVEUR_init();     // Initialisation du suiveur de ligne.
-    initColorSensor(); // Initialisation du détecteur de couleur.
+    SUIVEUR_init(); // Initialisation du suiveur de ligne.
+    COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
 
     for (int i=0; i<3; i++){
@@ -36,9 +38,9 @@ void setup() {
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     // TODO: Remplacer par la detection du sifflet.
-    while (!ROBUS_IsBumper(REAR))
-        ;
-    currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
+    while (!ROBUS_IsBumper(REAR));
+    // currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
+    setGoal(0.4, AVANCE, 60);
 }
 
 /**
@@ -47,39 +49,45 @@ void setup() {
  * Quand la fonction atteint la fin, elle recommence au début.
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
-void loop() 
-{
-    // currentMillis = millis(); // Mettre à jour le temps actuel en millisecondes.
+void loop() {
+    currentMillis = millis(); // Mettre à jour le temps actuel en millisecondes.
     // Si l'état a changé.
-    if (previousEtat != currentEtat)
-    {
+    if (previousEtat != currentEtat) {
         arreter(); // Arrêter le robot avant de changer d'état.
     }
 
-    switch (currentEtat)
-    {
-    case ARRET:
-        // arreter();
-        break;
-    case SUIVRE_LIGNE:
-        suivreLigne();
-        break;
-    case CONTOURNER_OBSTACLE:
-        // contournerObstacle();
-        break;
-    case QUILLE:
-        // renverserQuille();
-        break;
-    case DANSE:
-        // danserLosange();
-        break;
-    case PAS_LIGNE:
-        // avancerTrouverLigne();
-        break;
+    if (isMoving) {
+        ajusteVitesse();
+        lastUpdatePID = currentMillis;
     }
 
-        // À la fin, enregistrer le nouvel état précédent.
+    if (isGoal()) {
+    //Si on veut faire quelque chose quand il a fini.
+    }
+
+    switch (currentEtat) {
+        case ARRET:
+            // arreter();
+            break;
+        case SUIVRE_LIGNE:
+            suivreLigne();
+            break;
+        case CONTOURNER_OBSTACLE:
+            // contournerObstacle();
+            break;
+        case QUILLE:
+            // renverserQuille();
+            break;
+        case DANSE:
+            // danserLosange();
+            break;
+        case PAS_LIGNE:
+            // avancerTrouverLigne();
+            break;
+    }
+
+    // À la fin, enregistrer le nouvel état précédent.
     previousEtat = currentEtat;
-    
+
     delay(10); // Délai pour décharger le CPU.
 }

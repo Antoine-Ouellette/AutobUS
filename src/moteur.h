@@ -8,27 +8,39 @@
 
 enum MOUVEMENT { TOUR_GAUCHE, TOUR_DROIT, AVANCE, RECULE };
 
+/**
+ * Reset les deux encodeurs
+ */
+void ENCODERS_Reset();
+
+void resetPIDStats();
 
 /**
- * Permet d'établir l'objectif de chaque moteur, quand on veut avancer d'une distance fixe
- * @param vitesse Vitesse que le robot veut pendant son déplacement
+ * Permet d'établir l'objectif de chaque moteur, quand on veut se déplacer.
+ * @param vitesse Pourcentage de la vitesse à laquelle les moteurs doivent rouler.
+ * La valeur doit être entre 0 et 1. 1 étant pour reculer à 100% de la vitesse possible.
  * @param mouvement Mouvement que le robot veut faire {TOUR_GAUCHE, TOUR_DROIT, AVANCE, RECULE}
- * @param distance Distance en cm que le robot doit faire
- * @remark Si aucune distance n'est inclus, il va avancer en suivant la ligne
+ * @param distance Distance en cm / Angle en degré. Cela dépend s'il avance ou tourne.
+ * Si aucune distance n'est inclus, il va avancer en suivant la ligne
  */
-void setGoal(int vitesse, MOUVEMENT mouvement, int distance = 0);
-
+void setGoal(float vitesse, MOUVEMENT mouvement, float distance = 0);
 
 /**
- * Ajuste la vitesse des moteurs pour avoir la vitesse voulue dans @code setGoal()
+ * Calcule l'avancement de completion pour les deux encodeurs
+ * met l'avancement dans @code encCompletion @endcode entre 0 et 1
  */
-void ajustementPIDAutonome();
-
+void calcEncCompletion();
 
 /**
- * Ajuste la vitesse des moteurs pour qu'il reste sur la ligne
+ * Fonction qui permet de savoir si le robot a fini son mouvement. Si le mouvement est terminé, il va arreter tout seul.
+ * @return true : si le robot a fini le mouvement demandé, sinon false
  */
-void ajustementPIDLigne();
+bool isGoal();
+
+/**
+ * Ajuste la vitesse des moteurs pour qu'il avance droit avec le PID
+ */
+void ajusteVitesse();
 
 
 /**
@@ -36,41 +48,6 @@ void ajustementPIDLigne();
  */
 void arreter();
 
-
-/**
- * Démarrer le déplacement du robot à une vitesse donnée.
- * Active les 2 moteurs jusqu'à ce qu'on les arrête.
- * @param vitesse Pourcentage de la vitesse à laquelle les moteurs doivent rouler.
- * La valeur doit être entre 0 et 1. 1 étant pour avancer à 100% de la vitesse possible.
- * \n TODO: Sera modifié pour utiliser un PID de suiveur de ligne.
- */
-void avancer(float vitesse);
-
-
-/**
- * Démarrer le déplacement du robot en marche arrière à une vitesse donnée.
- * Active les 2 moteurs jusqu'à ce qu'on les arrête.
- * @param vitesse Pourcentage de la vitesse à laquelle les moteurs doivent rouler.
- * La valeur doit être entre 0 et 1. 1 étant pour reculer à 100% de la vitesse possible.
- * TODO: Sera modifié pour utiliser un PID de suiveur de ligne.
- */
-void reculer(float vitesse);
-
-
-/**
- * Tourner le robot à gauche d'un certain nombre de degrés à une vitesse donnée.
- * @param direction LEFT ou RIGHT pour indiquer dans quelle direction tourner.
- * @param degres Nombre de degrés à tourner.
- * @param vitesse Pourcentage de la vitesse à laquelle les moteurs doivent rouler.
- * La valeur doit être entre 0 et 1. 1 étant pour tourner à 100% de la vitesse possible.
- * TODO: Sera modifié pour utiliser un PID. Ceci est un exemple.
- */
-void tourner(bool direction, int degres, float vitesse);
-
-
-/**
- * Ajuste la vitesse des moteurs selon le mode de PID choisi par @code mode_PID
- */
-void ajusteVitesse();
+void avancer(float speed);
 
 #endif //AUTOBUS_MOTEUR_H

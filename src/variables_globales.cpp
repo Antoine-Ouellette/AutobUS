@@ -24,3 +24,8 @@ Etat previousEtat = ARRET;
  * Utilisé pour les timers sans bloquer le programme.
  */
 unsigned long currentMillis = 0;
+
+/**
+ * Variable pour savoir si le robot est en train de faire un déplacement
+ */
+bool isMoving = false;
