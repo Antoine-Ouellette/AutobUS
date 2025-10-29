@@ -12,6 +12,8 @@
 #include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 
+int led[3]= {10,11,12};
+
 /**
  * Fonction d'initialisation (Setup)
  * Exécutée une seule fois lorsque le robot est allumé.
@@ -22,6 +24,10 @@ void setup() {
     SUIVEUR_init();     // Initialisation du suiveur de ligne.
     initColorSensor(); // Initialisation du détecteur de couleur.
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
+
+    for (int i=0; i<3; i++){
+        pinMode(led[i], OUTPUT);
+    }
 
 
     // Réinitialiser les moteurs pour ne pas que le robot parte

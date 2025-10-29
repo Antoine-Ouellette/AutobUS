@@ -11,6 +11,8 @@
 
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
+int leds[3] = {10, 11, 12};
+
 void retrouverLigne()
 {
 }
@@ -28,42 +30,42 @@ void retrouverLigne()
  * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
  * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
  */
-void suivreLigne(){
-    
-    float VITESSE_AVANCE = 0.2;                              // Vitesse d'avancement en ligne droite normale
-    float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.55;  // Vitesse de correction pour retrouver la ligne
-    float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.55; // Vitesse de correction pour retrouver la ligne
+void suivreLigne()
+{
+
+    float VITESSE_AVANCE = 0.25;                              // Vitesse d'avancement en ligne droite normale
+    float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
     int depassement;
     int alignement;
+    int i = 0;
 
     Serial.println("SUIVEUR: ");
-    
+
+    uint8_t result = SUIVEUR_Read();
+    for (int i = 0; i < 3; i++)
+    {
+        digitalWrite(leds[i], (result & (1 << i)) ? HIGH : LOW);
+    }
+
     switch (SUIVEUR_Read())
     {
 
     case 0b010: // centré sur la ligne
         Serial.println(" CENTRE: ");
         avancer(VITESSE_AVANCE);
+        i = 0;
         break;
 
-    case 0b110: // légèrement à gauche
-        Serial.println(" GAUCHE: ");
-        MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_FAIBLE);
-        break;
-
-    case 0b100: // beaucoup à gauche
-        Serial.println(" FORT GAUCHE: ");    
+    case 0b100: // corrige à gauche
+        Serial.println(" FORT GAUCHE: ");
         MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
+        i++;
         break;
 
-    case 0b011: // légèrement à droite
-        Serial.println(" DROITE: ");
-        MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_FAIBLE);
-        break;
-
-    case 0b001: // beaucoup à droite
-        Serial.println(" FORT DROITE: ");    
+    case 0b001: // corrige à droite
+        Serial.println(" FORT DROITE: ");
         MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
+        i--;
         break;
 
     case 0b111: // Perpendiculaire à la ligne
@@ -84,12 +86,17 @@ void suivreLigne(){
         arreter();
         tourner(LEFT, 90, 0.1); // Probléatique si vient du dessous
         */
-    
+
         break;
 
     case 0b000: // ligne perdue
         Serial.println(" PERDU: ");
-        retrouverLigne();
+        if (i >= 0){
+            MOTOR_SetSpeed(RIGHT, 0.35);
+        }
+        else if (i <= 0){
+            MOTOR_SetSpeed(LEFT, 0.35);
+        }
         break;
     }
 }
@@ -98,7 +105,7 @@ void avancerTrouverLigne()
     const int distance = 80; // Distancce en cm à avancer
     uint8_t OutputSuiveur = SUIVEUR_Read();
 
-    if (OutputSuiveur == 0b101) //A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    if (OutputSuiveur == 0b101) // A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     {
         // Détection de la ligne perpendiculaire
         arreter();        // prend une pause
@@ -117,7 +124,14 @@ void avancerTrouverLigne()
             arreter();
         }
 
-        suivreLigne();
+        if (OutputSuiveur == 0b000)
+        {
+            retrouverLigne();
+        }
+        else
+        {
+            suivreLigne();
+        }
     }
 }
 
