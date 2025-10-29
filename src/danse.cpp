@@ -1,16 +1,17 @@
 /**
  * Projet: AutobUS
  * Equipe: P-12
- * Auteurs: Aimeric Bouillon, Mathieu Cabana, Samuel Houle, William Larouche, Alexi Ledoux, Antoine Ouellette, Adam Turcotte, Samy Yamouni
- * Description: Boucle principale du robot. S'occupe des états du robot (avancer, arrêt, tourner).
- * Date: 2025-10-02
+ * Auteurs: Aimeric Bouillon, Mathieu Cabana, Samuel Houle, William Larouche,
+ * Alexi Ledoux, Antoine Ouellette, Adam Turcotte, Samy Yamouni Description:
+ * Boucle principale du robot. S'occupe des états du robot (avancer, arrêt,
+ * tourner). Date: 2025-10-02
  */
-#include <LibRobus.h>           // Essentielle pour utiliser RobUS.
-#include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "actions_stations.h" // Inclure les actions à faire pour chaque station.
-#include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
 #include "detecteur_couleur.h" // Inclure les fonctions en lien avec le détecteur de couleurs.
-#include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
+#include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
+#include "suiveur_ligne.h" // Inclure les fonctions en lien avec le suiveur de ligne.
+#include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
+#include <LibRobus.h> // Essentielle pour utiliser RobUS.
 unsigned long lastUpdatePID = 0;
 int losange = 0;
 /**
@@ -19,22 +20,23 @@ int losange = 0;
  * Initialise les capteurs et prépare ce qui doit être prêt avant la loop().
  */
 void setup() {
-    BoardInit(); // Initialisation de la carte RobUS.
-    SUIVEUR_init(); // Initialisation du suiveur de ligne.
+    BoardInit();         // Initialisation de la carte RobUS.
+    SUIVEUR_init();      // Initialisation du suiveur de ligne.
     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
 
-    Serial.begin(9600); // Initialisation de la communication série pour le débogage.
-
+    // Initialisation de la communication série pour le débogage.
+    Serial.begin(9600);
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
     arreter();
 
-    // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
+    // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton
+    // arrière est appuyé.
     // TODO: Remplacer par la detection du sifflet.
-    while (!ROBUS_IsBumper(REAR));
+    while (!ROBUS_IsBumper(REAR))
+        ;
     // currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
-
 }
 
 /**
@@ -44,71 +46,101 @@ void setup() {
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
 void loop() {
-    switch (losange){
-    case 0:
-    setGoal(0.4, AVANCE, 15);
-    if(isGoal()){
-        losange++;
+
+    if (isMoving) {
+        ajusteVitesse();
     }
-    break;
+
+    switch (losange) {
+    case 0:
+        setGoal(0.4, AVANCE, 15);
+        break;
 
     case 1:
-    setGoal(0.4, TOUR_DROIT, 45);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        if (isGoal()) {
+            losange++;
+        }
+        break;
 
     case 2:
+        setGoal(0.4, TOUR_DROIT, 45);
+        break;
+
+    case 3:
+        if (isGoal()) {
+            losange++;
+        }
+
+    case 4:
         setGoal(0.4, RECULE, -10);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        break;
 
-        case 3:
+    case 5:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 6:
         setGoal(0.4, TOUR_GAUCHE, 90);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        break;
 
-        case 4:
+    case 7:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 8:
         setGoal(0.4, RECULE, 10);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        break;
 
-        case 5:
+    case 9:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 10:
         setGoal(0.4, TOUR_DROIT, 90);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        break;
 
-        case 6:
+    case 11:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 12:
         setGoal(0.4, AVANCE, 10);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        break;
 
-        case 7:
+    case 13:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 14:
         setGoal(0.4, TOUR_GAUCHE, 90);
-    if(isGoal()){
-        losange++;
-    }
-    break;
+        break;
 
-        case 8:
+    case 15:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 16:
         setGoal(0.4, AVANCE, 10);
-    if(isGoal()){
-        losange++;
-    }
-    break;
-}
+        break;
 
+    case 17:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+    };
 
     delay(10); // Délai pour décharger le CPU.
 }
