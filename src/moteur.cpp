@@ -232,3 +232,8 @@ void arreter() {
     MOTOR_SetSpeed(LEFT, 0);
     MOTOR_SetSpeed(RIGHT, 0);
 }
+
+void avancer(float speed) {
+    MOTOR_SetSpeed(LEFT, speed);
+    MOTOR_SetSpeed(RIGHT, speed);
+}
