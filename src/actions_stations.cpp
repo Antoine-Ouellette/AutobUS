@@ -29,53 +29,52 @@ void retrouverLigne()
  * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
  * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
  */
-//  void suivreLigne(){
+  void suivreLigne(){
 
-//     float VITESSE_AVANCE = 0.2;                              // Vitesse d'avancement en ligne droite normale
-//     float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.55;  // Vitesse de correction pour retrouver la ligne
-//     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.55; // Vitesse de correction pour retrouver la ligne
-//     int depassement;
-//     int alignement;
+     float VITESSE_AVANCE = 0.2;                              // Vitesse d'avancement en ligne droite normale
+     float VITESSE_CORRECTION_FAIBLE = VITESSE_AVANCE * 0.55;  // Vitesse de correction pour retrouver la ligne
+     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.55; // Vitesse de correction pour retrouver la ligne
+     int depassement;
+     int alignement;
 
-//     Serial.println("SUIVEUR: ");
+     Serial.println("SUIVEUR: ");
+     switch (SUIVEUR_Read())
+     {
 
-//     switch (SUIVEUR_Read())
-//     {
+     case 0b010: // centré sur la ligne
+        Serial.println(" CENTRE: ");
+         avancer(VITESSE_AVANCE);
+         break;
 
-//     case 0b010: // centré sur la ligne
-//         Serial.println(" CENTRE: ");
-//         avancer(VITESSE_AVANCE);
-//         break;
+     case 0b110: // légèrement à gauche
+         Serial.println(" GAUCHE: ");
+         MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_FAIBLE);
+         break;
 
-//     case 0b110: // légèrement à gauche
-//         Serial.println(" GAUCHE: ");
-//         MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_FAIBLE);
-//         break;
+     case 0b100: // beaucoup à gauche
+         Serial.println(" FORT GAUCHE: ");
+         MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
+         break;
 
-//     case 0b100: // beaucoup à gauche
-//         Serial.println(" FORT GAUCHE: ");
-//         MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
-//         break;
+     case 0b011: // légèrement à droite
+         Serial.println(" DROITE: ");
+         MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_FAIBLE);
+         break;
 
-//     case 0b011: // légèrement à droite
-//         Serial.println(" DROITE: ");
-//         MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_FAIBLE);
-//         break;
+     case 0b001: // beaucoup à droite
+         Serial.println(" FORT DROITE: ");
+         MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
+         break;
 
-//     case 0b001: // beaucoup à droite
-//         Serial.println(" FORT DROITE: ");
-//         MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
-//         break;
-
-//     case 0b111: // Perpendiculaire à la ligne
-//         Serial.println(" PERPENDICULAIRE: ");
-//         arreter();        // prend une pause
-//         delay(100);        // attend un peu pour stabiliser la lecture
-//         ENCODER_Reset(0); // Reset des encodeurs
-//         ENCODER_Reset(1);
-//         depassement = ENCODER_Read(0); // enregistre la distance dépassée
-//         ENCODER_Reset(0);                  // Reset des encodeurs
-//         ENCODER_Reset(1);
+     case 0b111: // Perpendiculaire à la ligne
+         Serial.println(" PERPENDICULAIRE: ");
+         arreter();        // prend une pause
+         delay(100);        // attend un peu pour stabiliser la lecture
+         ENCODER_Reset(0); // Reset des encodeurs
+         ENCODER_Reset(1);
+         depassement = ENCODER_Read(0); // enregistre la distance dépassée
+         ENCODER_Reset(0);                  // Reset des encodeurs
+         ENCODER_Reset(1);
 
         alignement = depassement - (4.7 * cmToPulse); // Calcule l'alignement à faire après l'arrêt
         while (ENCODER_Read(0) <= alignement)
@@ -85,41 +84,41 @@ void retrouverLigne()
         arreter();
         setGoal(0.1,TOUR_GAUCHE, 90); // Probléatique si vient du dessous
 
-//         break;
+         break;
 
-//     case 0b000: // ligne perdue
-//         Serial.println(" PERDU: ");
-//         retrouverLigne();
-//         break;
-//     }
-// }
-// void avancerTrouverLigne()
-// {
-//     const int distance = 80; // Distancce en cm à avancer
-//     uint8_t OutputSuiveur = SUIVEUR_Read();
+     case 0b000: // ligne perdue
+         Serial.println(" PERDU: ");
+         retrouverLigne();
+         break;
+     }
+ }
+ void avancerTrouverLigne()
+ {
+     const int distance = 80; // Distancce en cm à avancer
+     uint8_t OutputSuiveur = SUIVEUR_Read();
 
-//     if (OutputSuiveur == 0b101) //A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-//     {
-//         // Détection de la ligne perpendiculaire
-//         arreter();        // prend une pause
-//         ENCODER_Reset(0); // Reset des encodeurs
-//         ENCODER_Reset(1);
+     if (OutputSuiveur == 0b101) //A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     {
+         // Détection de la ligne perpendiculaire
+         arreter();        // prend une pause
+         ENCODER_Reset(0); // Reset des encodeurs
+         ENCODER_Reset(1);
 
-//         while (ENCODER_Read(0) <= distance * cmToPulse)
-//         {
-//             // Avance jusqu'à la distance spécifiée
-//             avancer(0.2);
-//         }
+         while (ENCODER_Read(0) <= distance * cmToPulse)
+         {
+             // Avance jusqu'à la distance spécifiée
+             avancer(0.2);
+         }
 
-//         if (ENCODER_Read(0) >= distance * cmToPulse)
-//         {
-//             // Vérification de la distance atteinte
-//             arreter();
-//         }
+         if (ENCODER_Read(0) >= distance * cmToPulse)
+         {
+             // Vérification de la distance atteinte
+             arreter();
+         }
 
-//         suivreLigne();
-//     }
-// }
+         suivreLigne();
+     }
+ }
 
 /**
  * Action à faire lorsque la station de la quille est atteinte.
