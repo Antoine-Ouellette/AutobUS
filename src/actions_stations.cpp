@@ -12,6 +12,24 @@
 
 int losange = 0;
 int Etat_mur = 0;
+// Variable pour la quille
+float degrer;
+float distance;
+enum Etat_quille
+{
+    etat_tours,
+    etat_recherche_quille,
+    etat_avanceQuille,
+    etat_attente_davancer,
+    etat_reculer,
+    etat_attente_deRevenir,
+    etat_attente_fin,
+    etat_revenir,
+};
+
+Etat_quille etat_quille = etat_tours;
+
+// Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
 /**
  * Fonction pour seulement avancer jusqu'à retrouver la ligne.
@@ -139,6 +157,58 @@ void avancerTrouverLigne() {
  */
 void renverserQuille()
 {
+
+    switch (etat_quille)
+    {
+
+    case etat_tours:
+        setGoal(0.1, TOUR_GAUCHE, 360);
+        etat_quille = etat_recherche_quille;
+        break;
+
+    case etat_recherche_quille:
+        distance = lireDistance_quille();
+        if (distance < 35)
+        {
+            arreter();
+            degrer = lireDistance_roue();
+            etat_quille = etat_avanceQuille;
+        }
+        break;
+    case etat_avanceQuille:
+        setGoal(0.3, AVANCE, distance + 5);
+        etat_quille = etat_attente_davancer;
+        break;
+    case etat_attente_davancer:
+        if (isGoal())
+        {
+            etat_quille = etat_reculer;
+        }
+        break;
+    case etat_reculer:
+        setGoal(0.3, RECULE, distance + 5);
+        etat_quille = etat_attente_deRevenir;
+        break;
+
+    case etat_attente_deRevenir:
+        if (isGoal())
+        {
+            etat_quille = etat_revenir;
+        }
+        break;
+    case etat_revenir:
+        setGoal(0.3, TOUR_DROIT, degrer);
+        etat_quille = etat_attente_fin;
+        break;
+
+    case etat_attente_fin:
+        if (isGoal())
+        {
+            etat_quille = etat_tours;
+            currentEtat = SUIVRE_LIGNE;
+            break;
+        }
+    }
 }
 
 /**

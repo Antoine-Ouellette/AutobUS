@@ -12,13 +12,13 @@ float lireDistance_quille()
     return distance;
 }
 
-
 // FONCTION distance roue:
 float lireDistance_roue()
 {
-    ENCODER_Reset(0);
-    float distance = ENCODER_Read(0) * (PI * 7.62) / 3200; // conversion des pulses en cm
+    // float cm = distance / cmToPulse; // conversion des cm en degr
 
-    float degrer = distance / cmToPulse; // conversion des cm en degr
+    float distance = ENCODER_Read(1) / cmToPulse; //* (PI * 7.62) / 3200; // conversion des pulses en cm
+    float degrer = distance / degToCmGauche;      // ((PI * DiamGRobot) / 360);
+
     return degrer;
 }
