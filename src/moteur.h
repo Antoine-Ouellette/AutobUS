@@ -48,5 +48,6 @@ void ajusteVitesse();
  */
 void arreter();
 
+void avancer(float speed);
 
 #endif //AUTOBUS_MOTEUR_H

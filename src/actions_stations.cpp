@@ -77,13 +77,13 @@ void retrouverLigne()
 //         ENCODER_Reset(0);                  // Reset des encodeurs
 //         ENCODER_Reset(1);
 
-//         alignement = depassement - (4.7 * cmToPulse); // Calcule l'alignement à faire après l'arrêt
-//         while (ENCODER_Read(0) <= alignement)
-//         { // Avance pour aligner le suiveur à la ligne une fois tourné
-//             avancer(0.05);
-//         }
-//         arreter();
-//         tourner(LEFT, 90, 0.1); // Probléatique si vient du dessous
+        alignement = depassement - (4.7 * cmToPulse); // Calcule l'alignement à faire après l'arrêt
+        while (ENCODER_Read(0) <= alignement)
+        { // Avance pour aligner le suiveur à la ligne une fois tourné
+            avancer(0.05);
+        }
+        arreter();
+        setGoal(0.1,TOUR_GAUCHE, 90); // Probléatique si vient du dessous
 
 //         break;
 
