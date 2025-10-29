@@ -82,7 +82,7 @@ void suivreLigne(){
             avancer(0.05);
         }
         arreter();
-        tourner(LEFT, 90, 0.1); // Probléatique si vient du dessous
+        setGoal(0.1,TOUR_GAUCHE, 90); // Probléatique si vient du dessous
 
         break;
 
@@ -171,17 +171,17 @@ void contournerObstacle()
  */
 void danserLosange()
 {
-    // TODO: tourner() est asynchrone. Il faudrait une deuxième fonction.
-    tourner(LEFT, 135, 1);
-    avancer(1);
-    tourner(LEFT, 90, 1);
-    avancer(1);
-    tourner(LEFT, 90, 1);
-    avancer(1);
-    tourner(LEFT, 90, 1);
-    avancer(1);
-    tourner(LEFT, 45, 1);
-    retrouverLigne();
-    tourner(RIGHT, 90, 1);
-    currentEtat = SUIVRE_LIGNE;
+    // // TODO: tourner() est asynchrone. Il faudrait une deuxième fonction.
+    // tourner(LEFT, 135, 1);
+    // avancer(1);
+    // tourner(LEFT, 90, 1);
+    // avancer(1);
+    // tourner(LEFT, 90, 1);
+    // avancer(1);
+    // tourner(LEFT, 90, 1);
+    // avancer(1);
+    // tourner(LEFT, 45, 1);
+    // retrouverLigne();
+    // tourner(RIGHT, 90, 1);
+    // currentEtat = SUIVRE_LIGNE;
 }
