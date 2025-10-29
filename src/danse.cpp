@@ -37,6 +37,7 @@ void setup() {
     while (!ROBUS_IsBumper(REAR))
         ;
     // currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
+    // setGoal(0.4, RECULE, 45);
 }
 
 /**
@@ -50,10 +51,12 @@ void loop() {
     if (isMoving) {
         ajusteVitesse();
     }
+    // isGoal();
 
     switch (losange) {
     case 0:
-        setGoal(0.4, AVANCE, 15);
+        setGoal(0.2, AVANCE, 20);
+        losange++;
         break;
 
     case 1:
@@ -63,16 +66,19 @@ void loop() {
         break;
 
     case 2:
-        setGoal(0.4, TOUR_DROIT, 45);
+        setGoal(0.2, TOUR_DROIT, 45);
+        losange++;
         break;
 
     case 3:
         if (isGoal()) {
             losange++;
         }
+        break;
 
     case 4:
-        setGoal(0.4, RECULE, -10);
+        setGoal(0.2, RECULE, 20);
+        losange++;
         break;
 
     case 5:
@@ -82,7 +88,8 @@ void loop() {
         break;
 
     case 6:
-        setGoal(0.4, TOUR_GAUCHE, 90);
+        setGoal(0.2, TOUR_GAUCHE, 90);
+        losange++;
         break;
 
     case 7:
@@ -92,7 +99,8 @@ void loop() {
         break;
 
     case 8:
-        setGoal(0.4, RECULE, 10);
+        setGoal(0.2, RECULE, 20);
+        losange++;
         break;
 
     case 9:
@@ -102,7 +110,8 @@ void loop() {
         break;
 
     case 10:
-        setGoal(0.4, TOUR_DROIT, 90);
+        setGoal(0.2, TOUR_DROIT, 90);
+        losange++;
         break;
 
     case 11:
@@ -112,7 +121,8 @@ void loop() {
         break;
 
     case 12:
-        setGoal(0.4, AVANCE, 10);
+        setGoal(0.2, AVANCE, 20);
+        losange++;
         break;
 
     case 13:
@@ -122,7 +132,8 @@ void loop() {
         break;
 
     case 14:
-        setGoal(0.4, TOUR_GAUCHE, 90);
+        setGoal(0.2, TOUR_GAUCHE, 90);
+        losange++;
         break;
 
     case 15:
@@ -132,7 +143,8 @@ void loop() {
         break;
 
     case 16:
-        setGoal(0.4, AVANCE, 10);
+        setGoal(0.2, AVANCE, 20);
+        losange++;
         break;
 
     case 17:
