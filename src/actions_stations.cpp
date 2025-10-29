@@ -4,15 +4,13 @@
  */
 
 #include "actions_stations.h"
-#include "moteur.h" // Inclure les fonctions en lien avec les moteurs des roues.
-#include "suiveur_ligne.h" // Inclure les fonctions en lien avec le suiveur de ligne.
+#include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
+#include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include <LibRobus.h> // Essentielle pour utiliser RobUS.
+#include <LibRobus.h>           // Essentielle pour utiliser RobUS.
 
 int losange = 0;
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
-
-
 
 void retrouverLigne() {}
 
@@ -32,7 +30,7 @@ void retrouverLigne() {}
 void suivreLigne()
 {
 
-    float VITESSE_AVANCE = 0.25;                              // Vitesse d'avancement en ligne droite normale
+    float VITESSE_AVANCE = 0.25;                            // Vitesse d'avancement en ligne droite normale
     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
     int depassement;
     int alignement;
@@ -67,70 +65,48 @@ void suivreLigne()
         i--;
         break;
 
-    case 0b111: // Perpendiculaire à la ligne
-        Serial.println(" PERPENDICULAIRE: ");
-        /*arreter();        // prend une pause
-        delay(100);        // attend un peu pour stabiliser la lecture
-        ENCODER_Reset(0); // Reset des encodeurs
-        ENCODER_Reset(1);
-        depassement = ENCODER_Read(0); // enregistre la distance dépassée
-        ENCODER_Reset(0);              // Reset des encodeurs
-        ENCODER_Reset(1);
-
-        alignement =
-            depassement -
-            (4.7 * cmToPulse); // Calcule l'alignement à faire après l'arrêt
-        while (ENCODER_Read(0) <=
-               alignement) { // Avance pour aligner le suiveur à la ligne une
-                             // fois tourné
-            avancer(0.05);
-        }
-        arreter();
-        tourner(LEFT, 90, 0.1); // Probléatique si vient du dessous
-        */
-
-        break;
-
     case 0b000: // ligne perdue
         Serial.println(" PERDU: ");
-        if (i >= 0){
+        if (i >= 0)
+        {
             MOTOR_SetSpeed(RIGHT, 0.35);
         }
-        else if (i <= 0){
+        else if (i <= 0)
+        {
             MOTOR_SetSpeed(LEFT, 0.35);
         }
         break;
     }
 }
-void avancerTrouverLigne() {
+
+void avancerTrouverLigne()
+{
     const int distance = 80; // Distancce en cm à avancer
     uint8_t OutputSuiveur = SUIVEUR_Read();
 
-    if (OutputSuiveur == 0b101) // A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    arreter();        // prend une pause
+    ENCODER_Reset(0); // Reset des encodeurs
+    ENCODER_Reset(1);
+
+    while (ENCODER_Read(0) <= distance * cmToPulse)
     {
-        // Détection de la ligne perpendiculaire
-        arreter();        // prend une pause
-        ENCODER_Reset(0); // Reset des encodeurs
-        ENCODER_Reset(1);
+        // Avance jusqu'à la distance spécifiée
+        avancer(0.2);
+    }
 
-        while (ENCODER_Read(0) <= distance * cmToPulse) {
-            // Avance jusqu'à la distance spécifiée
-            avancer(0.2);
-        }
+    if (ENCODER_Read(0) >= distance * cmToPulse)
+    {
+        // Vérification de la distance atteinte
+        arreter();
+    }
 
-        if (ENCODER_Read(0) >= distance * cmToPulse) {
-            // Vérification de la distance atteinte
-            arreter();
-        }
-
-        if (OutputSuiveur == 0b000)
-        {
-            retrouverLigne();
-        }
-        else
-        {
-            suivreLigne();
-        }
+    if (OutputSuiveur == 0b000)
+    {
+        retrouverLigne();
+    }
+    else
+    {
+        suivreLigne();
     }
 }
 
@@ -178,15 +154,18 @@ void contournerObstacle() {}
  * tourne de 90 degrés à droite pour être parallèle à la ligne. L'état du robot
  * est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
-void danserLosange() {
-    switch (losange) {
+void danserLosange()
+{
+    switch (losange)
+    {
     case 0:
         setGoal(0.2, AVANCE, 20);
         losange++;
         break;
 
     case 1:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -197,7 +176,8 @@ void danserLosange() {
         break;
 
     case 3:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -208,7 +188,8 @@ void danserLosange() {
         break;
 
     case 5:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -219,7 +200,8 @@ void danserLosange() {
         break;
 
     case 7:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -230,7 +212,8 @@ void danserLosange() {
         break;
 
     case 9:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -241,7 +224,8 @@ void danserLosange() {
         break;
 
     case 11:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -252,7 +236,8 @@ void danserLosange() {
         break;
 
     case 13:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -263,7 +248,8 @@ void danserLosange() {
         break;
 
     case 15:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -274,7 +260,8 @@ void danserLosange() {
         break;
 
     case 17:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange++;
         }
         break;
@@ -285,7 +272,8 @@ void danserLosange() {
         break;
 
     case 19:
-        if (isGoal()) {
+        if (isGoal())
+        {
             losange = 0;
             currentEtat = SUIVRE_LIGNE;
         }

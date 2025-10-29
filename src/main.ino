@@ -63,6 +63,29 @@ void loop() {
     if (isGoal()) {
     //Si on veut faire quelque chose quand il a fini.
     }
+    switch (COLORSENSOR_Read()) {
+        case ROUGE:
+            digitalWrite(leds[1], HIGH);
+            currentEtat = QUILLE;
+            break;
+        case VERT:
+            digitalWrite(leds[2], HIGH);
+            currentEtat = DANSE;
+            break;
+        case BLEU:
+            digitalWrite(leds[0], HIGH);
+            currentEtat = PAS_LIGNE;
+            break;
+        case JAUNE:
+            digitalWrite(leds[3], HIGH);
+            currentEtat = CONTOURNER_OBSTACLE;
+            break;
+        default:
+            for (int i=0; i<4; i++){
+                digitalWrite(leds[i], LOW);
+            }
+            break;
+    }
 
     switch (currentEtat) {
         case ARRET:
