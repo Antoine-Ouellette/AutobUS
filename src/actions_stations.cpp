@@ -10,6 +10,7 @@
 #include "detecteur_IR.h"
 #include "suiveur_ligne.h" // Inclure les fonctions en lien avec le suiveur de ligne.
 
+int losange = 0;
 int Etat_mur = 0;
 
 /**
@@ -29,11 +30,11 @@ void retrouverLigne() {
  * Le robot avance tout droit sur 75 cm.
  * Si la ligne n'est pas détectée, le robot va à droite sur max 30 cm.
  * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
- * Si la ligne n'est pas détectée, le robot revient au milieu en allant 30 cm à droite,
- * puis avance sur max 30 cm.
- * Si la ligne n'est pas détectée, le robot va à droite sur max 30 cm.
- * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
- * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
+ * Si la ligne n'est pas détectée, le robot revient au milieu en allant 30 cm à
+ * droite, puis avance sur max 30 cm. Si la ligne n'est pas détectée, le robot
+ * va à droite sur max 30 cm. Si la ligne n'est pas détectée, le robot va à
+ * gauche sur max 60 cm. Si la ligne n'est toujours pas détectée, le robot
+ * recule et recommence.
  */
 void suivreLigne() {
     float VITESSE_AVANCE = 0.2; // Vitesse d'avancement en ligne droite normale
@@ -104,7 +105,7 @@ void avancerTrouverLigne() {
     if (OutputSuiveur == 0b101) //A MODIFIER POUR 111 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     {
         // Détection de la ligne perpendiculaire
-        arreter(); // prend une pause
+        arreter();        // prend une pause
         ENCODER_Reset(0); // Reset des encodeurs
         ENCODER_Reset(1);
 
@@ -138,47 +139,6 @@ void avancerTrouverLigne() {
  */
 void renverserQuille()
 {
-    float degrer;
-    float distance;
-    enum Etat_quille
-    {
-        etat_tours,
-        etat_recherche_quille,
-        etat_avanceQuille,
-        etat_reculer,
-        etat_revenir
-    };
-
-    Etat_quille etat_quille = etat_tours;
-    switch (etat_quille)
-    {
-
-    case etat_tours:
-        setGoal(0.6, TOUR_GAUCHE, 360);
-        degrer = lireDistance_roue();
-        etat_quille = etat_recherche_quille;
-        break;
-    case etat_recherche_quille:
-        distance = lireDistance_quille();
-        if (distance > 25)
-        {
-            arreter();
-            etat_quille = etat_avanceQuille;
-        }
-        break;
-    case etat_avanceQuille:
-        setGoal(0.5, AVANCE, distance);
-        etat_quille = etat_reculer;
-        break;
-
-    case etat_reculer:
-        setGoal(0.5, RECULE, distance);
-        etat_quille = etat_revenir;
-        break;
-    case etat_revenir:
-        setGoal(0.6, TOUR_DROIT, degrer);
-        break;
-    }
 }
 
 /**
@@ -317,17 +277,116 @@ void contournerObstacle() {
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void danserLosange() {
-    // // TODO: tourner() est asynchrone. Il faudrait une deuxième fonction.
-    // tourner(LEFT, 135, 1);
-    // avancer(1);
-    // tourner(LEFT, 90, 1);
-    // avancer(1);
-    // tourner(LEFT, 90, 1);
-    // avancer(1);
-    // tourner(LEFT, 90, 1);
-    // avancer(1);
-    // tourner(LEFT, 45, 1);
-    // retrouverLigne();
-    // tourner(RIGHT, 90, 1);
-    // currentEtat = SUIVRE_LIGNE;
+    switch (losange) {
+    case 0:
+        setGoal(0.2, AVANCE, 20);
+        losange++;
+        break;
+
+    case 1:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 2:
+        setGoal(0.2, TOUR_DROIT, 45);
+        losange++;
+        break;
+
+    case 3:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 4:
+        setGoal(0.2, RECULE, 20);
+        losange++;
+        break;
+
+    case 5:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 6:
+        setGoal(0.2, TOUR_GAUCHE, 90);
+        losange++;
+        break;
+
+    case 7:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 8:
+        setGoal(0.2, RECULE, 20);
+        losange++;
+        break;
+
+    case 9:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 10:
+        setGoal(0.2, TOUR_DROIT, 90);
+        losange++;
+        break;
+
+    case 11:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 12:
+        setGoal(0.2, AVANCE, 20);
+        losange++;
+        break;
+
+    case 13:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 14:
+        setGoal(0.2, TOUR_GAUCHE, 90);
+        losange++;
+        break;
+
+    case 15:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 16:
+        setGoal(0.2, AVANCE, 20);
+        losange++;
+        break;
+
+    case 17:
+        if (isGoal()) {
+            losange++;
+        }
+        break;
+
+    case 18:
+        setGoal(0.2, TOUR_DROIT, 45);
+        losange++;
+        break;
+
+    case 19:
+        if (isGoal()) {
+            losange = 0;
+            currentEtat = SUIVRE_LIGNE;
+        }
+        break;
+    };
 }
