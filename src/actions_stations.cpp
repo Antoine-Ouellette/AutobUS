@@ -192,8 +192,7 @@ void renverserQuille()
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void contournerObstacle() {
-    uint8_t idCapteur = 0;
-    uint16_t distanceSeuil = 35;
+    uint16_t distanceSeuil = 20;
     switch (Etat_mur) {
         case 0: {
             setGoal(0.2, AVANCE, 40);
@@ -202,7 +201,7 @@ void contournerObstacle() {
         }
         case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
         {
-            uint16_t distanceActuelle = ROBUS_ReadIR(idCapteur);
+            float distanceActuelle = lireDistance_quille();
             if (distanceActuelle <= distanceSeuil) {
                 arreter();
                 Etat_mur = 2;
