@@ -448,6 +448,60 @@ void loop() {
         }
         break;
 
+    case 37: //Début changement position
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, RECULE, 20);
+        }
+        break;
+
+    case 38:
+        if (millis() - prevMil > 1500) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_GAUCHE, 90);
+        }
+        break;
+
+    case 39:
+        if (millis() - prevMil > 500) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 80);
+        }
+        break;
+
+    case 40:
+        if (millis() - prevMil > 4000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 90);
+        }
+        break;
+
+    case 41:
+        if (millis() - prevMil > 500) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 20);
+            //suivreLigne();
+        }
+        break;
+    case 42:
+            if (millis() - prevMil > 1500) {
+                prevMil = millis();
+                danse++;
+                setGoal(0.2, AVANCE, 20);
+            }
+    case 43:
+            if (millis() - prevMil > 2000) {
+                prevMil = millis();
+                danse++;
+            digitalWrite(ROUGE, 1);
+            }
+            break;
+
     default:
         break;
     }
