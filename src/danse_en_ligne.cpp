@@ -361,10 +361,13 @@ void loop() {
 
     case 26:
         if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_GAUCHE, 90);
         }
         break;
 
-    case 27:
+    case 27: // P1
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -379,6 +382,70 @@ void loop() {
             setGoal(0.2, TOUR_DROIT, 90);
         }
 
+        break;
+
+    case 29: // P2
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 28.284);
+        }
+        break;
+
+    case 30:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_GAUCHE, 90);
+        }
+        break;
+
+    case 31: // P3
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 28.284);
+        }
+        break;
+
+    case 32:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 90);
+        }
+        break;
+
+    case 33: // P4
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, RECULE, 28.284);
+        }
+        break;
+
+    case 34:
+        if (millis() - prevMil > 1333) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 45);
+        }
+        break;
+
+    case 35: // P4
+        if (millis() - prevMil > 1333) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 20);
+        }
+        break;
+
+    case 36:
+        if (millis() - prevMil > 1333) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 90);
+        }
         break;
 
     default:
