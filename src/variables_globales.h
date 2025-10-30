@@ -37,6 +37,8 @@ constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en 
 constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti les degrés en cm
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
+constexpr int  leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
+
 
 /**
  * Valeurs possibles de l'état du robot.
@@ -47,7 +49,7 @@ constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les
  * DANSE: Le robot fait la danse en forme de losange.
  * PAS_LIGNE: Le robot avance tout droit et essaie de retrouver la ligne.
  */
-enum Etat { ARRET, SUIVRE_LIGNE, CONTOURNER_OBSTACLE, QUILLE, DANSE, PAS_LIGNE };
+enum Etat { ARRET, SUIVRE_LIGNE, CONTOURNER_OBSTACLE, QUILLE, DANSE, PAS_LIGNE, RETROUVER_LIGNE };
 
 // Variables globales partagées entre tous les fichiers
 
