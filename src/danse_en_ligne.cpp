@@ -13,7 +13,7 @@
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 unsigned long lastUpdatePID = 0;
-int danse = 19;
+int danse = 0;
 int prev_rnd = 0;
 int alter = 0;
 

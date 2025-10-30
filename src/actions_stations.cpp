@@ -13,6 +13,7 @@
 int Etat_mur = 0;
 int Etat_avance_trouve = 0;
 int Etat_retrouver = 4;
+int losange = 0;
 // Variable pour la quille
 float degrer;
 float distance;
