@@ -12,6 +12,7 @@
 #include "suiveur_ligne.h" // Inclure les fonctions en lien avec le suiveur de ligne.
 
 int Etat_mur = 0;
+int losange=0;
 // Variable pour la quille
 float degrer;
 float distance;
@@ -45,10 +46,7 @@ void retrouverLigne()
     const float distanceDroite = 10;
     const float distanceGauche = 20;
     const float vitesse = 0.3;
-    const int maxTentatives = 2; // pour éviter une boucle infinie
 
-    int tentatives = 0;
-    bool ligneTrouvee = false;
 
     switch (Etat_retrouver)
     {
@@ -208,8 +206,6 @@ void suivreLigne()
 
     float VITESSE_AVANCE = 0.25;                            // Vitesse d'avancement en ligne droite normale
     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
-    int depassement;
-    int alignement;
     int i = 0;
 
     Serial.println("SUIVEUR: ");
