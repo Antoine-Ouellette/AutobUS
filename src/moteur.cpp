@@ -244,6 +244,7 @@ void ajusteVitesse() {
 
 void arreter() {
     isMoving = false;
+
     // Mettre les vitesses des deux moteurs à 0%.
     MOTOR_SetSpeed(LEFT, 0);
     MOTOR_SetSpeed(RIGHT, 0);
