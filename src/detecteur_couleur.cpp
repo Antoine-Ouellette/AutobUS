@@ -14,10 +14,10 @@ Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 // TODO : ajuster pour les vraies valeurs des couleurs
 uint16_t couleurs[nbCouleurs][3] = {
     {0, 0, 0}, // Noir
-    {255, 242, 212}, // Rouge
-    {221, 293, 218}, // Vert
-    {204, 265, 222}, // Bleu
-    {281, 301, 204} // Jaune
+    {229, 214, 188}, // Rouge
+    {160, 207, 153}, // Vert
+    {155, 202, 167}, // Bleu
+    {193, 209, 142} // Jaune
 
 };
 
@@ -37,6 +37,13 @@ COULEURS COLORSENSOR_Read() {
 
     //Lire les valeurs
     colorSensor.getRawData(&r, &g, &b, &clear);
+
+    Serial.print(r);
+    Serial.print(" ");
+    Serial.print(g);
+    Serial.print(" ");
+    Serial.print(b);
+    Serial.println("");
 
     for (int i = 0; i < nbCouleurs; i++) {
         //Boucle pour regarder toutes les couleurs
