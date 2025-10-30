@@ -5,6 +5,8 @@
 #ifndef AUTOBUS_ACTIONS_STATIONS_H
 #define AUTOBUS_ACTIONS_STATIONS_H
 
+extern int i_suivre_ligne;
+
 void retrouverLigne();
 
 void suivreLigne();
