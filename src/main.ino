@@ -11,6 +11,7 @@
 #include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
 #include "detecteur_couleur.h"  // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
+#include "sifflet.h"
 
 unsigned long lastUpdatePID = 0;
 int moves = 0;
@@ -24,6 +25,7 @@ void setup()
     BoardInit();         // Initialisation de la carte RobUS.
     SUIVEUR_init();      // Initialisation du suiveur de ligne.
     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+    init_sifflet();
 
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
 
@@ -38,8 +40,11 @@ void setup()
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     // TODO: Remplacer par la detection du sifflet.
-    while (!ROBUS_IsBumper(REAR))
-        ;
+    while (true) {
+        if (ROBUS_IsBumper(REAR) || detection_sifflet()) {
+            break;
+        }
+    };
     currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
 }
 
@@ -55,38 +60,36 @@ void loop()
 
     if (isMoving)
     {
+        isGoal();
         ajusteVitesse();
         lastUpdatePID = currentMillis;
     }
 
-    if (isGoal())
-    {
-        // Si on veut faire quelque chose quand il a fini.
-    }
-    switch (currentEtat == SUIVRE_LIGNE && COLORSENSOR_Read())
-    {
-    case ROUGE:
-        digitalWrite(leds[1], HIGH);
-        currentEtat = QUILLE;
-        break;
-    case VERT:
-        digitalWrite(leds[2], HIGH);
-        currentEtat = PAS_LIGNE;
-        break;
-    case BLEU:
-        digitalWrite(leds[0], HIGH);
-        currentEtat = DANSE;
-        break;
-    case JAUNE:
-        digitalWrite(leds[3], HIGH);
-        currentEtat = CONTOURNER_OBSTACLE;
-        break;
-    default:
-        for (int i = 0; i < 4; i++)
-        {
-            digitalWrite(leds[i], LOW);
+
+    if (currentEtat == SUIVRE_LIGNE) {
+        switch (COLORSENSOR_Read()) {
+            case ROUGE:
+                digitalWrite(leds[1], HIGH);
+                currentEtat = QUILLE;
+                break;
+            case VERT:
+                digitalWrite(leds[2], HIGH);
+                currentEtat = PAS_LIGNE;
+                break;
+            case BLEU:
+                digitalWrite(leds[0], HIGH);
+                currentEtat = DANSE;
+                break;
+            case JAUNE:
+                digitalWrite(leds[3], HIGH);
+                currentEtat = CONTOURNER_OBSTACLE;
+                break;
+            default:
+                for (int i = 0; i < 4; i++) {
+                    digitalWrite(leds[i], LOW);
+                }
+                break;
         }
-        break;
     }
 
     // Si l'état a changé.

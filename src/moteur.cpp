@@ -43,7 +43,6 @@ void ENCODERS_Reset() {
 }
 
 void resetPIDStats() {
-    ENCODERS_Reset();
     vitesseGoal = 0;
     for (int i = 0; i < 2; i++) {
         current_error_PID[i] = 0;
@@ -59,6 +58,7 @@ void resetPIDStats() {
 void setGoal(const float vitesse, const MOUVEMENT mouvement, const float distance) {
     isMoving = true;
     resetPIDStats();
+    ENCODERS_Reset();
     //Définir le temps de la dernière mesure, qui va être maintenant.
     millisLastPID = millis();
 
@@ -244,6 +244,7 @@ void ajusteVitesse() {
 
 void arreter() {
     isMoving = false;
+
     // Mettre les vitesses des deux moteurs à 0%.
     MOTOR_SetSpeed(LEFT, 0);
     MOTOR_SetSpeed(RIGHT, 0);

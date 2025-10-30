@@ -13,12 +13,12 @@
 //Constantes qui sont spécifiques au différent robot.
 #define ROBOTA 1
 #define ROBOTB 2
-#define MODEL ROBOTA //changer entre A et B dépendant du robot utilisé
+#define MODEL ROBOTB //changer entre A et B dépendant du robot utilisé
 
 #if MODEL == ROBOTB
 //Robot B
 #define  DiamDRobot  19.6
-#define  DiamGRobot  19.4
+#define  DiamGRobot  19.9
 #endif
 
 #if MODEL == ROBOTA
