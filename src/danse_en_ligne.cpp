@@ -13,9 +13,12 @@
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 unsigned long lastUpdatePID = 0;
-int danse = 0;
+int danse = 19;
+int prev_rnd = 0;
+int alter = 0;
 
 unsigned long prevMil = 0;
+unsigned long prevMil2 = 0;
 
 #define L_UP 180
 #define L_FORWARD 120
@@ -25,11 +28,6 @@ unsigned long prevMil = 0;
 #define R_FORWARD 60
 #define R_DOWN 140
 
-#define BLEU 10
-#define ROUGE 11
-#define VERT 12
-#define JAUNE 13
-
 /**
  * Fonction d'initialisation (Setup)
  * Exécutée une seule fois lorsque le robot est allumé.
@@ -37,10 +35,9 @@ unsigned long prevMil = 0;
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
-    pinMode(BLEU, OUTPUT);
-    pinMode(ROUGE, OUTPUT);
-    pinMode(VERT, OUTPUT);
-    pinMode(JAUNE, OUTPUT);
+    for (int i = 0; i < 4; i++) {
+        pinMode(leds[i], OUTPUT);
+    }
 
     Serial.begin(
         9600); // Initialisation de la communication série pour le débogage.
@@ -52,6 +49,7 @@ void setup() {
 
     SERVO_SetAngle(LEFT, L_FORWARD);
     SERVO_SetAngle(RIGHT, R_FORWARD);
+    randomSeed(analogRead(A0));
 }
 
 /**
@@ -114,8 +112,8 @@ void loop() {
         break;
 
     case 6:
-        digitalWrite(ROUGE, 0);
-        digitalWrite(JAUNE, 1);
+        digitalWrite(leds[1], 0);
+        digitalWrite(leds[3], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -123,8 +121,8 @@ void loop() {
         break;
 
     case 7:
-        digitalWrite(JAUNE, 0);
-        digitalWrite(VERT, 1);
+        digitalWrite(leds[3], 0);
+        digitalWrite(leds[2], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -132,8 +130,8 @@ void loop() {
         break;
 
     case 8:
-        digitalWrite(VERT, 0);
-        digitalWrite(BLEU, 1);
+        digitalWrite(leds[2], 0);
+        digitalWrite(leds[0], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -141,10 +139,10 @@ void loop() {
         break;
 
     case 9:
-    SERVO_SetAngle(LEFT, L_FORWARD);
-    SERVO_SetAngle(RIGHT, R_FORWARD);
-    digitalWrite(BLEU, 0);
-    digitalWrite(ROUGE, 1);
+        SERVO_SetAngle(LEFT, L_FORWARD);
+        SERVO_SetAngle(RIGHT, R_FORWARD);
+        digitalWrite(leds[0], 0);
+        digitalWrite(leds[1], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -153,9 +151,9 @@ void loop() {
 
     case 10:
         SERVO_SetAngle(LEFT, L_UP);
-    SERVO_SetAngle(RIGHT, R_UP);
-        digitalWrite(ROUGE, 0);
-        digitalWrite(JAUNE, 1);
+        SERVO_SetAngle(RIGHT, R_UP);
+        digitalWrite(leds[1], 0);
+        digitalWrite(leds[3], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -164,9 +162,9 @@ void loop() {
 
     case 11:
         SERVO_SetAngle(LEFT, L_FORWARD);
-    SERVO_SetAngle(RIGHT, R_FORWARD);
-        digitalWrite(JAUNE, 0);
-        digitalWrite(VERT, 1);
+        SERVO_SetAngle(RIGHT, R_FORWARD);
+        digitalWrite(leds[3], 0);
+        digitalWrite(leds[2], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -175,9 +173,9 @@ void loop() {
 
     case 12:
         SERVO_SetAngle(LEFT, L_DOWN);
-    SERVO_SetAngle(RIGHT, R_DOWN);
-        digitalWrite(VERT, 0);
-        digitalWrite(BLEU, 1);
+        SERVO_SetAngle(RIGHT, R_DOWN);
+        digitalWrite(leds[2], 0);
+        digitalWrite(leds[0], 1);
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
@@ -185,28 +183,202 @@ void loop() {
         }
         break;
 
-            case 13:
+    case 13:
         SERVO_SetAngle(LEFT, L_UP);
-    SERVO_SetAngle(RIGHT, R_UP);
-        digitalWrite(VERT, 1);
-        digitalWrite(BLEU, 1);
-            
+        SERVO_SetAngle(RIGHT, R_UP);
+
+        if (millis() - prevMil2 > 500) {
+            prevMil2 = millis();
+            int rnd = random(4);
+            digitalWrite(leds[rnd], 1);
+            digitalWrite(leds[prev_rnd], 0);
+            prev_rnd = rnd;
+        }
+
         if (millis() - prevMil > 2000) {
             prevMil = millis();
             danse++;
         }
         break;
 
-                    case 14:
-        SERVO_SetAngle(LEFT, L_UP);
-    SERVO_SetAngle(RIGHT, R_UP);
-        digitalWrite(VERT, 1);
-        digitalWrite(BLEU, 1);
-            
+    case 14:
+        SERVO_SetAngle(LEFT, L_DOWN);
+        SERVO_SetAngle(RIGHT, R_DOWN);
+        if (millis() - prevMil2 > 250) {
+            prevMil2 = millis();
+            if (alter == 0) {
+                digitalWrite(leds[1], HIGH);
+                digitalWrite(leds[3], LOW);
+                alter = 1;
+            } else {
+                digitalWrite(leds[1], LOW);
+                digitalWrite(leds[3], HIGH);
+                alter = 0;
+            }
+        }
+
         if (millis() - prevMil > 4000) {
             prevMil = millis();
             danse++;
         }
+        break;
+
+    case 15:
+        if (millis() - prevMil2 > 250) {
+            prevMil2 = millis();
+            if (alter == 0) {
+                digitalWrite(leds[3], HIGH);
+                digitalWrite(leds[2], LOW);
+                alter = 1;
+            } else {
+                digitalWrite(leds[3], LOW);
+                digitalWrite(leds[2], HIGH);
+                alter = 0;
+            }
+        }
+
+        if (millis() - prevMil > 4000) {
+            prevMil = millis();
+            danse++;
+        }
+        break;
+
+    case 16:
+        if (millis() - prevMil2 > 250) {
+            prevMil2 = millis();
+            if (alter == 0) {
+                digitalWrite(leds[2], HIGH);
+                digitalWrite(leds[0], LOW);
+                alter = 1;
+            } else {
+                digitalWrite(leds[2], LOW);
+                digitalWrite(leds[0], HIGH);
+                alter = 0;
+            }
+        }
+
+        if (millis() - prevMil > 4000) {
+            prevMil = millis();
+            danse++;
+        }
+        break;
+
+    case 17:
+        if (millis() - prevMil2 > 250) {
+            prevMil2 = millis();
+            if (alter == 0) {
+                digitalWrite(leds[1], HIGH);
+                digitalWrite(leds[0], LOW);
+                alter = 1;
+            } else {
+                digitalWrite(leds[1], LOW);
+                digitalWrite(leds[0], HIGH);
+                alter = 0;
+            }
+        }
+
+        if (millis() - prevMil > 4000) {
+            prevMil = millis();
+            danse++;
+        }
+        break;
+
+    case 18:
+        SERVO_SetAngle(LEFT, L_FORWARD);
+        SERVO_SetAngle(RIGHT, R_FORWARD);
+
+        if (millis() - prevMil2 > 500) {
+            prevMil2 = millis();
+            int rnd = random(4);
+            digitalWrite(leds[rnd], 1);
+            digitalWrite(leds[prev_rnd], 0);
+            prev_rnd = rnd;
+        }
+
+        if (millis() - prevMil > 4000) {
+            prevMil = millis();
+            danse++;
+        }
+        break;
+
+    case 19: // P1
+        SERVO_SetAngle(LEFT, L_UP);
+        SERVO_SetAngle(RIGHT, R_UP);
+        if (millis() - prevMil > 4000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, RECULE, 20);
+        }
+        break;
+
+    case 20:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 45);
+        }
+        break;
+
+    case 21: // P2
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 28.284);
+        }
+        break;
+
+    case 22:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_GAUCHE, 90);
+        }
+        break;
+
+    case 23: // P3
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, AVANCE, 28.284);
+        }
+        break;
+
+    case 24:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 90);
+        }
+        break;
+
+    case 25: // P4
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, RECULE, 28.284);
+        }
+        break;
+
+    case 26:
+        if (millis() - prevMil > 2000) {
+        }
+        break;
+
+    case 27:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, RECULE, 28.284);
+        }
+        break;
+
+    case 28:
+        if (millis() - prevMil > 2000) {
+            prevMil = millis();
+            danse++;
+            setGoal(0.2, TOUR_DROIT, 90);
+        }
+
         break;
 
     default:
