@@ -24,7 +24,7 @@ extern int index; //Objet présent du tableau
 
 extern unsigned long previousMillis; 
 #define interval_mean 10 //Interval de moyennage
-#define seuil 20 //Seuil de détection du sifflet
+#define seuil 90 //Seuil de détection du sifflet
 
 
 /**

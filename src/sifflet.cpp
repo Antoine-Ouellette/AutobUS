@@ -37,6 +37,10 @@ bool detection_sifflet() {
         noise_moy = noise_sum / mean_size;
     }
 
+    Serial.print(freq_moy);
+    Serial.print(" ");
+    Serial.println(noise_moy);
+
     index++;
 
     if (index >= mean_size) {

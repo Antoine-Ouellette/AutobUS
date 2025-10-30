@@ -38,12 +38,12 @@ COULEURS COLORSENSOR_Read() {
     //Lire les valeurs
     colorSensor.getRawData(&r, &g, &b, &clear);
 
-    Serial.print(r);
-    Serial.print(" ");
-    Serial.print(g);
-    Serial.print(" ");
-    Serial.print(b);
-    Serial.println("");
+    // Serial.print(r);
+    // Serial.print(" ");
+    // Serial.print(g);
+    // Serial.print(" ");
+    // Serial.print(b);
+    // Serial.println("");
 
     for (int i = 0; i < nbCouleurs; i++) {
         //Boucle pour regarder toutes les couleurs

@@ -11,6 +11,7 @@
 #include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
 #include "detecteur_couleur.h"  // Inclure les fonctions en lien avec le détecteur de couleurs.
 #include "suiveur_ligne.h"      // Inclure les fonctions en lien avec le suiveur de ligne.
+#include "sifflet.h"
 
 unsigned long lastUpdatePID = 0;
 int moves = 0;
@@ -37,7 +38,11 @@ void setup() {
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     // TODO: Remplacer par la detection du sifflet.
-    while (!ROBUS_IsBumper(REAR));
+    while (true) {
+        if (ROBUS_IsBumper(REAR) || detection_sifflet()) {
+            break;
+        }
+    };
     currentEtat = SUIVRE_LIGNE; // Définir l'état initial du robot.
 }
 
