@@ -35,7 +35,8 @@ enum Etat_quille {
 
 Etat_quille etat_quille = etat_avance_au_centre_quille;
 
-int i=0; // mémoire de la dernière direction prise
+int i_suivre_ligne = 0; // mémoire de la dernière direction prise
+bool startedFollow = false;
 
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
@@ -114,23 +115,25 @@ void retrouverLigne() {
 
         // Si on voit à partir de la droite
         case 12:
-            setGoal(vitesse, TOUR_GAUCHE, 10);
+            setGoal(vitesse, TOUR_GAUCHE, 30);
             Etat_retrouver = 13;
             break;
         case 13:
             if (isGoal()) {
                 Etat_retrouver = 4;
+                startedFollow = false;
                 currentEtat = SUIVRE_LIGNE;
             }
 
         // SI on voit à partir de la gauche
         case 16:
-            setGoal(vitesse, TOUR_DROIT, 10);
-            Etat_retrouver = 13;
+            setGoal(vitesse, TOUR_DROIT, 50);
+            Etat_retrouver = 17;
             break;
         case 17:
             if (isGoal()) {
                 Etat_retrouver = 4;
+                startedFollow = false;
                 currentEtat = SUIVRE_LIGNE;
             }
     }
@@ -142,44 +145,47 @@ void suivreLigne() {
 
     Serial.println("SUIVEUR: ");
 
+    if (!startedFollow) {
+        i_suivre_ligne = 0;
+        startedFollow = true;
+    }
+
     // uint8_t result = SUIVEUR_Read();
     // for (int i = 0; i < 3; i++)
     // {
     //     digitalWrite(leds[i], (result & (1 << i)) ? HIGH : LOW);
     // }
 
-    switch (SUIVEUR_Read())
-    {
 
-    case 0b010: // centré sur la ligne
-        Serial.println(" CENTRE: ");
-        avancer(VITESSE_AVANCE);
-        i = 0;
-        break;
+    switch (SUIVEUR_Read()) {
+        case 0b010: // centré sur la ligne
+            Serial.println(" CENTRE: ");
+            avancer(VITESSE_AVANCE);
+            i_suivre_ligne = 0;
+            break;
 
-    case 0b100: // corrige à gauche
-        Serial.println(" FORT GAUCHE: ");
-        MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
-        i++;
-        break;
+        case 0b100: // corrige à gauche
+            Serial.println(" FORT GAUCHE: ");
+            MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
+            MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
+            i_suivre_ligne++;
+            break;
 
-    case 0b001: // corrige à droite
-        Serial.println(" FORT DROITE: ");
-        MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
-        i--;
-        break;
+        case 0b001: // corrige à droite
+            Serial.println(" FORT DROITE: ");
+            MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
+            MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
+            i_suivre_ligne--;
+            break;
 
-    case 0b000: // ligne perdue
-        Serial.println(" PERDU: ");
-        if (i >= 0)
-        {
-            MOTOR_SetSpeed(RIGHT, 0.35);
-        }
-        else if (i <= 0)
-        {
-            MOTOR_SetSpeed(LEFT, 0.35);
-        }
-        break;
+        case 0b000: // ligne perdue
+            Serial.println(" PERDU: ");
+            if (i_suivre_ligne >= 0) {
+                MOTOR_SetSpeed(RIGHT, 0.35);
+            } else if (i_suivre_ligne <= 0) {
+                MOTOR_SetSpeed(LEFT, 0.35);
+            }
+            break;
     }
 }
 
@@ -196,35 +202,29 @@ void suivreLigne() {
  * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
  * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
  */
-void avancerTrouverLigne()
-{
+void avancerTrouverLigne() {
     const int distance = 120; // Distancce en cm à avancer
     uint8_t OutputSuiveur = SUIVEUR_Read();
 
-    switch (Etat_avance_trouve)
-    {
-    case 0:
-        setGoal(0.3, AVANCE, distance);
-        Etat_avance_trouve++;
-        break;
-
-    case 1:
-        if (isGoal())
-        {
+    switch (Etat_avance_trouve) {
+        case 0:
+            setGoal(0.3, AVANCE, distance);
             Etat_avance_trouve++;
-        }
-        break;
+            break;
 
-    case 2:
-        if (OutputSuiveur == 0b000)
-        {
-            retrouverLigne();
-        }
-        else
-        {
-            suivreLigne();
-        }
-        break;
+        case 1:
+            if (isGoal()) {
+                Etat_avance_trouve++;
+            }
+            break;
+
+        case 2:
+            if (OutputSuiveur == 0b000) {
+                currentEtat = RETROUVER_LIGNE;
+            } else {
+                currentEtat = SUIVRE_LIGNE;
+            }
+            break;
     }
 }
 
@@ -302,7 +302,7 @@ void renverserQuille() {
             break;
 
         case etat_avance_carre:
-            setGoal(0.3, AVANCE, 7);
+            setGoal(0.3, AVANCE, 15);
             etat_quille = etat_attente_fin;
 
             break;
@@ -310,7 +310,7 @@ void renverserQuille() {
         case etat_attente_fin:
             if (isGoal()) {
                 etat_quille = etat_avance_au_centre_quille;
-                retrouverLigne();
+                currentEtat = RETROUVER_LIGNE;
                 break;
             }
     }
@@ -326,136 +326,111 @@ void renverserQuille() {
  * Le robot avance jusqu'à retrouver la ligne (utilise la méthode retrouverLigne()).
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
-void contournerObstacle()
-{
+void contournerObstacle() {
     uint16_t distanceSeuil = 25;
-    switch (Etat_mur)
-    {
-    case 0:
-    {
-        setGoal(0.2, AVANCE, 40);
-        Etat_mur = 1;
-        break;
-    }
-    case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
-    {
-        float distanceActuelle = lireDistance_quille();
-        if (distanceActuelle <= distanceSeuil)
-        {
-            arreter();
-            Etat_mur = 2;
+    switch (Etat_mur) {
+        case 0: {
+            setGoal(0.2, AVANCE, 100);
+            Etat_mur = 1;
+            break;
         }
-        break;
-    }
+        case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
+        {
+            float distanceActuelle = lireDistance_quille();
+            if (distanceActuelle <= distanceSeuil) {
+                arreter();
+                Etat_mur = 2;
+            }
+            break;
+        }
 
-    case 2: // Avancer plus loin que l'obstacle
-    {
-        setGoal(0.2, TOUR_DROIT, 90);
-        Etat_mur = 3;
-        break;
-    }
+        case 2: // Avancer plus loin que l'obstacle
+        {
+            setGoal(0.2, TOUR_DROIT, 90);
+            Etat_mur = 3;
+            break;
+        }
 
-    case 3:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 4;
+        case 3: {
+            if (isGoal()) {
+                Etat_mur = 4;
+            }
+            break;
         }
-        break;
-    }
-    case 4:
-    {
-        setGoal(0.2, AVANCE, 40);
-        Etat_mur = 5;
-        break;
-    }
-    case 5:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 6;
+        case 4: {
+            setGoal(0.2, AVANCE, 40);
+            Etat_mur = 5;
+            break;
         }
-        break;
-    }
-    case 6:
-    {
-        setGoal(0.2, TOUR_GAUCHE, 90);
-        Etat_mur = 7;
-        break;
-    }
+        case 5: {
+            if (isGoal()) {
+                Etat_mur = 6;
+            }
+            break;
+        }
+        case 6: {
+            setGoal(0.2, TOUR_GAUCHE, 90);
+            Etat_mur = 7;
+            break;
+        }
 
-    case 7:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 8;
+        case 7: {
+            if (isGoal()) {
+                Etat_mur = 8;
+            }
+            break;
         }
-        break;
-    }
-    case 8:
-    {
-        setGoal(0.2, AVANCE, 60);
-        Etat_mur = 9;
-        break;
-    }
-    case 9:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 10;
+        case 8: {
+            setGoal(0.2, AVANCE, 60);
+            Etat_mur = 9;
+            break;
         }
-        break;
-    }
-    case 10:
-    {
-        setGoal(0.2, TOUR_GAUCHE, 90);
-        Etat_mur = 11;
-        break;
-    }
+        case 9: {
+            if (isGoal()) {
+                Etat_mur = 10;
+            }
+            break;
+        }
+        case 10: {
+            setGoal(0.2, TOUR_GAUCHE, 90);
+            Etat_mur = 11;
+            break;
+        }
 
-    case 11:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 12;
+        case 11: {
+            if (isGoal()) {
+                Etat_mur = 12;
+            }
+            break;
         }
-        break;
-    }
-    case 12:
-    {
-        setGoal(0.2, AVANCE, 40);
-        Etat_mur = 13;
-        break;
-    }
-    case 13:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 14;
+        case 12: {
+            setGoal(0.2, AVANCE, 40);
+            Etat_mur = 13;
+            break;
         }
-        break;
-    }
-    case 14:
-    {
-        setGoal(0.2, TOUR_DROIT, 90);
-        Etat_mur = 15;
-        break;
-    }
+        case 13: {
+            if (isGoal()) {
+                Etat_mur = 14;
+            }
+            break;
+        }
+        case 14: {
+            setGoal(0.2, TOUR_DROIT, 90);
+            Etat_mur = 15;
+            break;
+        }
 
-    case 15:
-    {
-        if (isGoal())
-        {
-            Etat_mur = 16;
+        case 15: {
+            if (isGoal()) {
+                Etat_mur = 16;
+            }
+            break;
         }
-        break;
-    }
-    case 16:
-    {
-        Etat_mur = 0;
-        retrouverLigne();
-        break;
-    }
+        case 16: {
+            Etat_mur = 0;
+            currentEtat = RETROUVER_LIGNE;
+            break;
+        }
     }
 }
 
@@ -476,129 +451,117 @@ void contournerObstacle()
  * Le robot tourne de 90 degrés à droite pour être parallèle à la ligne.
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
-void danserLosange()
-{
-    switch (losange)
-    {
-    case 0:
-        setGoal(0.2, AVANCE, 20);
-        losange++;
-        break;
-
-    case 1:
-        if (isGoal())
-        {
+void danserLosange() {
+    switch (losange) {
+        case 0:
+            setGoal(0.2, AVANCE, 40);
             losange++;
-        }
-        break;
+            break;
 
-    case 2:
-        setGoal(0.2, TOUR_DROIT, 45);
-        losange++;
-        break;
+        case 1:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 3:
-        if (isGoal())
-        {
+        case 2:
+            setGoal(0.2, TOUR_DROIT, 45);
             losange++;
-        }
-        break;
+            break;
 
-    case 4:
-        setGoal(0.2, RECULE, 20);
-        losange++;
-        break;
+        case 3:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 5:
-        if (isGoal())
-        {
+        case 4:
+            setGoal(0.2, RECULE, 20);
             losange++;
-        }
-        break;
+            break;
 
-    case 6:
-        setGoal(0.2, TOUR_GAUCHE, 90);
-        losange++;
-        break;
+        case 5:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 7:
-        if (isGoal())
-        {
+        case 6:
+            setGoal(0.2, TOUR_GAUCHE, 90);
             losange++;
-        }
-        break;
+            break;
 
-    case 8:
-        setGoal(0.2, RECULE, 20);
-        losange++;
-        break;
+        case 7:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 9:
-        if (isGoal())
-        {
+        case 8:
+            setGoal(0.2, RECULE, 20);
             losange++;
-        }
-        break;
+            break;
 
-    case 10:
-        setGoal(0.2, TOUR_DROIT, 90);
-        losange++;
-        break;
+        case 9:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 11:
-        if (isGoal())
-        {
+        case 10:
+            setGoal(0.2, TOUR_DROIT, 90);
             losange++;
-        }
-        break;
+            break;
 
-    case 12:
-        setGoal(0.2, AVANCE, 20);
-        losange++;
-        break;
+        case 11:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 13:
-        if (isGoal())
-        {
+        case 12:
+            setGoal(0.2, AVANCE, 20);
             losange++;
-        }
-        break;
+            break;
 
-    case 14:
-        setGoal(0.2, TOUR_GAUCHE, 90);
-        losange++;
-        break;
+        case 13:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 15:
-        if (isGoal())
-        {
+        case 14:
+            setGoal(0.2, TOUR_GAUCHE, 90);
             losange++;
-        }
-        break;
+            break;
 
-    case 16:
-        setGoal(0.2, AVANCE, 20);
-        losange++;
-        break;
+        case 15:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 17:
-        if (isGoal())
-        {
+        case 16:
+            setGoal(0.2, AVANCE, 20);
             losange++;
-        }
-        break;
+            break;
 
-    case 18:
-        setGoal(0.2, TOUR_DROIT, 45);
-        losange++;
-        break;
+        case 17:
+            if (isGoal()) {
+                losange++;
+            }
+            break;
 
-    case 19:
-        if (isGoal())
-        {
-            losange = 0;
-            currentEtat = SUIVRE_LIGNE;
-        }
-        break;
+        case 18:
+            setGoal(0.2, TOUR_DROIT, 45);
+            losange++;
+            break;
+
+        case 19:
+            if (isGoal()) {
+                losange = 0;
+                currentEtat = RETROUVER_LIGNE;
+            }
+            break;
     };
 }

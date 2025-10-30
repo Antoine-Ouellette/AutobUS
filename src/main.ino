@@ -60,14 +60,12 @@ void loop()
 
     if (isMoving)
     {
+        isGoal();
         ajusteVitesse();
         lastUpdatePID = currentMillis;
     }
 
-    if (isGoal())
-    {
-        // Si on veut faire quelque chose quand il a fini.
-    }
+
     if (currentEtat == SUIVRE_LIGNE) {
         switch (COLORSENSOR_Read()) {
             case ROUGE:
