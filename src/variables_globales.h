@@ -49,7 +49,7 @@ constexpr int  leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
  * DANSE: Le robot fait la danse en forme de losange.
  * PAS_LIGNE: Le robot avance tout droit et essaie de retrouver la ligne.
  */
-enum Etat { ARRET, SUIVRE_LIGNE, CONTOURNER_OBSTACLE, QUILLE, DANSE, PAS_LIGNE };
+enum Etat { ARRET, SUIVRE_LIGNE, CONTOURNER_OBSTACLE, QUILLE, DANSE, PAS_LIGNE, RETROUVER_LIGNE };
 
 // Variables globales partagées entre tous les fichiers
 

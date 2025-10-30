@@ -6,12 +6,15 @@
 #include "actions_stations.h"
 #include <LibRobus.h>           // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include "moteur.h"                       // Inclure les fonctions en lien avec les moteurs des roues.
+#include "moteur.h"             // Inclure les fonctions en lien avec les moteurs des roues.
 #include "detecteur_IR.h"
 #include "suiveur_ligne.h" // Inclure les fonctions en lien avec le suiveur de ligne.
 
 int losange = 0;
 int Etat_mur = 0;
+int Etat_avance_trouve = 0;
+int Etat_retrouver = 4;
+int losange = 0;
 // Variable pour la quille
 float degrer;
 float distance;
@@ -29,6 +32,8 @@ enum Etat_quille
 
 Etat_quille etat_quille = etat_tours;
 
+int i=0; // mémoire de la dernière direction prise
+
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
 /**
@@ -38,36 +43,123 @@ Etat_quille etat_quille = etat_tours;
  * Si la ligne est détectée, il se tourne parallèle à la ligne.
  * L'état du robot est changé à SUIVRE_LIGNE pour continuer le défi.
  */
-void retrouverLigne() {
+void retrouverLigne()
+{
+
+    const float distanceDroite = 30;
+    const float distanceGauche = 60;
+    const float vitesse = 0.3;
+
+    switch (Etat_retrouver)
+    {
+
+    case 4:
+        setGoal(vitesse, TOUR_DROIT, 30);
+        Etat_retrouver = 5;
+        break;
+
+    case 5:
+        if (SUIVEUR_Read() > 0)
+        {
+            Etat_retrouver = 12;
+            break;
+        }
+        if (isGoal())
+        {
+            Etat_retrouver = 6;
+        }
+        break;
+
+    case 6:
+        setGoal(vitesse, AVANCE, distanceDroite);
+        Etat_retrouver = 7;
+        break;
+
+    case 7:
+        if (SUIVEUR_Read() > 0)
+        {
+            Etat_retrouver = 12;
+            break;
+        }
+        if (isGoal())
+        {
+            Etat_retrouver = 8;
+        }
+        break;
+
+    case 8:
+        setGoal(vitesse, TOUR_GAUCHE, 90);
+        Etat_retrouver = 9;
+        break;
+
+    case 9:
+        if (SUIVEUR_Read() > 0)
+        {
+            Etat_retrouver = 16;
+            break;
+        }
+        if (isGoal())
+        {
+            Etat_retrouver = 10;
+        }
+        break;
+
+    case 10:
+        setGoal(vitesse, AVANCE, distanceGauche);
+        Etat_retrouver = 11;
+        break;
+
+    case 11:
+        if (SUIVEUR_Read() > 0)
+        {
+            Etat_retrouver = 16;
+            break;
+        }
+        if (isGoal())
+        {
+            Etat_retrouver = 4;
+        }
+        break;
+
+        // Si on voit à partir de la droite
+    case 12:
+        setGoal(vitesse, TOUR_GAUCHE, 10);
+        Etat_retrouver = 13;
+        break;
+    case 13:
+        if (isGoal())
+        {
+            Etat_retrouver = 4;
+            currentEtat = SUIVRE_LIGNE;
+        }
+
+    // SI on voit à partir de la gauche
+    case 16:
+        setGoal(vitesse, TOUR_DROIT, 10);
+        Etat_retrouver = 13;
+        break;
+    case 17:
+        if (isGoal())
+        {
+            Etat_retrouver = 4;
+            currentEtat = SUIVRE_LIGNE;
+        }
+    }
 }
 
-/**
- * Action à faire lorsque la station de passage sans ligne est atteinte.
- *
- * Le robot avance jusqu'à ce que la ligne termine.
- * Le robot avance tout droit sur 75 cm.
- * Si la ligne n'est pas détectée, le robot va à droite sur max 30 cm.
- * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
- * Si la ligne n'est pas détectée, le robot revient au milieu en allant 30 cm à
- * droite, puis avance sur max 30 cm. Si la ligne n'est pas détectée, le robot
- * va à droite sur max 30 cm. Si la ligne n'est pas détectée, le robot va à
- * gauche sur max 60 cm. Si la ligne n'est toujours pas détectée, le robot
- * recule et recommence.
- */
 void suivreLigne()
 {
 
     float VITESSE_AVANCE = 0.25;                            // Vitesse d'avancement en ligne droite normale
     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
-    int i = 0;
 
     Serial.println("SUIVEUR: ");
 
-    uint8_t result = SUIVEUR_Read();
-    for (int i = 0; i < 3; i++)
-    {
-        digitalWrite(leds[i], (result & (1 << i)) ? HIGH : LOW);
-    }
+    // uint8_t result = SUIVEUR_Read();
+    // for (int i = 0; i < 3; i++)
+    // {
+    //     digitalWrite(leds[i], (result & (1 << i)) ? HIGH : LOW);
+    // }
 
     switch (SUIVEUR_Read())
     {
@@ -104,34 +196,48 @@ void suivreLigne()
     }
 }
 
+/**
+ * Action à faire lorsque la station de passage sans ligne est atteinte.
+ *
+ * Le robot avance jusqu'à ce que la ligne termine.
+ * Le robot avance tout droit sur 75 cm.
+ * Si la ligne n'est pas détectée, le robot va à droite sur max 30 cm.
+ * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
+ * Si la ligne n'est pas détectée, le robot revient au milieu en allant 30 cm à droite,
+ * puis avance sur max 30 cm.
+ * Si la ligne n'est pas détectée, le robot va à droite sur max 30 cm.
+ * Si la ligne n'est pas détectée, le robot va à gauche sur max 60 cm.
+ * Si la ligne n'est toujours pas détectée, le robot recule et recommence.
+ */
 void avancerTrouverLigne()
 {
-    const int distance = 80; // Distancce en cm à avancer
+    const int distance = 120; // Distancce en cm à avancer
     uint8_t OutputSuiveur = SUIVEUR_Read();
 
-    arreter();        // prend une pause
-    ENCODER_Reset(0); // Reset des encodeurs
-    ENCODER_Reset(1);
+    switch (Etat_avance_trouve)
+    {
+    case 0:
+        setGoal(0.3, AVANCE, distance);
+        Etat_avance_trouve++;
+        break;
 
-    while (ENCODER_Read(0) <= distance * cmToPulse)
-    {
-        // Avance jusqu'à la distance spécifiée
-        avancer(0.2);
-    }
+    case 1:
+        if (isGoal())
+        {
+            Etat_avance_trouve++;
+        }
+        break;
 
-    if (ENCODER_Read(0) >= distance * cmToPulse)
-    {
-        // Vérification de la distance atteinte
-        arreter();
-    }
-
-    if (OutputSuiveur == 0b000)
-    {
-        retrouverLigne();
-    }
-    else
-    {
-        suivreLigne();
+    case 2:
+        if (OutputSuiveur == 0b000)
+        {
+            retrouverLigne();
+        }
+        else
+        {
+            suivreLigne();
+        }
+        break;
     }
 }
 
@@ -141,12 +247,13 @@ void avancerTrouverLigne()
  * Le robot doit trouver la quille. Il fait un tour à 360 degrés et utilise
  * le capteur à ultrasons pour la détecter.
  * Le robot enregistre à quel angle il va partir.
- * Le robot avance dans la direction de la quille jusqu'à ce que la valeur de la
- * distance soit très proche. Le robot fonce dans la quille. Le robot recule un
- * peu pour laisser de l'espace. Le robot tourne pour faire face à la ligne (en
- * utilisant le nombre de degrés tourné). Le robot avance jusqu'à retrouver la
- * ligne (utilise la méthode retrouverLigne()). L'état du robot est changé à
- * SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
+ * Le robot avance dans la direction de la quille jusqu'à ce que la valeur de la distance
+ * soit très proche.
+ * Le robot fonce dans la quille.
+ * Le robot recule un peu pour laisser de l'espace.
+ * Le robot tourne pour faire face à la ligne (en utilisant le nombre de degrés tourné).
+ * Le robot avance jusqu'à retrouver la ligne (utilise la méthode retrouverLigne()).
+ * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void renverserQuille()
 {
@@ -214,111 +321,136 @@ void renverserQuille()
  * Le robot avance jusqu'à retrouver la ligne (utilise la méthode retrouverLigne()).
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
-void contournerObstacle() {
-    uint16_t distanceSeuil = 20;
-    switch (Etat_mur) {
-        case 0: {
-            setGoal(0.2, AVANCE, 40);
-            Etat_mur = 1;
-            break;
-        }
-        case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
+void contournerObstacle()
+{
+    uint16_t distanceSeuil = 25;
+    switch (Etat_mur)
+    {
+    case 0:
+    {
+        setGoal(0.2, AVANCE, 40);
+        Etat_mur = 1;
+        break;
+    }
+    case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
+    {
+        float distanceActuelle = lireDistance_quille();
+        if (distanceActuelle <= distanceSeuil)
         {
-            float distanceActuelle = lireDistance_quille();
-            if (distanceActuelle <= distanceSeuil) {
-                arreter();
-                Etat_mur = 2;
-            }
-            break;
+            arreter();
+            Etat_mur = 2;
         }
+        break;
+    }
 
-        case 2: // Avancer plus loin que l'obstacle
+    case 2: // Avancer plus loin que l'obstacle
+    {
+        setGoal(0.2, TOUR_DROIT, 90);
+        Etat_mur = 3;
+        break;
+    }
+
+    case 3:
+    {
+        if (isGoal())
         {
-            setGoal(0.2, TOUR_DROIT, 90);
-            Etat_mur = 3;
-            break;
+            Etat_mur = 4;
         }
+        break;
+    }
+    case 4:
+    {
+        setGoal(0.2, AVANCE, 40);
+        Etat_mur = 5;
+        break;
+    }
+    case 5:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 6;
+        }
+        break;
+    }
+    case 6:
+    {
+        setGoal(0.2, TOUR_GAUCHE, 90);
+        Etat_mur = 7;
+        break;
+    }
 
-        case 3: {
-            if (isGoal()) {
-                Etat_mur = 4;
-            }
-            break;
+    case 7:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 8;
         }
-        case 4: {
-            setGoal(0.2, AVANCE, 40);
-            Etat_mur = 5;
-            break;
+        break;
+    }
+    case 8:
+    {
+        setGoal(0.2, AVANCE, 60);
+        Etat_mur = 9;
+        break;
+    }
+    case 9:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 10;
         }
-        case 5: {
-            if (isGoal()) {
-                Etat_mur = 6;
-            }
-            break;
-        }
-        case 6: {
-            setGoal(0.2, TOUR_GAUCHE, 90);
-            Etat_mur = 7;
-            break;
-        }
+        break;
+    }
+    case 10:
+    {
+        setGoal(0.2, TOUR_GAUCHE, 90);
+        Etat_mur = 11;
+        break;
+    }
 
-        case 7: {
-            if (isGoal()) {
-                Etat_mur = 8;
-            }
-            break;
+    case 11:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 12;
         }
-        case 8: {
-            setGoal(0.2, AVANCE, 50);
-            Etat_mur = 9;
-            break;
+        break;
+    }
+    case 12:
+    {
+        setGoal(0.2, AVANCE, 40);
+        Etat_mur = 13;
+        break;
+    }
+    case 13:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 14;
         }
-        case 9: {
-            if (isGoal()) {
-                Etat_mur = 10;
-            }
-            break;
-        }
-        case 10: {
-            setGoal(0.2, TOUR_GAUCHE, 90);
-            Etat_mur = 11;
-            break;
-        }
+        break;
+    }
+    case 14:
+    {
+        setGoal(0.2, TOUR_DROIT, 90);
+        Etat_mur = 15;
+        break;
+    }
 
-        case 11: {
-            if (isGoal()) {
-                Etat_mur = 12;
-            }
-            break;
+    case 15:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 16;
         }
-        case 12: {
-            setGoal(0.2, AVANCE, 40);
-            Etat_mur = 13;
-            break;
-        }
-        case 13: {
-            if (isGoal()) {
-                Etat_mur = 14;
-            }
-            break;
-        }
-        case 14: {
-            setGoal(0.2, TOUR_DROIT, 90);
-            Etat_mur = 15;
-            break;
-        }
-
-        case 15: {
-            if (isGoal()) {
-                Etat_mur = 16;
-            }
-            break;
-        }
-        case 16: {
-            Etat_mur = 0;
-            currentEtat = SUIVRE_LIGNE;
-            break;
-        }
+        break;
+    }
+    case 16:
+    {
+        Etat_mur = 0;       
+         retrouverLigne();
+        break;
+    }
     }
 }
 
