@@ -9,7 +9,7 @@
 Variables et #define
 accessibles seulement dans ce fichier.
 ******************************************************************************/
-#define ARRET_STATION_DELAY 5000 // Nombre de millisecondes que le robot est sensé rester à un arrêt de bus.
+#define ARRET_STATION_DELAY 5000 // Nombre de millisecondes que le robot est censé rester à un arrêt de bus.
 
 /******************************************************************************
 Fonctions

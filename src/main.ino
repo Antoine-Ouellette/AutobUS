@@ -10,6 +10,7 @@
 #include "lecture_capteurs.cpp" // Inclure les fonctions de lecture des capteurs.
 #include "moteurs.cpp" // Inclure les fonctions de contrôle des moteurs des roues.
 #include "etats_robot.cpp" // Inclure les actions à effectuer pour chaque état du robot.
+#include "moteur.h"
 
 /******************************************************************************
 Variables et #define
@@ -53,6 +54,8 @@ void lireCapteurs() {
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
+    //     SUIVEUR_init();      // Initialisation du suiveur de ligne.
+    //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
@@ -73,7 +76,13 @@ void loop() {
     //*** Lire les capteurs *********
     // Doit être effectué à toutes les loops.
     lireCapteurs();
-    
+
+    //*** Ajuster la vitesse pour le mouvement ***
+    if (isMoving) {
+        isGoal();
+        ajusteVitesse();
+    }
+
     //*** Effectuer les actions de l'état actuel *********
     if (currentEtat == ARRET && previousEtat != ARRET) {
         arreter();
@@ -87,11 +96,14 @@ void loop() {
         case CONTOURNER_OBSTACLE:
             contournerObstacle();
             break;
-        
+
         case STATION_BUS:
             reagirStation();
             break;
+        case ARRET:
+            //Il est déjà géré plus haut.
+            break;
     }
-    
+
     delay(10); // délai pour décharger le CPU.
 }

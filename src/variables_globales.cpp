@@ -9,6 +9,12 @@
 
 #include "variables_globales.h" // Récupérer la déclaration des variables globales.
 
+
+/**
+ * Variable pour savoir si le robot est en train de faire un déplacement
+ */
+bool isMoving = false;
+
 /**
  * État actuel du robot.
  */
@@ -17,7 +23,7 @@ Etat currentEtat = ARRET; // Au début, le robot est à l'arrêt.
 /**
  * État précédent du robot.
  */
-Etat previousEtat = ARRET;
+Etat previousEtat = currentEtat;
 
 /**
  * Nombre de millisecondes depuis le démarrage du robot.
