@@ -118,8 +118,7 @@ void retrouverLigne() {
     }
 }
 
-void suivreLigne() {
-    float VITESSE_AVANCE = 0.25; // Vitesse d'avancement en ligne droite normale
+void suivreLigne(float VITESSE_AVANCE) {
     float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
 
     Serial.println("SUIVEUR: ");
@@ -138,27 +137,23 @@ void suivreLigne() {
 
     switch (SUIVEUR_Read()) {
         case 0b010: // centré sur la ligne
-            Serial.println(" CENTRE: ");
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
             break;
 
         case 0b100: // corrige à gauche
-            Serial.println(" FORT GAUCHE: ");
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
             MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
             suivre_ligne_retroaction++;
             break;
 
         case 0b001: // corrige à droite
-            Serial.println(" FORT DROITE: ");
             MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
             break;
 
         case 0b000: // ligne perdue
-            Serial.println(" PERDU: ");
             if (suivre_ligne_retroaction >= 0) {
                 MOTOR_SetSpeed(RIGHT, 0.35);
             } else if (suivre_ligne_retroaction <= 0) {

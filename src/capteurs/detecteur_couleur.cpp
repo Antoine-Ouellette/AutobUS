@@ -3,9 +3,9 @@
  * Inclue la lecture du capteur et la conversion vers une valeur de l'enum COULEURS
  */
 
-#include "../detecteur_couleur.h"
 #include <Arduino.h>
 #include <Adafruit_TCS34725.h>
+#include "detecteur_couleur.h"
 
 
 //Variable pour connaitre le sensor de couleur

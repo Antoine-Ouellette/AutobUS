@@ -7,7 +7,7 @@
 
 void retrouverLigne();
 
-void suivreLigne();
+void suivreLigne(float VITESSE_AVANCE);
 
 void contournerObstacle();
 

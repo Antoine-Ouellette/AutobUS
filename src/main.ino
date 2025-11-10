@@ -7,10 +7,10 @@
  */
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-#include "lecture_capteurs.cpp" // Inclure les fonctions de lecture des capteurs.
-#include "moteurs.cpp" // Inclure les fonctions de contrôle des moteurs des roues.
-#include "etats_robot.cpp" // Inclure les actions à effectuer pour chaque état du robot.
+#include "lecture_capteurs.h" // Inclure les fonctions de lecture des capteurs.
+#include "etats_robot.h" // Inclure les actions à effectuer pour chaque état du robot.
 #include "moteur.h"
+#include "actions.h"
 
 /******************************************************************************
 Variables et #define
@@ -90,7 +90,7 @@ void loop() {
 
     switch (currentEtat) {
         case SUIVRE_LIGNE:
-            suivreLigne();
+            suivreLigne(0.25);
             break;
 
         case CONTOURNER_OBSTACLE:

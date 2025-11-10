@@ -3,7 +3,7 @@
  * Inclue la lecture du capteur et la conversion vers une valeur binaire
  */
 
-#include "../suiveur_ligne.h"
+#include "suiveur_ligne.h"
 #include <Arduino.h>
 
 constexpr int nbPins = 3;

@@ -4,32 +4,18 @@
  */
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
-
-/******************************************************************************
-Variables et #define
-accessibles seulement dans ce fichier.
-******************************************************************************/
-#define ARRET_STATION_DELAY 5000 // Nombre de millisecondes que le robot est censé rester à un arrêt de bus.
+#include "etats_robot.h"
 
 /******************************************************************************
 Fonctions
 ******************************************************************************/
 
 /**
- * Le robot suit la ligne noire au sol
- * et s'ajuste en continu jusqu'à ce que les capteurs
- * déclenchent un changement d'état.
- */
-void suivreLigne() {
-    //...
-}
-
-/**
  * Le robot contourne un obstacle détecté devant lui.
  * Ensuite, il retrouve la ligne noire par terre.
  * Enfin, il retourne à suivre la ligne.
  */
-void contournerObstacle() {
+void etatContournerObstacle() {
     if (!isObstacleContourne) {
         //...
     } else {
