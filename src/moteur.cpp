@@ -131,17 +131,17 @@ bool isGoal() {
 }
 
 void ajusteVitesse() {
+   
+    //Si on suit la ligne, on veut toujours avoir à avancer
+    if (mode_PID == LIGNE) {
+        suivreLigne(GoalVitesse);
+        return;
+    }
+
     const unsigned long currentTime = millis();
     const float delta = max(currentTime - millisLastPID, 1) / 1000.0; // En seconde
     millisLastPID = currentTime;
     float vitesseReel = GoalVitesse;
-
-    //Si on suit la ligne, on veut toujours avoir à avancer
-    if (mode_PID == LIGNE) {
-        //TODO : Appel la fonction de will?
-        //ajusteVitesseLigne();
-        return;
-    }
 
     calcEncCompletion();
 

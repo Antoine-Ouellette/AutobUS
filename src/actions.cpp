@@ -27,7 +27,7 @@ bool startedFollow = false;
  * L'état du robot est changé à SUIVRE_LIGNE pour continuer le défi.
  */
 void retrouverLigne() {
-    const float distanceDroite = 30;
+/*    const float distanceDroite = 30;
     const float distanceGauche = 60;
     const float vitesse = 0.3;
 
@@ -115,7 +115,7 @@ void retrouverLigne() {
                 startedFollow = false;
                 currentEtat = SUIVRE_LIGNE;
             }
-    }
+    }*/
 }
 
 void suivreLigne(float VITESSE_AVANCE) {
@@ -134,26 +134,29 @@ void suivreLigne(float VITESSE_AVANCE) {
     //     digitalWrite(leds[i], (result & (1 << i)) ? HIGH : LOW);
     // }
 
-
-    switch (SUIVEUR_Read()) {
-        case 0b010: // centré sur la ligne
+    // Combine les deux suiveurs de ligne sous un nombre binaire
+    uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
+   
+    //si 1, ligne est détectée, si 0, plancher
+    switch (combinaisonSensors) {
+        case 0b100001: // centré entre les lignes
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
             break;
 
-        case 0b100: // corrige à gauche
+        case 0b010000: // corrige à gauche
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
             MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
             suivre_ligne_retroaction++;
             break;
 
-        case 0b001: // corrige à droite
+        case 0b000010: // corrige à droite
             MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
             break;
 
-        case 0b000: // ligne perdue
+        case 0b000000: // ligne perdue
             if (suivre_ligne_retroaction >= 0) {
                 MOTOR_SetSpeed(RIGHT, 0.35);
             } else if (suivre_ligne_retroaction <= 0) {
