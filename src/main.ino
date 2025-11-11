@@ -54,7 +54,6 @@ void lireCapteurs() {
  */
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
-    //     SUIVEUR_init();      // Initialisation du suiveur de ligne.
     //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
@@ -62,8 +61,8 @@ void setup() {
     arreter();
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
-    // TODO: Remplacer par la detection du sifflet.
     while (!ROBUS_IsBumper(REAR));
+    //mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
 }
 
 /**
@@ -79,8 +78,8 @@ void loop() {
 
     //*** Ajuster la vitesse pour le mouvement ***
     if (isMoving) {
-        isGoal();
-        ajusteVitesse();
+        isGoal(); // Vérifie s'il a fini le mouvement pour stopper
+        ajusteVitesse(); // Met a jour les ajustement du PID/Suiveur de ligne
     }
 
     //*** Effectuer les actions de l'état actuel *********
@@ -90,7 +89,8 @@ void loop() {
 
     switch (currentEtat) {
         case SUIVRE_LIGNE:
-            suivreLigne(0.25);
+            // Ne rien faire de plus le PID s'en occupe.
+            //suivreLigne(0.25);
             break;
 
         case CONTOURNER_OBSTACLE:

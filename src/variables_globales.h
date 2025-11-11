@@ -34,6 +34,7 @@ constexpr int ppsMax = 4650 / 0.40; // pulse/s Max
 constexpr float completionGoal = 0.99; //Pourcentage de completion nécessaire pour avoir fini le mouvement.
 constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
 
+constexpr float rayonRobot = 9.8; // Rayon entre le centre et la roue du robot en cm
 constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti les degrés en cm
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 

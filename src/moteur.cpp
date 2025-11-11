@@ -15,7 +15,7 @@
 float ramp_duration = 3000; // Temps d'accélération du début du mouvement.
 float initialSpeed = 0.15; // Vitesse au début du mouvement.
 int side[2] = {0, 0}; // Coté de la rotation des roues 1, avant -1 arriere.
-float GoalVitesse = 0; //Vitesse voulue par les moteurs
+float GoalVitesse[2] = {0, 0}; //Vitesse voulue par les moteurs
 float GoalDistance[2] = {0, 0}; // Distance voulue pour chaque moteur.
 
 enum MODE { LIGNE, AUTONOME }; // Mode de fonctionnement du PID en suivre une ligne et être autonome.
@@ -43,8 +43,9 @@ void ENCODERS_Reset() {
 
 void resetPIDStats() {
     ENCODERS_Reset();
-    GoalVitesse = 0;
+
     for (int i = 0; i < 2; i++) {
+        GoalVitesse[i] = 0;
         current_error_PID[i] = 0;
         error_previous_PID[i] = 0;
         integral_PID[i] = 0;
@@ -65,26 +66,44 @@ void mouvementMoteurs(const float vitesse, const MOUVEMENT mouvement, const floa
     switch (mouvement) {
         case TOUR_GAUCHE:
             // TODO : Ajuster pour le décentrage
-            side[LEFT] = -1;
             side[RIGHT] = 1;
-            GoalVitesse = vitesse; // La roue droite avance.
-            GoalDistance[0] = distance * degToCmGauche * cmToPulse;
-            GoalDistance[1] = distance * degToCmGauche;
+            GoalVitesse[RIGHT] = vitesse;
+            GoalDistance[RIGHT] = (distance * (PI * (rayon + (DiamGRobot/2)) / 180)) * cmToPulse;
+
+            if (rayon <= (DiamGRobot/2)) {
+                side[LEFT] = -1;
+                GoalDistance[LEFT] = (distance * (PI * ((DiamGRobot/2) - rayon) / 180)) * cmToPulse;
+            } else {
+                side[LEFT] = 1;
+                GoalDistance[LEFT] = (distance * (PI * (rayon - (DiamGRobot/2)) / 180)) * cmToPulse;
+            }
+
+            GoalVitesse[LEFT] = side[LEFT] * GoalVitesse[RIGHT] * ((rayon - (DiamGRobot/2)) / (rayon + (DiamGRobot/2)));
+
             break;
         case TOUR_DROIT:
             // TODO : Ajuster pour le décentrage
-            // Appliquer des vitesses opposées aux deux moteurs.
             side[LEFT] = 1;
-            side[RIGHT] = -1;
-            GoalVitesse = vitesse; // La roue gauche avance.
-            GoalDistance[0] = distance * degToCmDroit * cmToPulse;
-            GoalDistance[1] = distance * degToCmDroit * cmToPulse;
+            GoalVitesse[LEFT] = vitesse;
+            GoalDistance[LEFT] = (distance * (PI * (rayon + (DiamDRobot/2)) / 180)) * cmToPulse;
+
+            if (rayon <= (DiamDRobot/2)) {
+                side[RIGHT] = -1;
+                GoalDistance[RIGHT] = (distance * (PI * ((DiamDRobot/2) - rayon) / 180)) * cmToPulse;
+            } else {
+                side[RIGHT] = 1;
+                GoalDistance[RIGHT] = (distance * (PI * (rayon - (DiamDRobot/2)) / 180)) * cmToPulse;
+            }
+
+            GoalVitesse[RIGHT] = side[RIGHT] * GoalVitesse[LEFT] * ((rayon - (DiamDRobot/2)) / (rayon + (DiamDRobot/2)));
+
             break;
         case AVANCE:
             // Appliquer une vitesse aux deux moteurs du robot.
             side[LEFT] = 1;
             side[RIGHT] = 1;
-            GoalVitesse = vitesse;
+            GoalVitesse[LEFT] = vitesse;
+            GoalVitesse[RIGHT] = vitesse;
             GoalDistance[0] = distance * cmToPulse;
             GoalDistance[1] = distance * cmToPulse;
             break;
@@ -92,11 +111,13 @@ void mouvementMoteurs(const float vitesse, const MOUVEMENT mouvement, const floa
             // Appliquer une vitesse aux deux moteurs du robot.
             side[LEFT] = -1;
             side[RIGHT] = -1;
-            GoalVitesse = vitesse;
+            GoalVitesse[LEFT] = vitesse;
+            GoalVitesse[RIGHT] = vitesse;
             GoalDistance[0] = -distance * cmToPulse;
             GoalDistance[1] = -distance * cmToPulse;
             break;
         case SUIVRE_LA_LIGNE:
+            GoalVitesse[LEFT] = vitesse;
             mode_PID = LIGNE;
             currentEtat = SUIVRE_LIGNE;
             return;
@@ -107,8 +128,8 @@ void mouvementMoteurs(const float vitesse, const MOUVEMENT mouvement, const floa
 void calcEncCompletion() {
     if (mode_PID == LIGNE) return;
 
-    const int32_t encLeft = ENCODER_Read(LEFT);
-    const int32_t encRight = ENCODER_Read(RIGHT);
+    const int32_t encLeft = side[LEFT] * ENCODER_Read(LEFT);
+    const int32_t encRight = side[RIGHT] * ENCODER_Read(RIGHT);
     encCompletion[LEFT] = max(encLeft / GoalDistance[LEFT], 0);
     // On fait le max pour être sûr de ne pas avoir de négatif.
     encCompletion[RIGHT] = max(encRight / GoalDistance[RIGHT], 0); // Même chose que l'autre ^
@@ -119,10 +140,12 @@ bool isGoal() {
 
     calcEncCompletion();
 
-    // Si le but est atteint
-    if (encCompletion[LEFT] > completionGoal || encCompletion[RIGHT] > completionGoal) {
-        if (isMoving)
+    // Si le but est atteint pour les deux
+    if (encCompletion[LEFT] > completionGoal && encCompletion[RIGHT] > completionGoal) {
+        if (isMoving) {
             arreter();
+            resetPIDStats();
+        }
         isMoving = false;
         return true;
     }
@@ -131,17 +154,16 @@ bool isGoal() {
 }
 
 void ajusteVitesse() {
-   
     //Si on suit la ligne, on veut toujours avoir à avancer
     if (mode_PID == LIGNE) {
-        suivreLigne(GoalVitesse);
+        suivreLigne(GoalVitesse[LEFT]);
         return;
     }
 
     const unsigned long currentTime = millis();
     const float delta = max(currentTime - millisLastPID, 1) / 1000.0; // En seconde
     millisLastPID = currentTime;
-    float vitesseReel = GoalVitesse;
+    float vitesseReel[2] = {GoalVitesse[LEFT], GoalVitesse[RIGHT]};
 
     calcEncCompletion();
 
@@ -160,8 +182,11 @@ void ajusteVitesse() {
     // }
 
     //Donne le nb de pulse qui devrait être fait depuis le début du mouvement.
-    pulseTotalSum[LEFT] += vitesseReel * ppsMax * delta * side[LEFT];
-    pulseTotalSum[RIGHT] += vitesseReel * ppsMax * delta * side[RIGHT];
+    if (abs(pulseTotalSum[LEFT]) - abs(GoalDistance[LEFT]) < 1)
+        pulseTotalSum[LEFT] += vitesseReel[LEFT] * ppsMax * delta * side[LEFT];
+
+    if (abs(pulseTotalSum[RIGHT]) - abs(GoalDistance[RIGHT]) < 1)
+        pulseTotalSum[RIGHT] += vitesseReel[RIGHT] * ppsMax * delta * side[RIGHT];
 
     current_error_PID[LEFT] = pulseTotalSum[LEFT] - ENCODER_Read(LEFT);
     current_error_PID[RIGHT] = pulseTotalSum[RIGHT] - ENCODER_Read(RIGHT);
