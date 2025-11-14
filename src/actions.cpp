@@ -144,18 +144,31 @@ void suivreLigne(float VITESSE_AVANCE) {
             suivre_ligne_retroaction = 0;
             break;
 
-        case 0b010000: // corrige à gauche
+        case 0b000010: // corrige à gauche
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
             MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
             suivre_ligne_retroaction++;
             break;
 
-        case 0b000010: // corrige à droite
+        case 0b010000: // corrige à droite
             MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
             break;
 
+        case 0b000001: // virage à Gauche
+            mouvementMoteurs(0.15, TOUR_GAUCHE, 90, rayonRobot);
+            break;
+
+        case 0b100000: // virage à Droite
+            mouvementMoteurs(0.15, TOUR_DROIT, 90, rayonRobot);
+            break;
+            
+        case 0b111111: //Ligne d'arrêt
+            arreter();
+            suivre_ligne_retroaction = 0;
+            break;
+        
         case 0b000000: // ligne perdue
             if (suivre_ligne_retroaction >= 0) {
                 MOTOR_SetSpeed(RIGHT, 0.35);
