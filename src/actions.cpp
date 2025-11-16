@@ -167,6 +167,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b111111: //Ligne d'arrêt
             arreter();
             suivre_ligne_retroaction = 0;
+            delay(2000);
             break;
         
         case 0b000000: // ligne perdue
@@ -174,6 +175,9 @@ void suivreLigne(float VITESSE_AVANCE) {
                 MOTOR_SetSpeed(RIGHT, 0.35);
             } else if (suivre_ligne_retroaction <= 0) {
                 MOTOR_SetSpeed(LEFT, 0.35);
+            }
+            else{
+                mouvementMoteurs(0.15, AVANCE, 50);
             }
             break;
     }
