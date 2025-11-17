@@ -136,7 +136,8 @@ void suivreLigne(float VITESSE_AVANCE) {
 
     // Combine les deux suiveurs de ligne sous un nombre binaire
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
-   
+    const int delaiArret = 2000;
+    double timerArret = 0;
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
         case 0b100001: // centré entre les lignes
@@ -167,17 +168,21 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b111111: //Ligne d'arrêt
             arreter();
             suivre_ligne_retroaction = 0;
-            delay(2000);
+            if (!timerArret) {
+                timerArret = millis();
+            } else if (millis() - timerArret >= delaiArret) {
+                // Après le délai, avancer de nouveau
+                timerArret = 0; // Réinitialiser le timer
+                mouvementMoteurs(0.15, AVANCE, distLigne);
+            }
             break;
         
         case 0b000000: // ligne perdue
             if (suivre_ligne_retroaction >= 0) {
                 MOTOR_SetSpeed(RIGHT, 0.35);
-            } else if (suivre_ligne_retroaction <= 0) {
+            } 
+            else if (suivre_ligne_retroaction <= 0) {
                 MOTOR_SetSpeed(LEFT, 0.35);
-            }
-            else{
-                mouvementMoteurs(0.15, AVANCE, 50);
             }
             break;
     }

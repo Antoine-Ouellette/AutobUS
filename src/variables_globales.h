@@ -40,6 +40,7 @@ constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les
 
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
 
+constexpr int distLigne = 21.02; // distance entre les deux lignes en cm
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
  */
