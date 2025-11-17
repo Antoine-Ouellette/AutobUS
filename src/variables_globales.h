@@ -89,4 +89,7 @@ extern bool isArreterProchaineStation;
  */
 extern bool isObstacleContourne;
 
+//distance entre l'obstacle et capteur
+constexpr float DistanceObstacle = rayonRobot * 2 + 5; 
+
 #endif
