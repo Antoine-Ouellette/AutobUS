@@ -144,7 +144,6 @@ bool isGoal() {
     if (encCompletion[LEFT] > completionGoal && encCompletion[RIGHT] > completionGoal) {
         if (isMoving) {
             arreter();
-            resetPIDStats();
         }
         isMoving = false;
         return true;
