@@ -11,23 +11,6 @@ Fonctions
 ******************************************************************************/
 
 /**
- * Le robot contourne un obstacle détecté devant lui.
- * Ensuite, il retrouve la ligne noire par terre.
- * Enfin, il retourne à suivre la ligne.
- */
-void etatContournerObstacle() {
-    if (!isObstacleContourne) {
-        //...
-    } else {
-        // À la fin, on enregistre que l'état qu'on vient de terminer est CONTOURNER_OBSTACLE.
-        previousEtat = CONTOURNER_OBSTACLE;
-        
-        // Retourner à suivre la ligne.
-        currentEtat = SUIVRE_LIGNE;
-    }
-}
-
-/**
  * Réaction lorsque le robot atteint une station de bus.
  * 
  * Le robot met à jour l'écran du nom du prochain arrêt.

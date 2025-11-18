@@ -10,12 +10,6 @@ accessibles seulement dans ce fichier.
 ******************************************************************************/
 #define ARRET_STATION_DELAY 5000 // Nombre de millisecondes que le robot est censé rester à un arrêt de bus.
 
-/**
- * Le robot contourne un obstacle détecté devant lui.
- * Ensuite, il retrouve la ligne noire par terre.
- * Enfin, il retourne à suivre la ligne.
- */
-void etatContournerObstacle();
 
 /**
  * Réaction lorsque le robot atteint une station de bus.

@@ -37,6 +37,8 @@ unsigned long currentMillis = 0;
  */
 unsigned long tempsDebutTimerEtatRobot = 0;
 
+unsigned long tempsDebutTimerContourner = 0;
+
 /**
  * Indique si le robot doit s'arrêter à la prochaine station de bus.
  */
