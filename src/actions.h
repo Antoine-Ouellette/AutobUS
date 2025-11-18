@@ -5,6 +5,8 @@
 #ifndef AUTOBUS_ACTIONS_STATIONS_H
 #define AUTOBUS_ACTIONS_STATIONS_H
 
+void eteindreLEDsSuiveurLigne();
+
 void retrouverLigne();
 
 void suivreLigne(float VITESSE_AVANCE);

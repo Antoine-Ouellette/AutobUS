@@ -7,6 +7,8 @@
 #define AUTOBUS_SUIVEUR_LIGNE_H
 #include <stdint.h>
 
+void SUIVEUR_init() ;
+
 /**
  *
  * {gauche, centre, droite} => \n

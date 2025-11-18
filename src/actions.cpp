@@ -14,9 +14,15 @@ int Etat_mur = 0;
 int Etat_retrouver = 4;
 
 
-int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise
+int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise (negative = droite, positive = gauche)
 bool startedFollow = false;
 
+void eteindreLedsSuiveur() {
+    digitalWrite(10, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(12, LOW);
+    digitalWrite(13, LOW);
+}
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
 /**
@@ -119,10 +125,8 @@ void retrouverLigne() {
 }
 
 void suivreLigne(float VITESSE_AVANCE) {
-    float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
-
-    Serial.println("SUIVEUR: ");
-
+    float VITESSE_CORRECTION = VITESSE_AVANCE * 0.5; // Vitesse de correction pour retrouver la ligne
+    float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue 
     if (!startedFollow) {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
@@ -138,52 +142,93 @@ void suivreLigne(float VITESSE_AVANCE) {
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
     const int delaiArret = 2000;
     double timerArret = 0;
+
+    // // Si combinaisonSensor contien 0b100000, le resee des bits on sen fout 
+    // if (combinaisonSensors & 0b100000)
+    // {
+
+    // }
+
+    
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
+        case 0b000001:
         case 0b100001: // centré entre les lignes
+            eteindreLedsSuiveur();
+            digitalWrite(10, HIGH);
+            digitalWrite(11, HIGH);
+            
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
             break;
 
         case 0b000010: // corrige à gauche
+            eteindreLedsSuiveur();
+            digitalWrite(12, HIGH);
+            
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
-            MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
+            MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
             suivre_ligne_retroaction++;
             break;
 
         case 0b010000: // corrige à droite
-            MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
+            eteindreLedsSuiveur();
+            digitalWrite(13, HIGH);
+            
+            MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
             break;
 
-        case 0b000001: // virage à Gauche
-            mouvementMoteurs(0.15, TOUR_GAUCHE, 90, rayonRobot);
+/*        case 0b000001: // virage à Gauche
+            eteindreLedsSuiveur();
+            digitalWrite(11, HIGH);
+            
+            mouvementMoteurs(VITESSE_CORRECTION, TOUR_GAUCHE, 90, rayonRobot+4);
+            suivre_ligne_retroaction++;
             break;
 
         case 0b100000: // virage à Droite
-            mouvementMoteurs(0.15, TOUR_DROIT, 90, rayonRobot);
-            break;
+            eteindreLedsSuiveur();
+            digitalWrite(10, HIGH);
             
+            mouvementMoteurs(VITESSE_CORRECTION, TOUR_DROIT, 90, rayonRobot);
+            suivre_ligne_retroaction--;
+            break;
+*/            
         case 0b111111: //Ligne d'arrêt
-            arreter();
-            suivre_ligne_retroaction = 0;
+            eteindreLedsSuiveur();
+            digitalWrite(10, HIGH);
+            digitalWrite(11, HIGH);
+            digitalWrite(12, HIGH);
+            digitalWrite(13, HIGH);
+            
             if (!timerArret) {
+                suivre_ligne_retroaction = 0;
+                arreter();
                 timerArret = millis();
             } else if (millis() - timerArret >= delaiArret) {
                 // Après le délai, avancer de nouveau
                 timerArret = 0; // Réinitialiser le timer
-                mouvementMoteurs(0.15, AVANCE, distLigne);
+                mouvementMoteurs(VITESSE_AVANCE*0.4, AVANCE, distLigne);
             }
             break;
         
         case 0b000000: // ligne perdue
-            if (suivre_ligne_retroaction >= 0) {
-                MOTOR_SetSpeed(RIGHT, 0.35);
+            eteindreLedsSuiveur();
+            
+            if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
+                MOTOR_SetSpeed(LEFT, VITESSE_BANG);
             } 
-            else if (suivre_ligne_retroaction <= 0) {
-                MOTOR_SetSpeed(LEFT, 0.35);
+            else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
+                MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
             }
+            break;
+        
+        default:
+            eteindreLedsSuiveur();
+            
+            avancer(VITESSE_AVANCE);
             break;
     }
 }
