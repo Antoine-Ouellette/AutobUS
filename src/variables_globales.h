@@ -27,6 +27,7 @@
 #define DiamGRobot 19.0
 #endif
 
+constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
 
 // Constantes
 constexpr float ppmsMax = 10; // pulse/ms max
@@ -39,6 +40,7 @@ constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti le
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
+constexpr int ledsClignotant[4]={}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
 
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement

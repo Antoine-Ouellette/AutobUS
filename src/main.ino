@@ -77,6 +77,10 @@ void loop() {
     lireCapteurs();
 
     //*** Ajuster la vitesse pour le mouvement ***
+    //*** Update l'état des clignotants du bus *********
+    updateClignotant();
+
+    //*** Ajuster la vitesse pour le mouvement *********
     if (isMoving) {
         isGoal(); // Vérifie s'il a fini le mouvement pour stopper
         ajusteVitesse(); // Met a jour les ajustement du PID/Suiveur de ligne

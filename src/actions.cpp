@@ -17,6 +17,37 @@ int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise
 bool startedFollow = false;
 
 
+unsigned long lastClignote = 0;
+bool clignote, clignoteG, clignoteD;
+
+void ajouteClignotant(const int cote) {
+    if (cote == RIGHT) clignoteD = true;
+    else if (cote == LEFT) clignoteG = true;
+}
+
+void enleveClignotant() {
+    clignoteG = false;
+    clignoteD = false;
+}
+
+void updateClignotant() {
+    if (millis() < lastClignote + clignotant_delay) return;
+
+    if (clignoteG) {
+        for (int i = 0; i < 2; i++) {
+            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+        }
+    }
+    if (clignoteD) {
+        for (int i = 2; i < 4; i++) {
+            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+        }
+    }
+
+    clignote = !clignote;
+    lastClignote = millis();
+}
+
 
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
