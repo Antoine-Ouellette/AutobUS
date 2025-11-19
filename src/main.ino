@@ -11,6 +11,11 @@
 #include "etats_robot.h" // Inclure les actions à effectuer pour chaque état du robot.
 #include "moteur.h"
 #include "actions.h"
+#include "arret.h"
+
+#include "../build\piolibdeps\megaatmega2560\Adafruit GFX Library\Fonts\FreeSans18pt7b.h"
+
+
 
 /******************************************************************************
 Variables et #define
@@ -56,6 +61,9 @@ void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
     //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
 
+    display.begin(0x3c, true); // Address 0x3C for 128x64
+    display.setFont(&FreeSans18pt7b);
+
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
     arreter();
@@ -63,6 +71,10 @@ void setup() {
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
     //mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
+
+    affichage_ecran(arrets[4]); // Afficher le premier arrêt au démarrage.
+
+
 }
 
 /**
