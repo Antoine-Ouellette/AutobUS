@@ -29,6 +29,10 @@ bool lireCapteurProximite() {
  * @return true si le bouton est appuyé, false sinon.
  */
 bool lireBoutonArretDemande() {
-    // ...
-    return false;
+    if (digitalRead(PIN_BUTTON) == LOW) {
+        isArreterProchaineStation = true;
+        return true;
+    } else {
+        return false;
+    }
 }

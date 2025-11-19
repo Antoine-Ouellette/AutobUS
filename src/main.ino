@@ -68,6 +68,8 @@ void setup() {
     // à cause de la mise sous tension précédente.
     arreter();
 
+    pinMode(PIN_BUTTON, INPUT); // Définir la pin du bouton d'arrêt comme entrée.
+
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
     //mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
