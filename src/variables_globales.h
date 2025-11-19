@@ -17,8 +17,8 @@
 
 #if MODEL == ROBOTB
 //Robot B
-#define  DiamDRobot  19.6
-#define  DiamGRobot  19.9
+#define  DiamDRobot  19.4
+#define  DiamGRobot  19.4
 #endif
 
 #if MODEL == ROBOTA
@@ -27,6 +27,10 @@
 #define DiamGRobot 19.0
 #endif
 
+#define PIN_BUTTON A15 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
+
+constexpr long contourner_delay = 10000; // Temps que le robot attend avant de contourner l'obstacle;
+constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
 
 // Constantes
 constexpr float ppmsMax = 10; // pulse/ms max
@@ -34,11 +38,15 @@ constexpr int ppsMax = 4650 / 0.40; // pulse/s Max
 constexpr float completionGoal = 0.99; //Pourcentage de completion nécessaire pour avoir fini le mouvement.
 constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
 
-constexpr float rayonRobot = 9.8; // Rayon entre le centre et la roue du robot en cm
+constexpr float rayonRobot = 9.7; // Rayon entre le centre et la roue du robot en cm
 constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti les degrés en cm
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
+//distance entre l'obstacle et capteur
+constexpr float DistanceObstacle = rayonRobot * 2 + 5;
+
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
+constexpr int ledsClignotant[4]={}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
 
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
@@ -77,6 +85,12 @@ extern unsigned long currentMillis;
  * Sert à tracker le temps écoulé depuis le début du timer.
  */
 extern unsigned long tempsDebutTimerEtatRobot;
+
+/**
+ * Quel était le temps quand le timer a débuté.
+ * Sert à tracker le temps écoulé depuis le début du timer.
+ */
+extern unsigned long tempsDebutTimerContourner;
 
 /**
  * Indique si le robot doit s'arrêter à la prochaine station de bus.

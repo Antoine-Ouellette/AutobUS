@@ -16,6 +16,7 @@
 #include "../build\piolibdeps\megaatmega2560\Adafruit GFX Library\Fonts\FreeSans18pt7b.h"
 
 
+#include "capteurs/detecteur_IR.h"
 
 /******************************************************************************
 Variables et #define
@@ -41,9 +42,16 @@ void lireCapteurs() {
         tempsDebutTimerEtatRobot = millis();
     }
     // Vérifier s'il y a un obstacle devant le robot.
-    else if (currentEtat != CONTOURNER_OBSTACLE && lireCapteurProximite()) {
-        // Débuter l'état CONTOURNER_OBSTACLE.
-        currentEtat = CONTOURNER_OBSTACLE;
+    else if (currentEtat != CONTOURNER_OBSTACLE && IR_ReadDistanceCm(FRONT) <= DistanceObstacle) {
+        if (isMoving) {
+            arreter();
+            tempsDebutTimerContourner = millis();
+        }
+        // Si durant tout le delai d'attente d'obstacle il est resté là, on le contourne
+        else if (tempsDebutTimerContourner + contourner_delay < millis()) {
+            // Débuter l'état CONTOURNER_OBSTACLE.
+            currentEtat = CONTOURNER_OBSTACLE;
+        }
     }
     // Vérifier si le bouton Arrêt demandé est appuyé.
     else if (!isArreterProchaineStation && lireBoutonArretDemande()) {
@@ -68,6 +76,8 @@ void setup() {
     // à cause de la mise sous tension précédente.
     arreter();
 
+    pinMode(PIN_BUTTON, INPUT); // Définir la pin du bouton d'arrêt comme entrée.
+
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
     //mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
@@ -88,10 +98,13 @@ void loop() {
     // Doit être effectué à toutes les loops.
     lireCapteurs();
 
-    //*** Ajuster la vitesse pour le mouvement ***
+    //*** Update l'état des clignotants du bus *********
+    updateClignotant();
+
+    //*** Ajuster la vitesse pour le mouvement *********
     if (isMoving) {
         isGoal(); // Vérifie s'il a fini le mouvement pour stopper
-        ajusteVitesse(); // Met a jour les ajustement du PID/Suiveur de ligne
+        ajusteVitesse(); // Met à jour les ajustement du PID/Suiveur de ligne
     }
 
     //*** Effectuer les actions de l'état actuel *********
@@ -114,6 +127,8 @@ void loop() {
             break;
         case ARRET:
             //Il est déjà géré plus haut.
+            break;
+        default:
             break;
     }
 

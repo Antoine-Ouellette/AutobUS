@@ -20,12 +20,6 @@ accessibles seulement dans ce fichier.
 #define OLED_RESET -1   //   QT-PY / XIAO
 extern Adafruit_SH1106G display; 
 
-/**
- * Le robot contourne un obstacle détecté devant lui.
- * Ensuite, il retrouve la ligne noire par terre.
- * Enfin, il retourne à suivre la ligne.
- */
-void etatContournerObstacle();
 
 void affichage_ecran(Arret arret);
 
