@@ -64,6 +64,7 @@ void quatreClignotants()
     ajouteClignotant(RIGHT);
 }
 
+
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
 /**

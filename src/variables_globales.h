@@ -9,6 +9,7 @@
 #define VARIABLES_GLOBALES_H
 
 #include "Arduino.h"
+#include <Adafruit_TCS34725.h>
 
 //Constantes qui sont spécifiques au différent robot.
 #define ROBOTA 1
@@ -26,6 +27,8 @@
 #define DiamDRobot 18.8
 #define DiamGRobot 19.0
 #endif
+
+#define PIN_BUTTON A15 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
 
 constexpr long contourner_delay = 10000; // Temps que le robot attend avant de contourner l'obstacle;
 constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
@@ -94,6 +97,12 @@ extern unsigned long tempsDebutTimerContourner;
  * Indique si le robot doit s'arrêter à la prochaine station de bus.
  */
 extern bool isArreterProchaineStation;
+
+/**
+ * Classe pour utiliser le capteur de couleur.
+ * Provient de la bibliothèque Adafruit_TCS34725.
+ */
+extern Adafruit_TCS34725 ColorSensor;
 
 /**
  * Indique si le robot a terminé de contourner l'obstacle.
