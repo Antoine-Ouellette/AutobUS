@@ -161,25 +161,32 @@ bool lireCapteurProximite() {
  * Lit l'état du bouton d'arrêt demandé.
  */
 void lireBoutonArretDemande() {
-    // Read current state of button pin.
-    int nowButtonState = digitalRead(PIN_BUTTON);
-    Serial.print("Button state: "); Serial.println(nowButtonState);
+    // // Read current state of button pin.
+    // int nowButtonState = digitalRead(PIN_BUTTON);
+    // Serial.print("Button state: "); Serial.println(nowButtonState);
 
-    // If button pin state has changed, record the time point.
-    if (nowButtonState != lastButtonState) {
-        lastChangeTime = millis();
+    // // If button pin state has changed, record the time point.
+    // if (nowButtonState != lastButtonState) {
+    //     lastChangeTime = millis();
+    // }
+
+    // // If button state changes, and stays stable for a while, then it should have skipped the bounce area.
+    // if (millis() - lastChangeTime > 10) {
+    //     if (buttonState != nowButtonState) { // Only proceed if button state has changed.
+    //         buttonState = nowButtonState;
+    //         if (buttonState == LOW) { // Low level indicates the button is pressed.
+    //             isArreterProchaineStation = true;
+    //             Serial.println("Arrêt demandé.");
+    //         }
+    //     }
+    // }
+
+    // // Save the latest state for next time.
+    // lastButtonState = nowButtonState;
+    Serial.print("Button state: "); Serial.println(digitalRead(PIN_BUTTON));
+    
+    if(!digitalRead(PIN_BUTTON)) {
+        isArreterProchaineStation = true;
+        Serial.println("Arrêt demandé.");
     }
-
-    // If button state changes, and stays stable for a while, then it should have skipped the bounce area.
-    if (millis() - lastChangeTime > 10) {
-        if (buttonState != nowButtonState) { // Only proceed if button state has changed.
-            buttonState = nowButtonState;
-            if (buttonState == LOW) { // Low level indicates the button is pressed.
-                isArreterProchaineStation = true;
-            }
-        }
-    }
-
-    // Save the latest state for next time.
-    lastButtonState = nowButtonState;
 }

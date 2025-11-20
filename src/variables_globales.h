@@ -28,7 +28,7 @@
 #define DiamGRobot 19.0
 #endif
 
-#define PIN_BUTTON 52 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
+#define PIN_BUTTON 49 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
 
 constexpr long contourner_delay = 10000; // Temps que le robot attend avant de contourner l'obstacle;
 constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
