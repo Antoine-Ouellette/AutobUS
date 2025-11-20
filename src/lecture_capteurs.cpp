@@ -163,6 +163,7 @@ bool lireCapteurProximite() {
 void lireBoutonArretDemande() {
     // Read current state of button pin.
     int nowButtonState = digitalRead(PIN_BUTTON);
+    Serial.print("Button state: "); Serial.println(nowButtonState);
 
     // If button pin state has changed, record the time point.
     if (nowButtonState != lastButtonState) {
