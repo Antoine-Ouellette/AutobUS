@@ -65,7 +65,6 @@ void mouvementMoteurs(const float vitesse, const MOUVEMENT mouvement, const floa
 
     switch (mouvement) {
         case TOUR_GAUCHE:
-            // TODO : Ajuster pour le décentrage
             side[RIGHT] = 1;
             GoalVitesse[RIGHT] = vitesse;
             GoalDistance[RIGHT] = (distance * (PI * (rayon + (DiamGRobot/2)) / 180)) * cmToPulse;
@@ -82,7 +81,6 @@ void mouvementMoteurs(const float vitesse, const MOUVEMENT mouvement, const floa
 
             break;
         case TOUR_DROIT:
-            // TODO : Ajuster pour le décentrage
             side[LEFT] = 1;
             GoalVitesse[LEFT] = vitesse;
             GoalDistance[LEFT] = (distance * (PI * (rayon + (DiamDRobot/2)) / 180)) * cmToPulse;
@@ -144,7 +142,6 @@ bool isGoal() {
     if (encCompletion[LEFT] > completionGoal && encCompletion[RIGHT] > completionGoal) {
         if (isMoving) {
             arreter();
-            resetPIDStats();
         }
         isMoving = false;
         return true;

@@ -5,12 +5,14 @@
  * Description: Boucle principale du robot. S'occupe des états du robot (avancer, arrêt, tourner).
  * Date: 2025-10-02
  */
-#include <LibRobus.h>           // Essentielle pour utiliser RobUS.
+#include <LibRobus.h> // Essentielle pour utiliser RobUS.
+#include <Adafruit_TCS34725.h> // Bibliothèque pour le capteur de couleur.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "lecture_capteurs.h"   // Inclure les fonctions de lecture des capteurs.
 #include "etats_robot.h"        // Inclure les actions à effectuer pour chaque état du robot.
 #include "moteur.h"
 #include "actions.h"
+#include "capteurs/detecteur_IR.h"
 #include "capteurs/suiveur_ligne.h"
 
 /******************************************************************************
@@ -39,16 +41,20 @@ void lireCapteurs()
         tempsDebutTimerEtatRobot = millis();
     }
     // Vérifier s'il y a un obstacle devant le robot.
-    else if (currentEtat != CONTOURNER_OBSTACLE && lireCapteurProximite())
-    {
-        // Débuter l'état CONTOURNER_OBSTACLE.
-        currentEtat = CONTOURNER_OBSTACLE;
+    else if (currentEtat != CONTOURNER_OBSTACLE && IR_ReadDistanceCm(FRONT) <= DistanceObstacle) {
+        if (isMoving) {
+            arreter();
+            tempsDebutTimerContourner = millis();
+        }
+        // Si durant tout le delai d'attente d'obstacle il est resté là, on le contourne
+        else if (tempsDebutTimerContourner + contourner_delay < millis()) {
+            // Débuter l'état CONTOURNER_OBSTACLE.
+            currentEtat = CONTOURNER_OBSTACLE;
+        }
     }
     // Vérifier si le bouton Arrêt demandé est appuyé.
-    else if (!isArreterProchaineStation && lireBoutonArretDemande())
-    {
-        // Indiquer qu'il faut s'arrêter quand on va atteindre la prochaine station.
-        isArreterProchaineStation = true;
+    else if (!isArreterProchaineStation) {
+        lireBoutonArretDemande();
     }
 }
 
@@ -61,6 +67,7 @@ void setup()
 {
     BoardInit(); // Initialisation de la carte RobUS.
     //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+    CLIGNOTANT_init();
     SUIVEUR_init();
 
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
@@ -69,6 +76,12 @@ void setup()
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
     arreter();
+
+    pinMode(PIN_BUTTON, INPUT_PULLUP); // Définir la pin du bouton d'arrêt comme entrée.
+    // Instanciation du capteur de couleur.
+    ColorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+    ColorSensor.begin();
+    ColorSensor.setInterrupt(false);
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR))
@@ -93,11 +106,13 @@ void loop()
     // Doit être effectué à toutes les loops.
     lireCapteurs();
 
-    //*** Ajuster la vitesse pour le mouvement ***
-    if (isMoving)
-    {
-        isGoal();        // Vérifie s'il a fini le mouvement pour stopper
-        ajusteVitesse(); // Met a jour les ajustement du PID/Suiveur de ligne
+    //*** Update l'état des clignotants du bus *********
+    updateClignotant();
+
+    //*** Ajuster la vitesse pour le mouvement *********
+    if (isMoving) {
+        isGoal(); // Vérifie s'il a fini le mouvement pour stopper
+        ajusteVitesse(); // Met à jour les ajustement du PID/Suiveur de ligne
     }
 
     //*** Effectuer les actions de l'état actuel *********
@@ -118,12 +133,14 @@ void loop()
         contournerObstacle();
         break;
 
-    case STATION_BUS:
-        reagirStation();
-        break;
-    case ARRET:
-        // Il est déjà géré plus haut.
-        break;
+        case STATION_BUS:
+            reagirStation();
+            break;
+        case ARRET:
+            //Il est déjà géré plus haut.
+            break;
+        default:
+            break;
     }
 
     delay(10); // délai pour décharger le CPU.

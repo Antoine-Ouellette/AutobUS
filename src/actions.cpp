@@ -17,6 +17,55 @@ int Etat_retrouver = 4;
 int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise (negative = droite, positive = gauche)
 bool startedFollow = false;
 
+
+unsigned long lastClignote = 0;
+bool clignote, clignoteG, clignoteD;
+
+void CLIGNOTANT_init()
+{
+    for (int i = 0; i < 4; i++){
+        pinMode(ledsClignotant[i],OUTPUT);
+    }
+}
+
+void ajouteClignotant(const int cote) {
+    if (cote == RIGHT) clignoteD = true;
+    else if (cote == LEFT) clignoteG = true;
+}
+
+void enleveClignotant() {
+    clignoteG = false;
+    clignoteD = false;
+     for (int i = 0; i < 4; i++) {
+           digitalWrite(ledsClignotant[i],  LOW);
+      }
+}
+
+void updateClignotant() {
+    if (millis() < lastClignote + clignotant_delay) return;
+
+    if (clignoteG) {
+        for (int i = 0; i < 2; i++) {
+            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+        }
+    }
+     if (clignoteD) {
+         for (int i = 2; i < 4; i++) {
+             digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+         }
+     }
+
+    clignote = !clignote;
+    lastClignote = millis();
+}
+
+void quatreClignotants()
+{
+    ajouteClignotant(LEFT);
+    ajouteClignotant(RIGHT);
+}
+
+
 void eteindreLedsSuiveur() {
     digitalWrite(10, LOW);
     digitalWrite(11, LOW);
@@ -35,7 +84,8 @@ void suivreLigne(float VITESSE_AVANCE) {
     float VITESSE_CORRECTION = VITESSE_AVANCE * 0.4; // Vitesse de correction pour retrouver la ligne
     float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue
 
-    if (!startedFollow) {
+    if (!startedFollow)
+    {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
     }
@@ -189,112 +239,121 @@ void suivreLigne(float VITESSE_AVANCE) {
  * Le robot avance jusqu'à retrouver la ligne (utilise la méthode retrouverLigne()).
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
-void contournerObstacle() {
-    uint16_t distanceSeuil = 25;
-    switch (Etat_mur) {
-        case 0: {
-            mouvementMoteurs(0.2, AVANCE, 100);
-            Etat_mur = 1;
-            break;
-        }
-        case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
-        {
-            float distanceActuelle = IR_ReadDistanceCm(FRONT);
-            if (distanceActuelle <= distanceSeuil) {
-                arreter();
-                Etat_mur = 2;
-            }
-            break;
-        }
 
-        case 2: // Avancer plus loin que l'obstacle
-        {
-            mouvementMoteurs(0.2, TOUR_DROIT, 90);
-            Etat_mur = 3;
-            break;
-        }
-
-        case 3: {
-            if (isGoal()) {
-                Etat_mur = 4;
-            }
-            break;
-        }
-        case 4: {
-            mouvementMoteurs(0.2, AVANCE, 40);
-            Etat_mur = 5;
-            break;
-        }
-        case 5: {
-            if (isGoal()) {
-                Etat_mur = 6;
-            }
-            break;
-        }
-        case 6: {
-            mouvementMoteurs(0.2, TOUR_GAUCHE, 90);
-            Etat_mur = 7;
-            break;
-        }
-
-        case 7: {
-            if (isGoal()) {
-                Etat_mur = 8;
-            }
-            break;
-        }
-        case 8: {
-            mouvementMoteurs(0.2, AVANCE, 60);
-            Etat_mur = 9;
-            break;
-        }
-        case 9: {
-            if (isGoal()) {
-                Etat_mur = 10;
-            }
-            break;
-        }
-        case 10: {
-            mouvementMoteurs(0.2, TOUR_GAUCHE, 90);
-            Etat_mur = 11;
-            break;
-        }
-
-        case 11: {
-            if (isGoal()) {
-                Etat_mur = 12;
-            }
-            break;
-        }
-        case 12: {
-            mouvementMoteurs(0.2, AVANCE, 40);
-            Etat_mur = 13;
-            break;
-        }
-        case 13: {
-            if (isGoal()) {
-                Etat_mur = 14;
-            }
-            break;
-        }
-        case 14: {
-            mouvementMoteurs(0.2, TOUR_DROIT, 90);
-            Etat_mur = 15;
-            break;
-        }
-
-        case 15: {
-            if (isGoal()) {
-                Etat_mur = 16;
-            }
-            break;
-        }
-        case 16: {
-            Etat_mur = 0;
-            mouvementMoteurs(0.3);
-            break;
-        }
+void contournerObstacle()
+{
+    switch (Etat_mur)
+    {
+    case 0:
+    {
+        mouvementMoteurs(0.25, AVANCE, 100);
+        Etat_mur = 1;
+        break;
     }
+    case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
+    {
+        if (IR_ReadDistanceCm(FRONT) <= DistanceObstacle)
+        {
+            Etat_mur = 2;
+        }
+        break;
+    }
+
+    case 2: // Avancer plus loin que l'obstacle
+    {
+        mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
+        quatreClignotants();
+        Etat_mur = 3;
+        break;
+    }
+
+    case 3:
+    {
+
+        if (isGoal())
+        {
+            Etat_mur = 4;
+        }
+        break;
+    }
+    case 4:
+    {
+        mouvementMoteurs(0.25, AVANCE, 100);
+        Etat_mur = 5;
+        break;
+    }
+    case 5:
+    {
+    
+        if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
+        {
+            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+            Etat_mur = 7;
+        }
+        break;
+    }
+    case 7:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 8;
+        }
+        break;
+    }
+    case 8:
+    {
+        mouvementMoteurs(0.25, AVANCE, 100);
+        Etat_mur = 9;
+        break;
+    }
+    case 9:
+    {
+        if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
+        {
+            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+            Etat_mur = 11;
+        }
+        break;
+    }
+
+    case 11:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 12;
+        }
+        break;
+    }
+    case 12:
+    {
+        mouvementMoteurs(0.25, AVANCE, 100);
+        Etat_mur = 13;
+        break;
+    }
+    case 13:
+    {
+        if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111)
+        {
+            mouvementMoteurs(0.3, TOUR_GAUCHE, 90, rayonRobot);
+            Etat_mur = 15;
+        }
+        break;
+    }
+
+    case 15:
+    {
+        if (isGoal())
+        {
+            Etat_mur = 16;
+        }
+        break;
+    }
+    case 16:
+    {
+        enleveClignotant();
+        Etat_mur = 0;
+        mouvementMoteurs(0.3, SUIVRE_LA_LIGNE);
+        break;
+    }
+    };
 }
-
-

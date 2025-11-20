@@ -9,7 +9,6 @@
 
 #include "variables_globales.h" // Récupérer la déclaration des variables globales.
 
-
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
  */
@@ -37,10 +36,18 @@ unsigned long currentMillis = 0;
  */
 unsigned long tempsDebutTimerEtatRobot = 0;
 
+unsigned long tempsDebutTimerContourner = 0;
+
 /**
  * Indique si le robot doit s'arrêter à la prochaine station de bus.
  */
 bool isArreterProchaineStation = false;
+
+/**
+ * Classe pour utiliser le capteur de couleur.
+ * Provient de la bibliothèque Adafruit_TCS34725.
+ */
+Adafruit_TCS34725 ColorSensor;
 
 /**
  * Indique si le robot a terminé de contourner l'obstacle.
