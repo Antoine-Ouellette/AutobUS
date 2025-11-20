@@ -27,14 +27,14 @@ void eteindreLedsSuiveur() {
 /**
  * Faire suivre la ligne au robot en utilisant les capteurs suiveurs de ligne.
  * Utilise une logique de type bang-bang pour corriger la trajectoire.
- * 
+ *
  * @param VITESSE_AVANCE La vitesse à laquelle le robot doit avancer en suivant la ligne.
  */
 
 void suivreLigne(float VITESSE_AVANCE) {
     float VITESSE_CORRECTION = VITESSE_AVANCE * 0.4; // Vitesse de correction pour retrouver la ligne
-    float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue 
-    
+    float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue
+
     if (!startedFollow) {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
@@ -57,7 +57,9 @@ void suivreLigne(float VITESSE_AVANCE) {
     const int delaiArret = 2000;
     static int etapeArret = 0;  // Étape actuelle dans la séquence d'arrêt
     static unsigned long timerArret = 0;
-    
+
+    // Serial.println(combinaisonSensors, BIN);
+
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
         case 0b000001:
@@ -66,11 +68,11 @@ void suivreLigne(float VITESSE_AVANCE) {
             eteindreLedsSuiveur();
             digitalWrite(10, HIGH);
             digitalWrite(11, HIGH);
-            
+
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
             break;
-        
+
         case 0b001111:
         case 0b111100:
         case 0b111110:
@@ -83,14 +85,14 @@ void suivreLigne(float VITESSE_AVANCE) {
             digitalWrite(11, HIGH);
             digitalWrite(12, HIGH);
             digitalWrite(13, HIGH);
-            
+
             switch (etapeArret) {
                 case 0://arrête
                     arreter();
                     timerArret = millis();
                     etapeArret++;
                     break;
-                
+
                 case 1: //attend pour faire son stop
                     if (millis() - timerArret >= delaiArret) {
                         // Après le délai, avancer de nouveau
@@ -98,12 +100,12 @@ void suivreLigne(float VITESSE_AVANCE) {
                         etapeArret++;
                     }
                     break;
-                
+
                 case 2: //traverse l'intersection
                     mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne);
                     etapeArret++;
                     break;
-                
+
                 case 3:  //retrouve sa ligne
                     uint8_t sg = SUIVEUR_Read(LEFT);
                     uint8_t sd = SUIVEUR_Read(RIGHT);
@@ -121,7 +123,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b010000: // corrige à gauche
             eteindreLedsSuiveur();
             digitalWrite(12, HIGH);
-            
+
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
             MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
             suivre_ligne_retroaction++;
@@ -130,7 +132,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b000010: // corrige à droite
             eteindreLedsSuiveur();
             digitalWrite(13, HIGH);
-            
+
             MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
@@ -141,37 +143,37 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b000011: // virage à Gauche
             eteindreLedsSuiveur();
             digitalWrite(11, HIGH);
-            
+
             mouvementMoteurs(VITESSE_AVANCE, TOUR_DROIT, 90, rayonRobot + ajustVirage);
             suivre_ligne_retroaction++;
             break;
 
         case 0b110001:
-        case 0b111001:    
+        case 0b111001:
         case 0b110000: // virage à Droite
             eteindreLedsSuiveur();
             digitalWrite(10, HIGH);
-            
+
             mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot + ajustVirage);
             suivre_ligne_retroaction--;
             break;
-        
+
             case 0b000000:
             case 0b001000:
             case 0b000100: // ligne perdue
             eteindreLedsSuiveur();
-            
+
             if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
                 MOTOR_SetSpeed(LEFT, VITESSE_BANG);
-            } 
+            }
             else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
                 MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
             }
             break;
-        
+
         default:
             eteindreLedsSuiveur();
-            
+
             avancer(VITESSE_AVANCE);
             break;
     }
