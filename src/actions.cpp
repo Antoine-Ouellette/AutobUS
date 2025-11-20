@@ -19,10 +19,15 @@ bool startedFollow = false;
 
 
 unsigned long lastClignote = 0;
-bool clignote, clignoteG, clignoteD;
+bool clignoteG, clignoteGauche, clignoteD,clignoteDroit;
 
-void CLIGNOTANT_init()
+void CLIGNOTANTS_init()
 {
+    clignoteG = false;
+    clignoteGauche = false;
+    clignoteD = false;
+    clignoteDroit = false;
+
     for (int i = 0; i < 4; i++){
         pinMode(ledsClignotant[i],OUTPUT);
     }
@@ -35,10 +40,9 @@ void ajouteClignotant(const int cote) {
 
 void enleveClignotant() {
     clignoteG = false;
+    clignoteGauche = false;
     clignoteD = false;
-     for (int i = 0; i < 4; i++) {
-           digitalWrite(ledsClignotant[i],  LOW);
-      }
+    clignoteDroit = false;
 }
 
 void updateClignotant() {
@@ -46,16 +50,19 @@ void updateClignotant() {
 
     if (clignoteG) {
         for (int i = 0; i < 2; i++) {
-            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+            digitalWrite(ledsClignotant[i], clignoteGauche ? HIGH : LOW);
         }
     }
-     if (clignoteD) {
-         for (int i = 2; i < 4; i++) {
-             digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
-         }
-     }
+    if (clignoteD) {
+        for (int i = 2; i < 4; i++) {
+            digitalWrite(ledsClignotant[i], clignoteDroit ? HIGH : LOW);
+        }
+    }
 
-    clignote = !clignote;
+    if (clignoteG)
+        clignoteGauche = !clignoteGauche;
+    if (clignoteD)
+        clignoteDroit = !clignoteDroit;
     lastClignote = millis();
 }
 

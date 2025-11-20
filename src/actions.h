@@ -6,7 +6,7 @@
 #define AUTOBUS_ACTIONS_STATIONS_H
 #include "Arduino.h"
 
-void CLIGNOTANT_init();
+void CLIGNOTANTS_init();
 
 /**
  * Ajoute un clignotant sur le côté spécifié du robot.
