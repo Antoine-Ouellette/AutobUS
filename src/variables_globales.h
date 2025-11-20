@@ -9,6 +9,7 @@
 #define VARIABLES_GLOBALES_H
 
 #include "Arduino.h"
+#include <Adafruit_TCS34725.h>
 
 //Constantes qui sont spécifiques au différent robot.
 #define ROBOTA 1
@@ -96,6 +97,12 @@ extern unsigned long tempsDebutTimerContourner;
  * Indique si le robot doit s'arrêter à la prochaine station de bus.
  */
 extern bool isArreterProchaineStation;
+
+/**
+ * Classe pour utiliser le capteur de couleur.
+ * Provient de la bibliothèque Adafruit_TCS34725.
+ */
+extern Adafruit_TCS34725 ColorSensor;
 
 /**
  * Indique si le robot a terminé de contourner l'obstacle.

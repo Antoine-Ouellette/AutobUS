@@ -6,6 +6,7 @@
  * Date: 2025-10-02
  */
 #include <LibRobus.h> // Essentielle pour utiliser RobUS.
+#include <Adafruit_TCS34725.h> // Bibliothèque pour le capteur de couleur.
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "lecture_capteurs.h" // Inclure les fonctions de lecture des capteurs.
 #include "etats_robot.h" // Inclure les actions à effectuer pour chaque état du robot.
@@ -68,6 +69,10 @@ void setup() {
     arreter();
 
     pinMode(PIN_BUTTON, INPUT); // Définir la pin du bouton d'arrêt comme entrée.
+    // Instanciation du capteur de couleur.
+    ColorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+    ColorSensor.begin();
+    ColorSensor.setInterrupt(false);
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
