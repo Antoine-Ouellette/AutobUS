@@ -7,8 +7,6 @@
 
 void eteindreLEDsSuiveurLigne();
 
-void retrouverLigne();
-
 void suivreLigne(float VITESSE_AVANCE);
 
 void contournerObstacle();
