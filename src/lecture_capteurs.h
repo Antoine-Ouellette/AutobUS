@@ -20,7 +20,6 @@ bool lireCapteurProximite();
 
 /**
  * Lit l'état du bouton d'arrêt demandé.
- * @return true si le bouton est appuyé, false sinon.
  */
-bool lireBoutonArretDemande();
+void lireBoutonArretDemande();
 #endif //LECTURE_CAPTEURS_H

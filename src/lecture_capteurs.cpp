@@ -32,9 +32,8 @@ bool lireCapteurProximite() {
 
 /**
  * Lit l'état du bouton d'arrêt demandé.
- * @return true si le bouton est appuyé, false sinon.
  */
-bool lireBoutonArretDemande() {
+void lireBoutonArretDemande() {
     // Read current state of button pin.
     int nowButtonState = digitalRead(PIN_BUTTON);
 

@@ -49,9 +49,8 @@ void lireCapteurs() {
         }
     }
     // Vérifier si le bouton Arrêt demandé est appuyé.
-    else if (!isArreterProchaineStation && lireBoutonArretDemande()) {
-        // Indiquer qu'il faut s'arrêter quand on va atteindre la prochaine station.
-        isArreterProchaineStation = true;
+    else if (!isArreterProchaineStation) {
+        lireBoutonArretDemande();
     }
 }
 
