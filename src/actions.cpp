@@ -13,15 +13,21 @@
 int Etat_mur = 0;
 int Etat_retrouver = 4;
 
-int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise
+
+int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise (negative = droite, positive = gauche)
 bool startedFollow = false;
 
 
 unsigned long lastClignote = 0;
-bool clignote, clignoteG, clignoteD;
+bool clignoteG, clignoteGauche, clignoteD,clignoteDroit;
 
-void CLIGNOTANT_init()
+void CLIGNOTANTS_init()
 {
+    clignoteG = false;
+    clignoteGauche = false;
+    clignoteD = false;
+    clignoteDroit = false;
+
     for (int i = 0; i < 4; i++){
         pinMode(ledsClignotant[i],OUTPUT);
     }
@@ -34,10 +40,9 @@ void ajouteClignotant(const int cote) {
 
 void enleveClignotant() {
     clignoteG = false;
+    clignoteGauche = false;
     clignoteD = false;
-     for (int i = 0; i < 4; i++) {
-           digitalWrite(ledsClignotant[i],  LOW);
-      }
+    clignoteDroit = false;
 }
 
 void updateClignotant() {
@@ -45,16 +50,19 @@ void updateClignotant() {
 
     if (clignoteG) {
         for (int i = 0; i < 2; i++) {
-            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+            digitalWrite(ledsClignotant[i], clignoteGauche ? HIGH : LOW);
         }
     }
-     if (clignoteD) {
-         for (int i = 2; i < 4; i++) {
-             digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
-         }
-     }
+    if (clignoteD) {
+        for (int i = 2; i < 4; i++) {
+            digitalWrite(ledsClignotant[i], clignoteDroit ? HIGH : LOW);
+        }
+    }
 
-    clignote = !clignote;
+    if (clignoteG)
+        clignoteGauche = !clignoteGauche;
+    if (clignoteD)
+        clignoteDroit = !clignoteDroit;
     lastClignote = millis();
 }
 
@@ -65,159 +73,166 @@ void quatreClignotants()
 }
 
 
-// Fonction pour seulement avancer jusqu'à retrouver la ligne.
-
-/**
- * Fonction pour seulement avancer jusqu'à retrouver la ligne.
- *
- * Le robot avance tout droit.
- * Si la ligne est détectée, il se tourne parallèle à la ligne.
- * L'état du robot est changé à SUIVRE_LIGNE pour continuer le défi.
- */
-void retrouverLigne()
-{
-    /*    const float distanceDroite = 30;
-        const float distanceGauche = 60;
-        const float vitesse = 0.3;
-
-        switch (Etat_retrouver) {
-            case 4:
-                mouvementMoteurs(vitesse, TOUR_DROIT, 30);
-                Etat_retrouver = 5;
-                break;
-
-            case 5:
-                if (SUIVEUR_Read() > 0) {
-                    Etat_retrouver = 12;
-                    break;
-                }
-                if (isGoal()) {
-                    Etat_retrouver = 6;
-                }
-                break;
-
-            case 6:
-                mouvementMoteurs(vitesse, AVANCE, distanceDroite);
-                Etat_retrouver = 7;
-                break;
-
-            case 7:
-                if (SUIVEUR_Read() > 0) {
-                    Etat_retrouver = 12;
-                    break;
-                }
-                if (isGoal()) {
-                    Etat_retrouver = 8;
-                }
-                break;
-
-            case 8:
-                mouvementMoteurs(vitesse, TOUR_GAUCHE, 90);
-                Etat_retrouver = 9;
-                break;
-
-            case 9:
-                if (SUIVEUR_Read() > 0) {
-                    Etat_retrouver = 16;
-                    break;
-                }
-                if (isGoal()) {
-                    Etat_retrouver = 10;
-                }
-                break;
-
-            case 10:
-                mouvementMoteurs(vitesse, AVANCE, distanceGauche);
-                Etat_retrouver = 11;
-                break;
-
-            case 11:
-                if (SUIVEUR_Read() > 0) {
-                    Etat_retrouver = 16;
-                    break;
-                }
-                if (isGoal()) {
-                    Etat_retrouver = 4;
-                }
-                break;
-
-            // Si on voit à partir de la droite
-            case 12:
-                mouvementMoteurs(vitesse, TOUR_GAUCHE, 30);
-                Etat_retrouver = 13;
-                break;
-            case 13:
-                if (isGoal()) {
-                    Etat_retrouver = 4;
-                    startedFollow = false;
-                    currentEtat = SUIVRE_LIGNE;
-                }
-
-            // SI on voit à partir de la gauche
-            case 16:
-                mouvementMoteurs(vitesse, TOUR_DROIT, 50);
-                Etat_retrouver = 17;
-                break;
-            case 17:
-                if (isGoal()) {
-                    Etat_retrouver = 4;
-                    startedFollow = false;
-                    currentEtat = SUIVRE_LIGNE;
-                }
-        }*/
+void eteindreLedsSuiveur() {
+    digitalWrite(10, LOW);
+    digitalWrite(11, LOW);
+    digitalWrite(12, LOW);
+    digitalWrite(13, LOW);
 }
 
-void suivreLigne(float VITESSE_AVANCE)
-{
-    float VITESSE_CORRECTION_ELEVEE = VITESSE_AVANCE * 0.2; // Vitesse de correction pour retrouver la ligne
+/**
+ * Faire suivre la ligne au robot en utilisant les capteurs suiveurs de ligne.
+ * Utilise une logique de type bang-bang pour corriger la trajectoire.
+ *
+ * @param VITESSE_AVANCE La vitesse à laquelle le robot doit avancer en suivant la ligne.
+ */
 
-    Serial.println("SUIVEUR: ");
+void suivreLigne(float VITESSE_AVANCE) {
+    float VITESSE_CORRECTION = VITESSE_AVANCE * 0.4; // Vitesse de correction pour retrouver la ligne
+    float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue
 
     if (!startedFollow)
     {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
     }
+/*  //Protection si l'autobus est en sens inverse
+    void checkCrossDetection() {
+    int rawLeft0  = analogRead(pins[0]);
+    int rawRight0 = analogRead(pins[3]);
 
-    // uint8_t result = SUIVEUR_Read();
-    // for (int i = 0; i < 3; i++)
-    // {
-    //     digitalWrite(leds[i], (result & (1 << i)) ? HIGH : LOW);
-    // }
-
+    // Does right sensor see something that would count as LEFT line?
+    if (detectUsingThreshold(seuil_ligneGauche, incertitude_SL_Gauche, rawRight0)||(detectUsingThreshold(seuil_ligneDroit, incertitude_SL_Droit, rawLeft0)) {
+        Serial.println("Right sensor matches LEFT line threshold!"){
+        ajouteClignotant(LEFT);
+        ajouteClignotant(RIGHT);
+        mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 180);
+        }
+*/
     // Combine les deux suiveurs de ligne sous un nombre binaire
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
+    const int delaiArret = 2000;
+    static int etapeArret = 0;  // Étape actuelle dans la séquence d'arrêt
+    static unsigned long timerArret = 0;
 
-    // si 1, ligne est détectée, si 0, plancher
-    switch (combinaisonSensors)
-    {
-    case 0b100001: // centré entre les lignes
-        avancer(VITESSE_AVANCE);
-        suivre_ligne_retroaction = 0;
-        break;
+    // Serial.println(combinaisonSensors, BIN);
 
-    case 0b010000: // corrige à gauche
-        MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
-        MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION_ELEVEE);
-        suivre_ligne_retroaction++;
-        break;
+    //si 1, ligne est détectée, si 0, plancher
+    switch (combinaisonSensors) {
+        case 0b000001:
+        case 0b100000:
+        case 0b100001: // centré entre les lignes
+            eteindreLedsSuiveur();
+            digitalWrite(10, HIGH);
+            digitalWrite(11, HIGH);
 
-    case 0b000010: // corrige à droite
-        MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION_ELEVEE);
-        MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
-        suivre_ligne_retroaction--;
-        break;
+            avancer(VITESSE_AVANCE);
+            suivre_ligne_retroaction = 0;
+            break;
 
-    case 0b000000: // ligne perdue
-        if (suivre_ligne_retroaction >= 0)
-        {
-            MOTOR_SetSpeed(RIGHT, 0.35);
-        }
-        else if (suivre_ligne_retroaction <= 0)
-        {
-            MOTOR_SetSpeed(LEFT, 0.35);
-        }
-        break;
+        case 0b001111:
+        case 0b111100:
+        case 0b111110:
+        case 0b011111:
+        case 0b111000:
+        case 0b000111:
+        case 0b111111: //Ligne d'arrêt
+            eteindreLedsSuiveur();
+            digitalWrite(10, HIGH);
+            digitalWrite(11, HIGH);
+            digitalWrite(12, HIGH);
+            digitalWrite(13, HIGH);
+
+            switch (etapeArret) {
+                case 0://arrête
+                    arreter();
+                    timerArret = millis();
+                    etapeArret++;
+                    break;
+
+                case 1: //attend pour faire son stop
+                    if (millis() - timerArret >= delaiArret) {
+                        // Après le délai, avancer de nouveau
+                        timerArret = 0; // Réinitialiser le timer
+                        etapeArret++;
+                    }
+                    break;
+
+                case 2: //traverse l'intersection
+                    mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne);
+                    etapeArret++;
+                    break;
+
+                case 3:  //retrouve sa ligne
+                    uint8_t sg = SUIVEUR_Read(LEFT);
+                    uint8_t sd = SUIVEUR_Read(RIGHT);
+                    uint8_t comb = (sg << 3) | sd;
+
+                    if (comb == 0b000000) {
+                        avancer(VITESSE_AVANCE);
+                    } else {
+                        etapeArret = 0;
+                    }
+                    break;
+            }
+            break;
+
+        case 0b010000: // corrige à gauche
+            eteindreLedsSuiveur();
+            digitalWrite(12, HIGH);
+
+            MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
+            MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
+            suivre_ligne_retroaction++;
+            break;
+
+        case 0b000010: // corrige à droite
+            eteindreLedsSuiveur();
+            digitalWrite(13, HIGH);
+
+            MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
+            MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
+            suivre_ligne_retroaction--;
+            break;
+
+        case 0b100011:
+        case 0b100111:
+        case 0b000011: // virage à Gauche
+            eteindreLedsSuiveur();
+            digitalWrite(11, HIGH);
+
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_DROIT, 90, rayonRobot + ajustVirage);
+            suivre_ligne_retroaction++;
+            break;
+
+        case 0b110001:
+        case 0b111001:
+        case 0b110000: // virage à Droite
+            eteindreLedsSuiveur();
+            digitalWrite(10, HIGH);
+
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot + ajustVirage);
+            suivre_ligne_retroaction--;
+            break;
+
+            case 0b000000:
+            case 0b001000:
+            case 0b000100: // ligne perdue
+            eteindreLedsSuiveur();
+
+            if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
+                MOTOR_SetSpeed(LEFT, VITESSE_BANG);
+            }
+            else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
+                MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
+            }
+            break;
+
+        default:
+            eteindreLedsSuiveur();
+
+            avancer(VITESSE_AVANCE);
+            break;
     }
 }
 
