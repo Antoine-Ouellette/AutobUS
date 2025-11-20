@@ -44,7 +44,7 @@ constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les
 constexpr float DistanceObstacle = rayonRobot * 2 + 5;
 
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
-constexpr int ledsClignotant[4]={}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
+constexpr int ledsClignotant[4] = {10, 11, 12, 13}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
 
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement

@@ -20,6 +20,13 @@ bool startedFollow = false;
 unsigned long lastClignote = 0;
 bool clignote, clignoteG, clignoteD;
 
+void CLIGNOTANT_init()
+{
+    for (int i = 0; i < 4; i++){
+        pinMode(ledsClignotant[i],OUTPUT);
+    }
+}
+
 void ajouteClignotant(const int cote) {
     if (cote == RIGHT) clignoteD = true;
     else if (cote == LEFT) clignoteG = true;
@@ -28,6 +35,9 @@ void ajouteClignotant(const int cote) {
 void enleveClignotant() {
     clignoteG = false;
     clignoteD = false;
+     for (int i = 0; i < 4; i++) {
+           digitalWrite(ledsClignotant[i],  LOW);
+      }
 }
 
 void updateClignotant() {
@@ -38,16 +48,21 @@ void updateClignotant() {
             digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
         }
     }
-    if (clignoteD) {
-        for (int i = 2; i < 4; i++) {
-            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
-        }
-    }
+     if (clignoteD) {
+         for (int i = 2; i < 4; i++) {
+             digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
+         }
+     }
 
     clignote = !clignote;
     lastClignote = millis();
 }
 
+void quatreClignotants()
+{
+    ajouteClignotant(LEFT);
+    ajouteClignotant(RIGHT);
+}
 
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
@@ -238,6 +253,7 @@ void contournerObstacle()
     case 2: // Avancer plus loin que l'obstacle
     {
         mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
+        quatreClignotants();
         Etat_mur = 3;
         break;
     }
@@ -325,6 +341,7 @@ void contournerObstacle()
     }
     case 16:
     {
+        enleveClignotant();
         Etat_mur = 0;
         mouvementMoteurs(0.3, SUIVRE_LA_LIGNE);
         break;

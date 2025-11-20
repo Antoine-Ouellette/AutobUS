@@ -63,6 +63,7 @@ void lireCapteurs() {
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
     //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+    CLIGNOTANT_init();
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
@@ -71,6 +72,7 @@ void setup() {
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
     //mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
+    currentEtat = CONTOURNER_OBSTACLE;
 }
 
 /**

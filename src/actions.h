@@ -4,6 +4,9 @@
 
 #ifndef AUTOBUS_ACTIONS_STATIONS_H
 #define AUTOBUS_ACTIONS_STATIONS_H
+#include "Arduino.h"
+
+void CLIGNOTANT_init();
 
 /**
  * Ajoute un clignotant sur le côté spécifié du robot.
@@ -27,5 +30,7 @@ void retrouverLigne();
 void suivreLigne(float VITESSE_AVANCE);
 
 void contournerObstacle();
+
+//void quatreClignotants();
 
 #endif //AUTOBUS_ACTIONS_STATIONS_H
