@@ -58,8 +58,9 @@ void suivreLigne(float VITESSE_AVANCE) {
     static int etapeArret = 0;  // Étape actuelle dans la séquence d'arrêt
     static unsigned long timerArret = 0;
 
-    // Serial.println(combinaisonSensors, BIN);
-
+    Serial.println(combinaisonSensors, BIN);
+    return;
+    
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
         case 0b000001:
@@ -107,9 +108,9 @@ void suivreLigne(float VITESSE_AVANCE) {
                     break;
 
                 case 3:  //retrouve sa ligne
-                    uint8_t sg = SUIVEUR_Read(LEFT);
-                    uint8_t sd = SUIVEUR_Read(RIGHT);
-                    uint8_t comb = (sg << 3) | sd;
+                    uint8_t suivGauche = SUIVEUR_Read(LEFT);
+                    uint8_t suivDroit = SUIVEUR_Read(RIGHT);
+                    uint8_t comb = (suivGauche << 3) | suivDroit;
 
                     if (comb == 0b000000) {
                         avancer(VITESSE_AVANCE);

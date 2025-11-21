@@ -60,11 +60,10 @@ void lireCapteurs()
 void setup()
 {
     BoardInit(); // Initialisation de la carte RobUS.
-    //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
-    SUIVEUR_init();
-
-    Serial.begin(9600); // Initialisation de la communication série pour le débogage.
-    Serial.println("start");
+        //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+        Serial.begin(9600); // Initialisation de la communication série pour le débogage.
+        Serial.println("start");
+        SUIVEUR_init();
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
