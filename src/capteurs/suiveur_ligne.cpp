@@ -13,24 +13,24 @@ int pins[nbPins] = {A10, A9, A8, A13, A12, A11}; //Pins du suiveur gauche {gauch
 //TODO : Modifier les valeurs une fois la maquette refaite
 //seuils pour sensor gauche (0)
 int seuil_ligne_0 = 600;
-int seuil_externGauche_0 = 750;
-int seuil_externDroit_0 = 700;
+int seuil_plancherGauche_0 = 750;
+int seuil_plancherDroit_0 = 700;
 //seuils pour sensor droit (1)
-int seuil_externGauche_1 = 700; 
-int seuil_externDroit_1 = 750; 
+int seuil_plancherGauche_1 = 700; 
+int seuil_plancherDroit_1 = 750; 
 int seuil_ligne_1 = 750;
 
 //Choix du détecteur IR sur un des suiveurs de ligne
 typedef struct seuilSuiveur {
-    float position [3];
+    int position [3];
 } Seuil;
 
 Seuil seuilGauche = {
-    {seuil_ligne_0,seuil_externGauche_0, seuil_externDroit_0}
+    {seuil_ligne_0,seuil_plancherGauche_0, seuil_plancherDroit_0}
 };
 
 Seuil seuilDroit = {
-    {seuil_ligne_1, seuil_externGauche_1, seuil_externDroit_1}
+    {seuil_ligne_1, seuil_plancherGauche_1, seuil_plancherDroit_1}
 };
 
 
@@ -60,7 +60,6 @@ uint8_t SUIVEUR_Read(int ID) {
             const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
             resultat |= isLine << i;
         }
-        return resultat;
     }
     else if (ID){
         for (int i = 0; i < nbPinsPerSensor; i++) {
@@ -68,11 +67,6 @@ uint8_t SUIVEUR_Read(int ID) {
             const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
             resultat |= isLine << i;
         }
-        return resultat;
     }
+    return resultat;
 }
-
-/*bool detectUsingThreshold(float seuil, float incertitude, int raw) {
-    return (raw > (seuil - incertitude) && raw < (seuil + incertitude));
-}
-*/

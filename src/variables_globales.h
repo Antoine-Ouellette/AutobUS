@@ -41,7 +41,7 @@ constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
 
 constexpr float distLigne = 21.02; // distance entre les deux lignes en cm
-constexpr float distRoueSuiveur = 5.45; // distance entre la roue et le suiveur de ligne en cm
+constexpr float distRoueSuiveur = 5.47; // distance entre la roue et le suiveur de ligne en cm
 constexpr float ajustVirage = distRoueSuiveur/0.70710678118;
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement

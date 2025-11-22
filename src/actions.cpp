@@ -39,19 +39,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
     }
-/*  //Protection si l'autobus est en sens inverse
-    void checkCrossDetection() {
-    int rawLeft0  = analogRead(pins[0]);
-    int rawRight0 = analogRead(pins[3]);
 
-    // Does right sensor see something that would count as LEFT line?
-    if (detectUsingThreshold(seuil_ligneGauche, incertitude_SL_Gauche, rawRight0)||(detectUsingThreshold(seuil_ligneDroit, incertitude_SL_Droit, rawLeft0)) {
-        Serial.println("Right sensor matches LEFT line threshold!"){
-        ajouteClignotant(LEFT);
-        ajouteClignotant(RIGHT);
-        mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 180);
-        }
-*/
     // Combine les deux suiveurs de ligne sous un nombre binaire
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
     const int delaiArret = 2000;
@@ -63,9 +51,11 @@ void suivreLigne(float VITESSE_AVANCE) {
 
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
+        
+        // centré entre les lignes
         case 0b000001:
         case 0b100000:
-        case 0b100001: // centré entre les lignes
+        case 0b100001:
             eteindreLedsSuiveur();
             digitalWrite(10, HIGH);
             digitalWrite(11, HIGH);
@@ -74,13 +64,14 @@ void suivreLigne(float VITESSE_AVANCE) {
             suivre_ligne_retroaction = 0;
             break;
 
+         //Ligne d'arrêt
         case 0b001111:
         case 0b111100:
         case 0b111110:
         case 0b011111:
         case 0b111000:
         case 0b000111:
-        case 0b111111: //Ligne d'arrêt
+        case 0b111111:
             eteindreLedsSuiveur();
             digitalWrite(10, HIGH);
             digitalWrite(11, HIGH);
@@ -88,13 +79,16 @@ void suivreLigne(float VITESSE_AVANCE) {
             digitalWrite(13, HIGH);
 
             switch (etapeArret) {
-                case 0://arrête
+                
+                //arrête
+                case 0:
                     arreter();
                     timerArret = millis();
                     etapeArret++;
                     break;
 
-                case 1: //attend pour faire son stop
+                //attend pour faire son stop
+                case 1:
                     if (millis() - timerArret >= delaiArret) {
                         // Après le délai, avancer de nouveau
                         timerArret = 0; // Réinitialiser le timer
@@ -102,12 +96,14 @@ void suivreLigne(float VITESSE_AVANCE) {
                     }
                     break;
 
-                case 2: //traverse l'intersection
-                    mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+5);
+                //traverse l'intersection
+                case 2:
+                    mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+10);
                     etapeArret++;
                     break;
 
-                case 3:  //retrouve sa ligne
+                //retrouve sa ligne
+                case 3:
                     uint8_t suivGauche = SUIVEUR_Read(LEFT);
                     uint8_t suivDroit = SUIVEUR_Read(RIGHT);
                     uint8_t comb = (suivGauche << 3) | suivDroit;
@@ -121,7 +117,8 @@ void suivreLigne(float VITESSE_AVANCE) {
             }
             break;
 
-        case 0b010000: // corrige à gauche
+        // corrige à gauche
+        case 0b010000:
             eteindreLedsSuiveur();
             digitalWrite(12, HIGH);
 
@@ -130,7 +127,8 @@ void suivreLigne(float VITESSE_AVANCE) {
             suivre_ligne_retroaction++;
             break;
 
-        case 0b000010: // corrige à droite
+         // corrige à droite
+        case 0b000010:
             eteindreLedsSuiveur();
             digitalWrite(13, HIGH);
 
@@ -139,9 +137,9 @@ void suivreLigne(float VITESSE_AVANCE) {
             suivre_ligne_retroaction--;
             break;
 
+        // virage à Gauche
         case 0b100011:
-        case 0b100111:
-        case 0b000011: // virage à Gauche
+        case 0b000011:
             eteindreLedsSuiveur();
             digitalWrite(11, HIGH);
 
@@ -149,9 +147,9 @@ void suivreLigne(float VITESSE_AVANCE) {
             suivre_ligne_retroaction++;
             break;
 
+        // virage à Droite
         case 0b110001:
-        case 0b111001:
-        case 0b110000: // virage à Droite
+        case 0b110000:
             eteindreLedsSuiveur();
             digitalWrite(10, HIGH);
 
@@ -159,9 +157,10 @@ void suivreLigne(float VITESSE_AVANCE) {
             suivre_ligne_retroaction--;
             break;
 
-            case 0b000000:
-            case 0b001000:
-            case 0b000100: // ligne perdue
+        // décentré de la ligne
+        case 0b000000:
+        case 0b001000:
+        case 0b000100:
             eteindreLedsSuiveur();
 
             if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
@@ -173,9 +172,6 @@ void suivreLigne(float VITESSE_AVANCE) {
             break;
 
         default:
-            eteindreLedsSuiveur();
-
-            avancer(VITESSE_AVANCE);
             break;
     }
 }
