@@ -54,12 +54,22 @@ void SUIVEUR_init() {
 //Lecture du suiveur
 uint8_t SUIVEUR_Read(int ID) {
     uint8_t resultat = 0b000; //Résultat du sensor
-    for (int i = 0; i < nbPinsPerSensor; i++) {
-        const int lecture = analogRead(pins[i]);
-        const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
-        resultat |= isLine << i;
+    if (!ID){
+        for (int i = 0; i < nbPinsPerSensor; i++) {
+            const int lecture = analogRead(pins[i]);
+            const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
+            resultat |= isLine << i;
+        }
+        return resultat;
     }
-    return resultat;
+    else if (ID){
+        for (int i = 0; i < nbPinsPerSensor; i++) {
+            const int lecture = analogRead(pins[i+3]);
+            const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
+            resultat |= isLine << i;
+        }
+        return resultat;
+    }
 }
 
 /*bool detectUsingThreshold(float seuil, float incertitude, int raw) {

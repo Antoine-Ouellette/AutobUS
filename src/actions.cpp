@@ -58,9 +58,9 @@ void suivreLigne(float VITESSE_AVANCE) {
     static int etapeArret = 0;  // Étape actuelle dans la séquence d'arrêt
     static unsigned long timerArret = 0;
 
-    Serial.println(combinaisonSensors, BIN);
-    return;
-    
+    // Serial.println(combinaisonSensors, BIN);
+
+
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
         case 0b000001:
@@ -103,7 +103,7 @@ void suivreLigne(float VITESSE_AVANCE) {
                     break;
 
                 case 2: //traverse l'intersection
-                    mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne);
+                    mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+5);
                     etapeArret++;
                     break;
 

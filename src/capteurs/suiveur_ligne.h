@@ -7,7 +7,7 @@
 #define AUTOBUS_SUIVEUR_LIGNE_H
 #include <stdint.h>
 
-void SUIVEUR_init() ;
+void SUIVEUR_init();
 
 /**
  *
