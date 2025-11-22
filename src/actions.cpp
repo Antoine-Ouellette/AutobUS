@@ -16,55 +16,6 @@ int Etat_retrouver = 4;
 int suivre_ligne_retroaction = 0; // mémoire de la dernière direction prise
 bool startedFollow = false;
 
-
-unsigned long lastClignote = 0;
-bool clignote, clignoteG, clignoteD;
-
-void CLIGNOTANT_init()
-{
-    for (int i = 0; i < 4; i++){
-        pinMode(ledsClignotant[i],OUTPUT);
-    }
-}
-
-void ajouteClignotant(const int cote) {
-    if (cote == RIGHT) clignoteD = true;
-    else if (cote == LEFT) clignoteG = true;
-}
-
-void enleveClignotant() {
-    clignoteG = false;
-    clignoteD = false;
-     for (int i = 0; i < 4; i++) {
-           digitalWrite(ledsClignotant[i],  LOW);
-      }
-}
-
-void updateClignotant() {
-    if (millis() < lastClignote + clignotant_delay) return;
-
-    if (clignoteG) {
-        for (int i = 0; i < 2; i++) {
-            digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
-        }
-    }
-     if (clignoteD) {
-         for (int i = 2; i < 4; i++) {
-             digitalWrite(ledsClignotant[i], clignote ? HIGH : LOW);
-         }
-     }
-
-    clignote = !clignote;
-    lastClignote = millis();
-}
-
-void quatreClignotants()
-{
-    ajouteClignotant(LEFT);
-    ajouteClignotant(RIGHT);
-}
-
-
 // Fonction pour seulement avancer jusqu'à retrouver la ligne.
 
 /**
@@ -254,7 +205,6 @@ void contournerObstacle()
     case 2: // Avancer plus loin que l'obstacle
     {
         mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
-        quatreClignotants();
         Etat_mur = 3;
         break;
     }
@@ -276,17 +226,30 @@ void contournerObstacle()
     }
     case 5:
     {
-    
+
         if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
         {
             mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+            Etat_mur = 6;
+        }
+        break;
+    }
+    case 6:
+    {
+        if (isGoal())
+        {
             Etat_mur = 7;
         }
         break;
     }
     case 7:
     {
-        if (isGoal())
+        // Avancer vers l'objet jusqu'à ce qu'il le détecte
+        if (IR_ReadDistanceCm(RIGHT) >= DistanceObstacle + 5)
+        {
+            mouvementMoteurs(0.25, AVANCE, 100);
+        }
+        else
         {
             Etat_mur = 8;
         }
@@ -294,58 +257,98 @@ void contournerObstacle()
     }
     case 8:
     {
-        mouvementMoteurs(0.25, AVANCE, 100);
-        Etat_mur = 9;
+        if (IR_ReadDistanceCm(RIGHT) <= DistanceObstacle + 5)
+        {
+
+            mouvementMoteurs(0.25, AVANCE, 100);
+            Etat_mur = 9;
+        }
         break;
     }
+
     case 9:
     {
-        if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
+        if (IR_ReadDistanceCm(RIGHT) >= DistanceObstacle + 5)
         {
             mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+            Etat_mur = 10;
+        }
+        break;
+    }
+
+    case 10:
+    {
+        if (isGoal())
+        {
             Etat_mur = 11;
         }
         break;
     }
-
     case 11:
     {
-        if (isGoal())
-        {
-            Etat_mur = 12;
-        }
-        break;
-    }
-    case 12:
-    {
         mouvementMoteurs(0.25, AVANCE, 100);
-        Etat_mur = 13;
+        Etat_mur = 12;
         break;
     }
-    case 13:
+
+        // JE NE SAIS PAS COMMENT CA MARCHE POUR LE CASE 12 POUR RETROUVER CA LIGNE!
+
+    case 12: // retrouve sa ligne
     {
-        if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111)
+        uint8_t suivGauche = SUIVEUR_Read(LEFT);
+        uint8_t suivDroit = SUIVEUR_Read(RIGHT);
+        uint8_t comb = (suivGauche << 3) | suivDroit;
+        if (comb == 0b000000)
         {
-            mouvementMoteurs(0.3, TOUR_GAUCHE, 90, rayonRobot);
-            Etat_mur = 15;
+            avancer(0.25);
+        }
+        else
+        {
+            mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
+            Etat_mur = 3;
         }
         break;
     }
 
-    case 15:
+    case 13:
     {
         if (isGoal())
         {
-            Etat_mur = 16;
+            Etat_mur = 14;
         }
         break;
     }
-    case 16:
+
+    case 14: // changer d'etat pour suivre la ligne
     {
-        enleveClignotant();
-        Etat_mur = 0;
-        mouvementMoteurs(0.3, SUIVRE_LA_LIGNE);
+        currentEtat = SUIVRE_LIGNE;
         break;
     }
     };
 }
+
+/* ANCIENT CODE POUR SUIVRE LA LIGNE...MARCHE PAS JE CROIS
+case 12:
+{
+    if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111)
+    {
+        mouvementMoteurs(0.3, TOUR_GAUCHE, 90, rayonRobot);
+        Etat_mur = 13;
+    }
+    break;
+}
+
+case 13:
+{
+    if (isGoal())
+    {
+        Etat_mur = 14;
+    }
+    break;
+}
+case 14:
+{
+    Etat_mur = 0;
+    mouvementMoteurs(0.2, SUIVRE_LA_LIGNE);
+    break;
+}*/
