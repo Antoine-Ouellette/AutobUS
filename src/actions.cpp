@@ -42,12 +42,11 @@ void suivreLigne(float VITESSE_AVANCE) {
 
     // Combine les deux suiveurs de ligne sous un nombre binaire
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
-    const int delaiArret = 2000;
-    static int etapeArret = 0;  // Étape actuelle dans la séquence d'arrêt
-    static unsigned long timerArret = 0;
+   // const int delaiArret = 2000;
+   // static unsigned long timerArret = 0;
 
-    // Serial.println(combinaisonSensors, BIN);
-
+    //Serial.println(combinaisonSensors, BIN);
+    //return;
 
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
@@ -57,9 +56,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b100000:
         case 0b100001:
             eteindreLedsSuiveur();
-            digitalWrite(10, HIGH);
-            digitalWrite(11, HIGH);
-
+ 
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
             break;
@@ -68,101 +65,60 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b001111:
         case 0b111100:
         case 0b111110:
-        case 0b011111:
-        case 0b111000:
-        case 0b000111:
         case 0b111111:
-            eteindreLedsSuiveur();
+        case 0b000111:
+        case 0b100111:
+        case 0b111000:
+        case 0b111001:
+            Serial.println("LIGNE ARRET DETECTE");
             digitalWrite(10, HIGH);
-            digitalWrite(11, HIGH);
-            digitalWrite(12, HIGH);
-            digitalWrite(13, HIGH);
-
-            switch (etapeArret) {
-                
-                //arrête
-                case 0:
-                    arreter();
-                    timerArret = millis();
-                    etapeArret++;
-                    break;
-
-                //attend pour faire son stop
-                case 1:
-                    if (millis() - timerArret >= delaiArret) {
-                        // Après le délai, avancer de nouveau
-                        timerArret = 0; // Réinitialiser le timer
-                        etapeArret++;
-                    }
-                    break;
-
-                //traverse l'intersection
-                case 2:
-                    mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+10);
-                    etapeArret++;
-                    break;
-
-                //retrouve sa ligne
-                case 3:
-                    uint8_t suivGauche = SUIVEUR_Read(LEFT);
-                    uint8_t suivDroit = SUIVEUR_Read(RIGHT);
-                    uint8_t comb = (suivGauche << 3) | suivDroit;
-
-                    if (comb == 0b000000) {
-                        avancer(VITESSE_AVANCE);
-                    } else {
-                        etapeArret = 0;
-                    }
-                    break;
-            }
+            Serial.println("[ARRET]");
+            arreter();
+            Serial.println("[DELAY]");
+            delay(2000);
+            Serial.println("[FIN DELAY]");
+            Serial.println("[TRAVERSE INTERSECTION]");
+            mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+10);
+            Serial.println("[FIN TRAVERSE INTERSECTION]");
             break;
 
         // corrige à gauche
         case 0b010000:
-            eteindreLedsSuiveur();
-            digitalWrite(12, HIGH);
-
+            Serial.println("CORRECTION GAUCHE");
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
             MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
             suivre_ligne_retroaction++;
+            Serial.print("RETROACTION CORRECTION :");
+            Serial.println(suivre_ligne_retroaction);
             break;
 
          // corrige à droite
         case 0b000010:
-            eteindreLedsSuiveur();
-            digitalWrite(13, HIGH);
-
+            Serial.println("CORRECTION DROITE");
             MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
+            Serial.print("RETROACTION CORRECTION : ");
+            Serial.println(suivre_ligne_retroaction);
             break;
 
-        // virage à Gauche
-        case 0b100011:
-        case 0b000011:
-            eteindreLedsSuiveur();
-            digitalWrite(11, HIGH);
-
-            mouvementMoteurs(VITESSE_AVANCE, TOUR_DROIT, 90, rayonRobot + ajustVirage);
-            suivre_ligne_retroaction++;
-            break;
-
-        // virage à Droite
-        case 0b110001:
-        case 0b110000:
-            eteindreLedsSuiveur();
-            digitalWrite(10, HIGH);
-
+        // virage
+        case 0b110010:
+        case 0b110011:
+            Serial.println("VIRAGE");
             mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot + ajustVirage);
-            suivre_ligne_retroaction--;
+            Serial.println("FIN VIRAGE");
+            suivre_ligne_retroaction++;
+            Serial.print("RETROACTION VIRAGE : ");
+            Serial.println(suivre_ligne_retroaction);
             break;
 
         // décentré de la ligne
         case 0b000000:
-        case 0b001000:
-        case 0b000100:
-            eteindreLedsSuiveur();
+            Serial.print("RETROACTION EXECUTION :");
+            Serial.println(suivre_ligne_retroaction);
 
+            eteindreLedsSuiveur();
             if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
                 MOTOR_SetSpeed(LEFT, VITESSE_BANG);
             }
@@ -171,7 +127,44 @@ void suivreLigne(float VITESSE_AVANCE) {
             }
             break;
 
+        case 0b000100:
+            Serial.print("RETROACTION EXECUTION 000100 :");
+            Serial.println(suivre_ligne_retroaction);
+
+            eteindreLedsSuiveur();
+            if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
+                MOTOR_SetSpeed(LEFT, VITESSE_BANG);
+            }
+            else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
+                MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
+            }
+            else if (suivre_ligne_retroaction == 0) {
+                Serial.print("PAS RETROACTION, RECENTRER");
+                MOTOR_SetSpeed(LEFT, VITESSE_BANG);
+            }
+            break;
+
+        case 0b001000:
+            Serial.print("RETROACTION EXECUTION 001000 :");
+            Serial.println(suivre_ligne_retroaction);
+
+            eteindreLedsSuiveur();
+            if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
+                MOTOR_SetSpeed(LEFT, VITESSE_BANG);
+            }
+            else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
+                MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
+            }
+            else if (suivre_ligne_retroaction == 0) {
+             Serial.print("PAS RETROACTION, RECENTRER");
+                MOTOR_SetSpeed(LEFT, VITESSE_BANG);
+            }
+            break;
+
+
         default:
+            Serial.print("DEFAULT : ");
+            Serial.println(combinaisonSensors, BIN);
             break;
     }
 }
