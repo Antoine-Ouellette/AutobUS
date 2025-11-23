@@ -70,7 +70,8 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b100111:
         case 0b111000:
         case 0b111001:
-            Serial.println("LIGNE ARRET DETECTE");
+            Serial.print("LIGNE ARRET DETECTE :");
+            Serial.println(combinaisonSensors, BIN);
             digitalWrite(10, HIGH);
             Serial.println("[ARRET]");
             arreter();
@@ -78,8 +79,7 @@ void suivreLigne(float VITESSE_AVANCE) {
             delay(2000);
             Serial.println("[FIN DELAY]");
             Serial.println("[TRAVERSE INTERSECTION]");
-            mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+10);
-            Serial.println("[FIN TRAVERSE INTERSECTION]");
+            mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+7);
             break;
 
         // corrige à gauche
@@ -105,12 +105,14 @@ void suivreLigne(float VITESSE_AVANCE) {
         // virage
         case 0b110010:
         case 0b110011:
-            Serial.println("VIRAGE");
+        case 0b110001:
+        case 0b100011:
+            Serial.print("VIRAGE : ");
+            Serial.println(combinaisonSensors, BIN);
             mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot + ajustVirage);
-            Serial.println("FIN VIRAGE");
-            suivre_ligne_retroaction++;
-            Serial.print("RETROACTION VIRAGE : ");
-            Serial.println(suivre_ligne_retroaction);
+            // suivre_ligne_retroaction++;
+            // Serial.print("RETROACTION VIRAGE : ");
+            // Serial.println(suivre_ligne_retroaction);
             break;
 
         // décentré de la ligne
