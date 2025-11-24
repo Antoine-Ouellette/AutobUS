@@ -39,7 +39,7 @@ constexpr int ppsMax = 4650 / 0.40; // pulse/s Max
 constexpr float completionGoal = 0.99; //Pourcentage de completion nécessaire pour avoir fini le mouvement.
 constexpr double cmToPulse = 3200 / (7.62 * PI); //Ratio qui converti les cm en pulse pour les moteurs
 
-constexpr float rayonRobot = 9.7; // Rayon entre le centre et la roue du robot en cm
+constexpr float rayonRobot = 9.75; // Rayon entre le centre et la roue du robot en cm
 constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti les degrés en cm
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
@@ -54,7 +54,7 @@ extern int numero_arret;
 
 constexpr float distLigne = 21.02; // distance entre les deux lignes en cm
 constexpr float distRoueSuiveur = 5.45; // distance entre la roue et le suiveur de ligne en cm
-constexpr float ajustVirage = distRoueSuiveur/0.70710678118;
+constexpr float ajustVirage = 9; // ajustement pour les virages en cm
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
  */

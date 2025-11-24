@@ -72,9 +72,11 @@ void lireCapteurs()
  */
 void setup()
 {
-    Serial.begin(9600); // Initialisation de la communication série pour le débogage.
     BoardInit(); // Initialisation de la carte RobUS.
-
+        //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
+        Serial.begin(9600); // Initialisation de la communication série pour le débogage.
+        Serial.println("start");
+        SUIVEUR_init();
     display.begin(0x3c, true); // Address 0x3C for 128x64
     display.setFont(&FreeSans18pt7b);
 
