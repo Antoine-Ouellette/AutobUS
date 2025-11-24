@@ -34,7 +34,6 @@ void eteindreLedsSuiveur() {
 void suivreLigne(float VITESSE_AVANCE) {
     float VITESSE_CORRECTION = VITESSE_AVANCE * 0.4; // Vitesse de correction pour retrouver la ligne
     float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue
-    double timerStart = 0;
     if (!startedFollow) {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
