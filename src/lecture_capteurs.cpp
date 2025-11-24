@@ -161,10 +161,9 @@ bool lireCapteurProximite() {
  * Lit l'état du bouton d'arrêt demandé.
  */
 void lireBoutonArretDemande() {
-    return;
-
     // // Read current state of button pin.
     // int nowButtonState = digitalRead(PIN_BUTTON);
+    // Serial.print("Button state: "); Serial.println(nowButtonState);
 
     // // If button pin state has changed, record the time point.
     // if (nowButtonState != lastButtonState) {
@@ -177,10 +176,17 @@ void lireBoutonArretDemande() {
     //         buttonState = nowButtonState;
     //         if (buttonState == LOW) { // Low level indicates the button is pressed.
     //             isArreterProchaineStation = true;
+    //             Serial.println("Arrêt demandé.");
     //         }
     //     }
     // }
 
     // // Save the latest state for next time.
     // lastButtonState = nowButtonState;
+    Serial.print("Button state: "); Serial.println(digitalRead(PIN_BUTTON));
+    
+    if(!digitalRead(PIN_BUTTON)) {
+        isArreterProchaineStation = true;
+        Serial.println("Arrêt demandé.");
+    }
 }

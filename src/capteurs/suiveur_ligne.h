@@ -7,6 +7,8 @@
 #define AUTOBUS_SUIVEUR_LIGNE_H
 #include <stdint.h>
 
+void SUIVEUR_init() ;
+
 /**
  *
  * {gauche, centre, droite} => \n
@@ -18,5 +20,6 @@
  * De 0b000 à 0b111 (=> (int) de 0 à 7)
  */
 uint8_t SUIVEUR_Read(int ID);
+bool detectUsingThreshold(float seuil, float incertitude, int raw);
 
 #endif //AUTOBUS_SUIVEUR_LIGNE_H

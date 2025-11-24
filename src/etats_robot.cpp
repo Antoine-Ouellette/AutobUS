@@ -6,6 +6,10 @@
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "etats_robot.h"
 
+
+
+Adafruit_SH1106G display = Adafruit_SH1106G(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
 /******************************************************************************
 Fonctions
 ******************************************************************************/
@@ -17,6 +21,15 @@ Fonctions
  * Si l'arrêt à cette station a été demandé, il attend 5 secondes.
  * Sinon, il ne s'arrête pas (-> SUIVRE_LIGNE).
  */
+void affichage_ecran(Arret arret) {
+    display.clearDisplay();
+    display.setTextSize(1);      // Normal 1:1 pixel scale
+    display.setTextColor(SH110X_WHITE); // Draw white text
+    display.setCursor(0, 28);    // Start at top-left corner
+    display.println(arret.nom_arret);
+    display.display();
+}
+
 void reagirStation() {
     // Si l'arrêt à cette station a été demandé ET que ça fait 5 secondes que le robot est arrêté à la station de bus.
     // OU
@@ -27,6 +40,9 @@ void reagirStation() {
     ) {
         // Mettre à jour l'écran avec le nom du prochain arrêt.
         // changerTexteEcran();
+        affichage_ecran(arrets[numero_arret]);
+        
+        
 
         // Réinitialiser le bouton d'arrêt demandé.
         isArreterProchaineStation = false;
@@ -37,4 +53,5 @@ void reagirStation() {
         // Retourner à suivre la ligne.
         currentEtat = SUIVRE_LIGNE;
     }
+    numero_arret++;
 }
