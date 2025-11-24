@@ -63,17 +63,17 @@ void lireCapteurs() {
 void setup() {
     BoardInit(); // Initialisation de la carte RobUS.
     //     COLOR_SENSOR_init(); // Initialisation du détecteur de couleur.
-    CLIGNOTANT_init();
+    // CLIGNOTANT_init();
 
     // Réinitialiser les moteurs pour ne pas que le robot parte
     // à cause de la mise sous tension précédente.
     arreter();
-
-    pinMode(PIN_BUTTON, INPUT); // Définir la pin du bouton d'arrêt comme entrée.
+    SUIVEUR_init();
+    // pinMode(PIN_BUTTON, INPUT); // Définir la pin du bouton d'arrêt comme entrée.
     // Instanciation du capteur de couleur.
-    ColorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
-    ColorSensor.begin();
-    ColorSensor.setInterrupt(false);
+    // ColorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+    // ColorSensor.begin();
+    // ColorSensor.setInterrupt(false);
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
@@ -90,10 +90,10 @@ void setup() {
 void loop() {
     //*** Lire les capteurs *********
     // Doit être effectué à toutes les loops.
-    lireCapteurs();
+    // lireCapteurs();
 
     //*** Update l'état des clignotants du bus *********
-    updateClignotant();
+    // updateClignotant();
 
     //*** Ajuster la vitesse pour le mouvement *********
     if (isMoving) {

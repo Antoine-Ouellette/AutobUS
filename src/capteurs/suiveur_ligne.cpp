@@ -2,27 +2,72 @@
  * @file Fonction en lien avec le suiveur de ligne
  * Inclue la lecture du capteur et la conversion vers une valeur binaire
  */
-
+ 
 #include "suiveur_ligne.h"
 #include <Arduino.h>
-
-//TODO : Brancher le second sensor pins A11, A12, A13
+ 
 constexpr int nbPins = 6;
-int pins[nbPins] = {A8, A9, A10, A11, A12, A13}; //Pins du suiveur gauche {gauche, centre, droit} et du suiveur droit{gauche, centre, droit}
-
-//TODO : Hardcode les valeurs
-float seuil_ligne = 0; // Seuil de luminosité qui représente la ligne
-float seuil_extern = 0; // Seuil de luminosité qui représente le sol
-float incertitude_SL = 0; // Écart accepté du seuil (incertitude suiveur de ligne)
-
+constexpr int nbPinsPerSensor = 3;
+int pins[nbPins] = {A10, A9, A8, A13, A12, A11}; //Pins du suiveur gauche {gauche, centre, droit} et du suiveur droit{gauche, centre, droit}
+ 
+//TODO : Modifier les valeurs une fois la maquette refaite
+//seuils pour sensor gauche (0)
+int seuil_ligne_0 = 600;
+int seuil_plancherGauche_0 = 750;
+int seuil_plancherDroit_0 = 700;
+//seuils pour sensor droit (1)
+int seuil_plancherGauche_1 = 700;
+int seuil_plancherDroit_1 = 750;
+int seuil_ligne_1 = 750;
+ 
+//Choix du détecteur IR sur un des suiveurs de ligne
+typedef struct seuilSuiveur {
+    int position [3];
+} Seuil;
+ 
+Seuil seuilGauche = {
+    {seuil_ligne_0,seuil_plancherGauche_0, seuil_plancherDroit_0}
+};
+ 
+Seuil seuilDroit = {
+    {seuil_ligne_1, seuil_plancherGauche_1, seuil_plancherDroit_1}
+};
+ 
+ 
+//Choix du suiveur à utiliser
+typedef struct sensor {
+    Seuil GaucheOuDroite[2];
+}Sensor;
+ 
+Sensor SuiveurLigne = {
+    {seuilGauche, seuilDroit}
+};
+ 
+//initialisation des pins des suiveurs de ligne sur l'Arduino
+void SUIVEUR_init() {
+    for (int i = 0; i < nbPins; i++) {
+        pinMode(pins[i], INPUT);
+    }
+}
+ 
+ 
+//Lecture du suiveur
 uint8_t SUIVEUR_Read(int ID) {
     uint8_t resultat = 0b000; //Résultat du sensor
-
-    for (int i = 0; i < nbPins; i++) {
-        const int lecture = analogRead(pins[i+3*(ID)]);
-        const bool isLine = ((seuil_ligne - incertitude_SL) < lecture && lecture < (seuil_ligne + incertitude_SL));
-        resultat |= isLine << i;
+    if (!ID){
+        for (int i = 0; i < nbPinsPerSensor; i++) {
+            const int lecture = analogRead(pins[i]);
+            const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
+            resultat |= isLine << i;
+        }
     }
-
+    else if (ID){
+        for (int i = 0; i < nbPinsPerSensor; i++) {
+            const int lecture = analogRead(pins[i+3]);
+            const bool isLine = (SuiveurLigne.GaucheOuDroite[ID].position[i]) <= lecture;
+            resultat |= isLine << i;
+        }
+    }
     return resultat;
 }
+ 

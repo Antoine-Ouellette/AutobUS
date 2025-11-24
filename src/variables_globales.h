@@ -28,7 +28,7 @@
 #define DiamGRobot 19.0
 #endif
 
-#define PIN_BUTTON A15 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
+// #define PIN_BUTTON 39 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
 
 constexpr long contourner_delay = 10000; // Temps que le robot attend avant de contourner l'obstacle;
 constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
@@ -44,7 +44,7 @@ constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti le
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
 //distance entre l'obstacle et capteur
-constexpr float DistanceObstacle = rayonRobot * 2 + 5;
+constexpr float DistanceObstacle = rayonRobot * 2 + 8;
 
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
 constexpr int ledsClignotant[4] = {10, 11, 12, 13}; // DEL {Av.G, Ar.G, Av.D, Ar.D}

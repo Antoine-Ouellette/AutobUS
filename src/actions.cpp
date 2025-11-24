@@ -204,7 +204,7 @@ void contournerObstacle()
 
     case 2: // Avancer plus loin que l'obstacle
     {
-        mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
+        mouvementMoteurs(0.25, TOUR_GAUCHE, 90, rayonRobot+5);
         Etat_mur = 3;
         break;
     }
@@ -229,7 +229,7 @@ void contournerObstacle()
 
         if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
         {
-            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle - rayonRobot);
             Etat_mur = 6;
         }
         break;
@@ -270,7 +270,7 @@ void contournerObstacle()
     {
         if (IR_ReadDistanceCm(RIGHT) >= DistanceObstacle + 5)
         {
-            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle - rayonRobot);
             Etat_mur = 10;
         }
         break;
@@ -304,8 +304,8 @@ void contournerObstacle()
         }
         else
         {
-            mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
-            Etat_mur = 3;
+            mouvementMoteurs(0.25, TOUR_GAUCHE, 90, rayonRobot -2);
+            Etat_mur = 13;
         }
         break;
     }

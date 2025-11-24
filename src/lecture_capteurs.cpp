@@ -161,24 +161,26 @@ bool lireCapteurProximite() {
  * Lit l'état du bouton d'arrêt demandé.
  */
 void lireBoutonArretDemande() {
-    // Read current state of button pin.
-    int nowButtonState = digitalRead(PIN_BUTTON);
+    return;
 
-    // If button pin state has changed, record the time point.
-    if (nowButtonState != lastButtonState) {
-        lastChangeTime = millis();
-    }
+    // // Read current state of button pin.
+    // int nowButtonState = digitalRead(PIN_BUTTON);
 
-    // If button state changes, and stays stable for a while, then it should have skipped the bounce area.
-    if (millis() - lastChangeTime > 10) {
-        if (buttonState != nowButtonState) { // Only proceed if button state has changed.
-            buttonState = nowButtonState;
-            if (buttonState == LOW) { // Low level indicates the button is pressed.
-                isArreterProchaineStation = true;
-            }
-        }
-    }
+    // // If button pin state has changed, record the time point.
+    // if (nowButtonState != lastButtonState) {
+    //     lastChangeTime = millis();
+    // }
 
-    // Save the latest state for next time.
-    lastButtonState = nowButtonState;
+    // // If button state changes, and stays stable for a while, then it should have skipped the bounce area.
+    // if (millis() - lastChangeTime > 10) {
+    //     if (buttonState != nowButtonState) { // Only proceed if button state has changed.
+    //         buttonState = nowButtonState;
+    //         if (buttonState == LOW) { // Low level indicates the button is pressed.
+    //             isArreterProchaineStation = true;
+    //         }
+    //     }
+    // }
+
+    // // Save the latest state for next time.
+    // lastButtonState = nowButtonState;
 }
