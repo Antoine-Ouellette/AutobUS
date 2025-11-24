@@ -6,6 +6,7 @@
 #ifndef AUTOBUS_DETECTEUR_COULEUR_H
 #define AUTOBUS_DETECTEUR_COULEUR_H
 
+
 // Nombre de couleurs de l'enum COULEURS
 constexpr int nbCouleurs = 5;
 
@@ -14,7 +15,7 @@ constexpr int nbCouleurs = 5;
  * @brief Enum des couleurs que le capteur pourra détecter :
  * NOIR, ROUGE, VERT, BLEU, BLANC
  */
-enum COULEURS { NOIR, ROUGE, VERT, BLEU, JAUNE };
+enum COULEURS { GRIS, ROUGE, BRUN, BLEU, ORANGE, BLANC };
 
 /**
  * Initialise le détecteur de couleurs

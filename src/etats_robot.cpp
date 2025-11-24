@@ -40,6 +40,9 @@ void reagirStation() {
     ) {
         // Mettre à jour l'écran avec le nom du prochain arrêt.
         // changerTexteEcran();
+        affichage_ecran(arrets[numero_arret]);
+        
+        
 
         // Réinitialiser le bouton d'arrêt demandé.
         isArreterProchaineStation = false;
@@ -50,4 +53,5 @@ void reagirStation() {
         // Retourner à suivre la ligne.
         currentEtat = SUIVRE_LIGNE;
     }
+    numero_arret++;
 }

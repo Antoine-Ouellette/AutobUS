@@ -49,3 +49,7 @@ bool isArreterProchaineStation = false;
  * Vrai si le robot a terminé, faux sinon.
  */
 bool isObstacleContourne = false;
+
+
+
+int numero_arret=0;

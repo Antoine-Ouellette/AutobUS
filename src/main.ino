@@ -14,7 +14,7 @@
 #include "arret.h"
 
 #include "../build\piolibdeps\megaatmega2560\Adafruit GFX Library\Fonts\FreeSans18pt7b.h"
-
+#include "capteurs/detecteur_couleur.h"
 
 #include "capteurs/detecteur_IR.h"
 
@@ -40,6 +40,8 @@ void lireCapteurs() {
         currentEtat = STATION_BUS;
         // Enregistrer quand le robot est arrivé à la station.
         tempsDebutTimerEtatRobot = millis();
+
+        arreter();
     }
     // Vérifier s'il y a un obstacle devant le robot.
     else if (currentEtat != CONTOURNER_OBSTACLE && IR_ReadDistanceCm(FRONT) <= DistanceObstacle) {

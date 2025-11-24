@@ -48,6 +48,9 @@ constexpr float DistanceObstacle = rayonRobot * 2 + 5;
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
 constexpr int ledsClignotant[4]={}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
 
+extern int numero_arret;
+
+
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
  */

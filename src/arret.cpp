@@ -4,10 +4,9 @@
 #include "arret.h"
 
 Arret arrets [nb_arret] = {
-    {"UDES", "Rouge"},
-    {"410-112", "Bleu"},
-    {"Boul J-C", "Vert"},
-    {"Panneton", "Jaune"},
-    {"Roy", "Orange"},
-    {"Cabana", "Violet"}
+    {"UDES", BLEU},
+    {"410-112", ORANGE},
+    {"Boul J-C", ROUGE},
+    {"Panneton", BRUN},
+    {"Roy", GRIS}
 };
