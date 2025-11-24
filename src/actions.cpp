@@ -175,7 +175,7 @@ void suivreLigne(float VITESSE_AVANCE) {
             Serial.print("VIRAGE DETECTE : ");
             Serial.println(combinaisonSensors, BIN);
             Serial.println("[VIRAGE]");            
-            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot+ajustVirage);
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_DROIT, 90, rayonRobot+ajustVirage);
            break;
 
         // décentré de la ligne

@@ -94,7 +94,6 @@ void setup()
     pinMode(11, OUTPUT); // LED rouge
     pinMode(12, OUTPUT); // LED vert
     pinMode(13, OUTPUT); // LED jaune
-    currentEtat = SUIVRE_LIGNE;
     
     // Instanciation du capteur de couleur.
     ColorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
@@ -102,7 +101,9 @@ void setup()
     ColorSensor.setInterrupt(false);
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
-    while (!ROBUS_IsBumper(REAR));
+    while (!ROBUS_IsBumper(REAR)){
+        currentEtat = SUIVRE_LIGNE;
+    }
 }
 
 /**
