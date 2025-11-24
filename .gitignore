@@ -3,4 +3,5 @@ build/
 /.idea/
 /.vscode/
 !/.vscode/extensions.json
+/Assets/
 /Documents/

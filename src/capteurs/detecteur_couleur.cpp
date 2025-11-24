@@ -11,33 +11,62 @@
 //Variable pour connaitre le sensor de couleur
 Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
 
-// TODO : ajuster pour les vraies valeurs des couleurs
-uint16_t couleurs[nbCouleurs][3] = {
-    {199, 246, 210}, // Gris
-    {255, 145, 129}, // Rouge
-    {146, 139, 104}, // Brun
-    {93, 144 ,163}, // Bleu
-    {313, 175, 137} // Orange
-};
 
 // TODO : ajuster pour les vraies valeurs
-int incertitude_DC = 25; // Écart accepté (incertitude détecteur couleur)
+int sampleIndex = 0;
+RGB couleurSample[nbSamples];
+
 
 void COLOR_SENSOR_init() {
+    for (int i = 0; i < nbSamples; i++) {
+        couleurSample[i].r = 0;
+        couleurSample[i].g = 0;
+        couleurSample[i].b = 0;
+    }
+
     colorSensor.begin();
     // Met la led à ON pour pouvoir la lire
     colorSensor.setInterrupt(false);
     delay(50); // prend 50 ms pour l'initialiser
 }
 
-COULEURS COLORSENSOR_Read() {
+void COLOR_SENSOR_update() {
+    sampleIndex = (sampleIndex + 1) % nbSamples;
+
     // Variables pour enregistrer les valeurs de couleurs lues
     uint16_t r, g, b, clear;
 
     // Lire les valeurs
     colorSensor.getRawData(&r, &g, &b, &clear);
 
+    couleurSample[sampleIndex].r = r;
+    couleurSample[sampleIndex].g = g;
+    couleurSample[sampleIndex].b = b;
+
     // ## Utile lors de l'ajustement des couleurs à lires ##
+
+    // Serial.print("Read : ");
+    // Serial.print(couleurSample[sampleIndex].r);
+    // Serial.print(" ");
+    // Serial.print(couleurSample[sampleIndex].g);
+    // Serial.print(" ");
+    // Serial.print(couleurSample[sampleIndex].b);
+    // Serial.print(" ");
+}
+
+
+COULEURS COLOR_SENSOR_Read() {
+    // Variables pour enregistrer les valeurs de couleurs
+    uint16_t r = 0, g = 0, b = 0;
+
+    // Faire la moyenne
+    for (const RGB i: couleurSample) {
+        r += i.r / float(nbSamples);
+        g += i.g / float(nbSamples);
+        b += i.b / float(nbSamples);
+    }
+
+    // Serial.print("Real : ");
     // Serial.print(r);
     // Serial.print(" ");
     // Serial.print(g);
@@ -49,10 +78,34 @@ COULEURS COLORSENSOR_Read() {
         // Boucle pour regarder toutes les couleurs
 
         // Si la couleur ne respecte pas un des seuille, aller voir la prochaine couleurs enregistré
-        if (couleurs[i][0] - incertitude_DC > r || couleurs[i][0] + incertitude_DC < r) continue;
-        if (couleurs[i][1] - incertitude_DC > g || couleurs[i][1] + incertitude_DC < g) continue;
-        if (couleurs[i][2] - incertitude_DC > b || couleurs[i][2] + incertitude_DC < b) continue;
+        if (couleursDef[i].r -incertitude_DC < r && r < couleursDef[i].r +incertitude_DC) {
+            //Chill rien faire
+        }else {
+            continue;
+        }
 
+        if (couleursDef[i].g - incertitude_DC < g && g < couleursDef[i].g +incertitude_DC) {
+            //Chill rien faire
+        }else {
+            continue;
+        }
+
+        if (couleursDef[i].b - incertitude_DC < b && b < couleursDef[i].b +incertitude_DC) {
+            // Chill rien faire
+        }
+        else {
+            continue;
+        }
+
+
+        // // ## For Debug ##
+        // Serial.print("def ");
+        // Serial.print(couleursDef[i].r);
+        // Serial.print(" Color : ");
+        // Serial.print(i);
+        // Serial.print(" = ");
+        // Serial.println(intToColor(i));
+        // // ## ##
         return intToColor(i);
     }
 
@@ -61,17 +114,8 @@ COULEURS COLORSENSOR_Read() {
 
 
 COULEURS intToColor(const int n) {
-    switch (n) {
-        case 0:
-            return GRIS;
-        case 1:
-            return ROUGE;
-        case 2:
-            return BRUN;
-        case 3:
-            return BLEU;
-        case 4:
-            return ORANGE;
-        default: return BLANC;
+    if (n < 0 || n >= nbCouleurs) {
+        return NOIR; // Valeur par défaut
     }
+    return couleurs[n];
 }
