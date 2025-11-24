@@ -34,7 +34,7 @@ void eteindreLedsSuiveur() {
 void suivreLigne(float VITESSE_AVANCE) {
     float VITESSE_CORRECTION = VITESSE_AVANCE * 0.4; // Vitesse de correction pour retrouver la ligne
     float VITESSE_BANG = VITESSE_AVANCE * 1.2; // Vitesse pour le coup de virage quand la ligne est perdue
-
+    double timerStart = 0;
     if (!startedFollow) {
         suivre_ligne_retroaction = 0;
         startedFollow = true;
@@ -42,8 +42,7 @@ void suivreLigne(float VITESSE_AVANCE) {
 
     // Combine les deux suiveurs de ligne sous un nombre binaire
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
-   // const int delaiArret = 2000;
-   // static unsigned long timerArret = 0;
+   const int delaiArret = 2000;
 
     //Serial.println(combinaisonSensors, BIN);
     //return;
@@ -56,7 +55,6 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b100000:
         case 0b100001:
             eteindreLedsSuiveur();
- 
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
             break;
@@ -72,11 +70,24 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b111001:
             Serial.print("LIGNE ARRET DETECTE :");
             Serial.println(combinaisonSensors, BIN);
-            digitalWrite(10, HIGH);
             Serial.println("[ARRET]");
             arreter();
+            while (SUIVEUR_Read(LEFT) != 0b111 && SUIVEUR_Read(RIGHT) != 0b111) {
+                Serial.println("[ALLIGNEMENT] : ");
+                Serial.println(combinaisonSensors, BIN);
+                while (SUIVEUR_Read(LEFT) != 0b111) {
+                    MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
+                    MOTOR_SetSpeed(RIGHT, 0);
+                }
+                while (SUIVEUR_Read(RIGHT) != 0b111) {
+                    MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
+                    MOTOR_SetSpeed(LEFT, 0);
+
+                }
+            } 
+            digitalWrite(10, HIGH);
             Serial.println("[DELAY]");
-            delay(2000);
+            delay(delaiArret);
             Serial.println("[FIN DELAY]");
             Serial.println("[TRAVERSE INTERSECTION]");
             mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+7);
@@ -105,15 +116,12 @@ void suivreLigne(float VITESSE_AVANCE) {
         // virage
         case 0b110010:
         case 0b110011:
-        case 0b110001:
         case 0b100011:
-            Serial.print("VIRAGE : ");
+            Serial.print("VIRAGE DETECTE : ");
             Serial.println(combinaisonSensors, BIN);
-            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot + ajustVirage);
-            // suivre_ligne_retroaction++;
-            // Serial.print("RETROACTION VIRAGE : ");
-            // Serial.println(suivre_ligne_retroaction);
-            break;
+            Serial.println("[VIRAGE]");            
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonRobot+ajustVirage);
+           break;
 
         // décentré de la ligne
         case 0b000000:
@@ -182,111 +190,6 @@ void suivreLigne(float VITESSE_AVANCE) {
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 void contournerObstacle() {
-    uint16_t distanceSeuil = 25;
-    switch (Etat_mur) {
-        case 0: {
-            mouvementMoteurs(0.2, AVANCE, 100);
-            Etat_mur = 1;
-            break;
-        }
-        case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
-        {
-            float distanceActuelle = IR_ReadDistanceCm(FRONT);
-            if (distanceActuelle <= distanceSeuil) {
-                arreter();
-                Etat_mur = 2;
-            }
-            break;
-        }
-
-        case 2: // Avancer plus loin que l'obstacle
-        {
-            mouvementMoteurs(0.2, TOUR_DROIT, 90);
-            Etat_mur = 3;
-            break;
-        }
-
-        case 3: {
-            if (isGoal()) {
-                Etat_mur = 4;
-            }
-            break;
-        }
-        case 4: {
-            mouvementMoteurs(0.2, AVANCE, 40);
-            Etat_mur = 5;
-            break;
-        }
-        case 5: {
-            if (isGoal()) {
-                Etat_mur = 6;
-            }
-            break;
-        }
-        case 6: {
-            mouvementMoteurs(0.2, TOUR_GAUCHE, 90);
-            Etat_mur = 7;
-            break;
-        }
-
-        case 7: {
-            if (isGoal()) {
-                Etat_mur = 8;
-            }
-            break;
-        }
-        case 8: {
-            mouvementMoteurs(0.2, AVANCE, 60);
-            Etat_mur = 9;
-            break;
-        }
-        case 9: {
-            if (isGoal()) {
-                Etat_mur = 10;
-            }
-            break;
-        }
-        case 10: {
-            mouvementMoteurs(0.2, TOUR_GAUCHE, 90);
-            Etat_mur = 11;
-            break;
-        }
-
-        case 11: {
-            if (isGoal()) {
-                Etat_mur = 12;
-            }
-            break;
-        }
-        case 12: {
-            mouvementMoteurs(0.2, AVANCE, 40);
-            Etat_mur = 13;
-            break;
-        }
-        case 13: {
-            if (isGoal()) {
-                Etat_mur = 14;
-            }
-            break;
-        }
-        case 14: {
-            mouvementMoteurs(0.2, TOUR_DROIT, 90);
-            Etat_mur = 15;
-            break;
-        }
-
-        case 15: {
-            if (isGoal()) {
-                Etat_mur = 16;
-            }
-            break;
-        }
-        case 16: {
-            Etat_mur = 0;
-            mouvementMoteurs(0.3);
-            break;
-        }
-    }
 }
 
 
