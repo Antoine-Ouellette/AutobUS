@@ -5,17 +5,46 @@
 
 #ifndef AUTOBUS_DETECTEUR_COULEUR_H
 #define AUTOBUS_DETECTEUR_COULEUR_H
+#include <Adafruit_TCS34725.h>
 
+extern Adafruit_TCS34725 colorSensor;
 
 // Nombre de couleurs de l'enum COULEURS
-constexpr int nbCouleurs = 5;
+constexpr int nbCouleurs = 7;
+
 
 /**
  * @enum COULEURS
  * @brief Enum des couleurs que le capteur pourra détecter :
  * NOIR, ROUGE, VERT, BLEU, BLANC
  */
-enum COULEURS { GRIS, ROUGE, BRUN, BLEU, ORANGE, BLANC };
+enum COULEURS { NOIR, GRIS, BRUN, ROUGE, ORANGE, BLEU, BLANC };
+
+constexpr COULEURS couleurs[nbCouleurs] = {NOIR, GRIS, BRUN, ROUGE, ORANGE, BLEU, BLANC}; //Tableau pour la conversion
+
+typedef struct {
+    uint16_t r;
+    uint16_t g;
+    uint16_t b;
+} RGB;
+
+
+constexpr int nbSamples = 4;
+extern int sampleIndex;
+extern RGB couleurSample[nbSamples];
+
+constexpr int incertitude_DC = 10; // Écart accepté (incertitude détecteur couleur)
+
+// TODO : ajuster pour les vraies valeurs des couleurs
+constexpr RGB couleursDef[nbCouleurs] = {
+    {0, 0, 0}, // Noir
+    {60, 74, 61}, // Gris
+    {44, 40, 28}, //Brun
+    {78, 38, 32}, // Rouge
+    {100, 53, 40}, // Orange
+    {29, 44, 49}, // Bleu
+};
+
 
 /**
  * Initialise le détecteur de couleurs
@@ -23,11 +52,17 @@ enum COULEURS { GRIS, ROUGE, BRUN, BLEU, ORANGE, BLANC };
 void COLOR_SENSOR_init();
 
 /**
+ * Fait une nouvelle lecture du capteur pour mettre à jour la moyenne de la couleur lue.
+ * @remark Doit être appelé dans le loop
+ */
+void COLOR_SENSOR_update();
+
+/**
  * @brief Lit la valeur du capteur et retourne une valeur selon COULEURS
  * @return Une couleur selon COULEURS
  * @remarks Retourne NOIR s'il ne reconnait aucune couleur
  */
-COULEURS COLORSENSOR_Read();
+COULEURS COLOR_SENSOR_Read();
 
 /**
  * @brief Traduit un int vers COULEURS

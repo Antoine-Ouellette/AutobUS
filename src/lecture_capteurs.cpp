@@ -5,6 +5,8 @@
 #include "variables_globales.h" // Inclure les variables globales partagées entre tous les fichiers.
 #include "lecture_capteurs.h"
 
+#include "arret_bus.h"
+
 /******************************************************************************
 Variables globales et #define
 L'ensemble des fonctions y ont accès.
@@ -186,7 +188,9 @@ void lireBoutonArretDemande() {
     //Serial.print("Button state: "); Serial.println(digitalRead(PIN_BUTTON));
     
     if(!digitalRead(PIN_BUTTON)) {
-        isArreterProchaineStation = true;
+
+        ajouterArretDemande(nextArret);
+
         Serial.println("Arrêt demandé.");
     }
 }
