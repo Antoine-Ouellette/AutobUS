@@ -35,7 +35,7 @@ void reagirStation() {
         arrets[currentArret].isDemande  = false;
 
         // Retourner à suivre la ligne.
-        mouvementMoteurs(vitesseSuivreLigne);
+        mouvementMoteurs(VitesseSuivreLigne);
     }
     numero_arret++;
 }

@@ -53,7 +53,7 @@ constexpr int ledArretDemande = 10; // TODO : chsnger pour la bonne led
 
 extern int numero_arret;
 
-
+constexpr float VitesseSuivreLigne = 0.3;
 constexpr float distLigne = 21.02; // distance entre les deux lignes en cm
 constexpr float distRoueSuiveur = 5.45; // distance entre la roue et le suiveur de ligne en cm
 constexpr float ajustVirage = 9; // ajustement pour les virages en cm
