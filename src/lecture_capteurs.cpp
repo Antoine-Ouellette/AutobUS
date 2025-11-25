@@ -183,7 +183,7 @@ void lireBoutonArretDemande() {
 
     // // Save the latest state for next time.
     // lastButtonState = nowButtonState;
-    Serial.print("Button state: "); Serial.println(digitalRead(PIN_BUTTON));
+    //Serial.print("Button state: "); Serial.println(digitalRead(PIN_BUTTON));
     
     if(!digitalRead(PIN_BUTTON)) {
         isArreterProchaineStation = true;

@@ -99,7 +99,7 @@ void suivreLigne(float VITESSE_AVANCE) {
     uint8_t combinaisonSensors = SUIVEUR_Read(LEFT) << 3 | (SUIVEUR_Read(RIGHT));
    const int delaiArret = 2000;
 
-    //Serial.println(combinaisonSensors, BIN);
+    Serial.println(combinaisonSensors, BIN);
     //return;
 
     //si 1, ligne est détectée, si 0, plancher
