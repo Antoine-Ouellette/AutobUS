@@ -33,11 +33,12 @@ Les fonctions doivent être déclarées avant d'être utilisées.
  * Change l'état du robot si nécessaire.
  * L'état n'est pas changé si les capteurs n'en indiquent pas le besoin.
  */
-void lireCapteurs()
-{
+void lireCapteurs() {
     // Vérifier si on est sur une station de bus.
-    if (currentEtat != STATION_BUS && isArret()) {
-
+    if (currentEtat != STATION_BUS &&
+        isArret() &&
+        tempsDebutTimerEtatRobot + 2000 < millis() &&
+        currentEtat != CONTOURNER_OBSTACLE) {
         // Débuter l'état STATION_BUS.
         currentEtat = STATION_BUS;
 
@@ -71,8 +72,10 @@ void lireCapteurs()
  * Initialise les capteurs et prépare ce qui doit être prêt avant la loop().
  */
 void setup() {
+#if CONSOLE_DEBUG
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
     Serial.println("Start");
+#endif
     BoardInit(); // Initialisation de la carte RobUS.
 
 
@@ -95,12 +98,13 @@ void setup() {
     pinMode(13, OUTPUT); // LED jaune
 
     //Fait qu'il suit la ligne
-    mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
+    mouvementMoteurs(VitesseSuivreLigne, SUIVRE_LA_LIGNE);
 
     // Instanciation du capteur de couleur.
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
     while (!ROBUS_IsBumper(REAR));
+    // mouvementMoteurs(0.3, AVANCE, 100);
 }
 
 /**
@@ -141,7 +145,7 @@ void loop() {
         case SUIVRE_LIGNE:
             // Ne rien faire de plus le PID s'en occupe.
             if (!isMoving)
-                suivreLigne(0.2);
+                suivreLigne(VitesseSuivreLigne);
             break;
 
         case CONTOURNER_OBSTACLE:

@@ -6,6 +6,7 @@
 #include <Arduino.h>
 #include <Adafruit_TCS34725.h>
 #include "detecteur_couleur.h"
+#include "variables_globales.h"
 
 
 //Variable pour connaitre le sensor de couleur
@@ -98,12 +99,14 @@ COULEURS COLOR_SENSOR_Read() {
 
 
         // // ## For Debug ##
+#if CONSOLE_DEBUG
         // Serial.print("def ");
         // Serial.print(couleursDef[i].r);
         // Serial.print(" Color : ");
         // Serial.print(i);
         // Serial.print(" = ");
         // Serial.println(intToColor(i));
+#endif
         // // ## ##
         return intToColor(i);
     }
