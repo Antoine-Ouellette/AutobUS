@@ -9,13 +9,16 @@
 
 
 //Variable pour connaitre le sensor de couleur
-Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_16X);
+#define COMMAND_BIT 0x80
 
 
 // TODO : ajuster pour les vraies valeurs
 int sampleIndex = 0;
 RGB couleurSample[nbSamples];
 
+unsigned long nextReading = 0;
+unsigned long integration_ms = 50;
 
 void COLOR_SENSOR_init() {
     for (int i = 0; i < nbSamples; i++) {
@@ -31,17 +34,15 @@ void COLOR_SENSOR_init() {
 }
 
 void COLOR_SENSOR_update() {
+    if (millis() < nextReading) return; // Couleur pas encore prête
+    nextReading = millis() + integration_ms;
+
     sampleIndex = (sampleIndex + 1) % nbSamples;
 
-    // Variables pour enregistrer les valeurs de couleurs lues
-    uint16_t r, g, b, clear;
-
     // Lire les valeurs
-    colorSensor.getRawData(&r, &g, &b, &clear);
-
-    couleurSample[sampleIndex].r = r;
-    couleurSample[sampleIndex].g = g;
-    couleurSample[sampleIndex].b = b;
+    couleurSample[sampleIndex].r = colorSensor.read16(TCS34725_RDATAL);
+    couleurSample[sampleIndex].g = colorSensor.read16(TCS34725_GDATAL);
+    couleurSample[sampleIndex].b = colorSensor.read16(TCS34725_BDATAL);
 
     // ## Utile lors de l'ajustement des couleurs à lires ##
 
@@ -50,8 +51,7 @@ void COLOR_SENSOR_update() {
     // Serial.print(" ");
     // Serial.print(couleurSample[sampleIndex].g);
     // Serial.print(" ");
-    // Serial.print(couleurSample[sampleIndex].b);
-    // Serial.print(" ");
+    // Serial.println(couleurSample[sampleIndex].b);
 }
 
 
@@ -78,22 +78,21 @@ COULEURS COLOR_SENSOR_Read() {
         // Boucle pour regarder toutes les couleurs
 
         // Si la couleur ne respecte pas un des seuille, aller voir la prochaine couleurs enregistré
-        if (couleursDef[i].r -incertitude_DC < r && r < couleursDef[i].r +incertitude_DC) {
+        if (couleursDef[i].r - incertitude_DC < r && r < couleursDef[i].r + incertitude_DC) {
             //Chill rien faire
-        }else {
+        } else {
             continue;
         }
 
-        if (couleursDef[i].g - incertitude_DC < g && g < couleursDef[i].g +incertitude_DC) {
+        if (couleursDef[i].g - incertitude_DC < g && g < couleursDef[i].g + incertitude_DC) {
             //Chill rien faire
-        }else {
+        } else {
             continue;
         }
 
-        if (couleursDef[i].b - incertitude_DC < b && b < couleursDef[i].b +incertitude_DC) {
+        if (couleursDef[i].b - incertitude_DC < b && b < couleursDef[i].b + incertitude_DC) {
             // Chill rien faire
-        }
-        else {
+        } else {
             continue;
         }
 

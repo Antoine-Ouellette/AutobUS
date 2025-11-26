@@ -33,16 +33,16 @@ constexpr int nbSamples = 4;
 extern int sampleIndex;
 extern RGB couleurSample[nbSamples];
 
-constexpr int incertitude_DC = 10; // Écart accepté (incertitude détecteur couleur)
+constexpr int incertitude_DC = 20; // Écart accepté (incertitude détecteur couleur)
 
 // TODO : ajuster pour les vraies valeurs des couleurs
 constexpr RGB couleursDef[nbCouleurs] = {
     {0, 0, 0}, // Noir
-    {60, 74, 61}, // Gris
-    {44, 40, 28}, //Brun
-    {78, 38, 32}, // Rouge
-    {100, 53, 40}, // Orange
-    {29, 44, 49}, // Bleu
+    {258, 314, 259}, // Gris
+    {187, 177, 129}, //Brun
+    {320, 140, 120}, // Rouge
+    {350 ,192, 140}, // Orange
+    {110, 155, 156},// Bleu
 };
 
 
