@@ -18,6 +18,8 @@
 #include "capteurs/manette_IR.h"
 #include "capteurs/suiveur_ligne.h"
 
+int nbLoop = 0;
+
 /******************************************************************************
 Variables et #define
 accessibles seulement dans ce fichier.
@@ -114,6 +116,8 @@ void setup() {
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
 void loop() {
+    nbLoop++;
+
     //*** Lire les capteurs *********
     // Doit être effectué à toutes les loops.
     lireCapteurs();
@@ -122,13 +126,19 @@ void loop() {
     COLOR_SENSOR_update();
 
     //*** Update l'état des clignotants du bus *********
-    updateClignotant();
+    if (nbLoop % 4 == 0) {
+        updateClignotant();
+    }
 
     // Réagi à la lecture fait par la manette
-    reagirManetteIR();
+    if (nbLoop % 2 == 0) {
+        reagirManetteIR();
+    }
 
     // Met a jour l'état de la lumière de demande d'arret
-    updateLumiereArret();
+    if (nbLoop % 6 == 0) {
+        updateLumiereArret();
+    }
 
     //*** Ajuster la vitesse pour le mouvement *********
     if (isMoving) {
