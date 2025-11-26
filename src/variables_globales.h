@@ -59,7 +59,7 @@ extern int numero_arret;
 constexpr float VitesseSuivreLigne = 0.25;
 constexpr float distLigne = 21.02; // distance entre les deux lignes en cm
 constexpr float distRoueSuiveur = 5.45; // distance entre la roue et le suiveur de ligne en cm
-constexpr float ajustVirage = 9; // ajustement pour les virages en cm
+constexpr float rayonCourbe = 25.5; // Rayon de courbure des virages 90 du parcours
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
  */

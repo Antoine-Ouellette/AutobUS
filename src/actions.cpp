@@ -197,7 +197,7 @@ void suivreLigne(float VITESSE_AVANCE) {
             Serial.println(combinaisonSensors, BIN);
 #endif
 
-            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, 27-rayonRobot);
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonCourbe-rayonRobot);
             break;
 
         // décentré de la ligne
