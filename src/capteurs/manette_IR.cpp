@@ -3,9 +3,7 @@
 //
 
 #include "manette_IR.h"
-
 #include "arret_bus.h"
-#include "ecran.h"
 #include "variables_globales.h"
 
 void reagirManetteIR() {
@@ -15,17 +13,18 @@ void reagirManetteIR() {
     if (code == 0) return;
 
     // For debug
-    Serial.println(code,HEX);
+    // #if CONSOLE_DEBUG
+    //     Serial.println(code,HEX);
+    // #endif
 
     for (uint32_t i = 0; i < nbCode; i++) {
         if (codes[i] == code) {
-            if (equivArret[i] == -1) {
-                ajouterArretDemande(nextArret);
-                return;
-            } else {
-                ajouterArretDemande(equivArret[i]);
-                return;
-            }
+            ajouterArretDemande(nextArret);
+#if CONSOLE_DEBUG
+            Serial.print("[MANETTE] : prochain arret demande = ");
+            Serial.println(nextArret);
+#endif
+            return;
         }
     }
 }

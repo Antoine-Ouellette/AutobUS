@@ -105,7 +105,8 @@ void setup() {
     // Instanciation du capteur de couleur.
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
-    while (!ROBUS_IsBumper(REAR));
+    while (!ROBUS_IsBumper(REAR) && REMOTE_read() != 0);
+
     // mouvementMoteurs(0.3, AVANCE, 100);
 }
 
