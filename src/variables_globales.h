@@ -33,7 +33,7 @@
 
 #define PIN_BUTTON 49 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
 
-#define ARRET_STATION_DELAY 10000 // Nombre de millisecondes que le robot est censé rester à un arrêt de bus.
+#define ARRET_STATION_DELAY 15000 // Nombre de millisecondes que le robot est censé rester à un arrêt de bus.
 constexpr long contourner_delay = 10000; // Temps que le robot attend avant de contourner l'obstacle;
 constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
 
