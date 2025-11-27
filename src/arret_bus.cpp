@@ -12,8 +12,8 @@ Arret arrets[nbArret] = {
     Arret{"UDES", BLEU, false},
     Arret{"410-112", JAUNE, false},
     Arret{"Boul J-C", ROUGE, false},
-    Arret{"Panneton", BRUN, false},
-    Arret{"Roy", GRIS, false}
+    Arret{"Panneton", GRIS, false},
+    Arret{"Roy", BRUN, false}
 };
 bool lumiereArret = false;
 
