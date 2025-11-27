@@ -100,7 +100,7 @@ COULEURS COLOR_SENSOR_Read() {
 
         // // ## For Debug ##
 #if CONSOLE_DEBUG
-        // Serial.print("def ");
+        // Serial.print("[COULEUR] def ");
         // Serial.print(couleursDef[i].r);
         // Serial.print(" Color : ");
         // Serial.print(i);

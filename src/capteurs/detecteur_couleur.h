@@ -18,9 +18,9 @@ constexpr int nbCouleurs = 7;
  * @brief Enum des couleurs que le capteur pourra détecter :
  * NOIR, ROUGE, VERT, BLEU, BLANC
  */
-enum COULEURS { NOIR, GRIS, BRUN, ROUGE, ORANGE, BLEU, BLANC };
+enum COULEURS { NOIR, GRIS, BRUN, ROUGE, JAUNE, BLEU, BLANC };
 
-constexpr COULEURS couleurs[nbCouleurs] = {NOIR, GRIS, BRUN, ROUGE, ORANGE, BLEU, BLANC}; //Tableau pour la conversion
+constexpr COULEURS couleurs[nbCouleurs] = {NOIR, GRIS, BRUN, ROUGE, JAUNE, BLEU, BLANC}; //Tableau pour la conversion
 
 typedef struct {
     uint16_t r;
@@ -41,7 +41,7 @@ constexpr RGB couleursDef[nbCouleurs] = {
     {258, 314, 259}, // Gris
     {187, 177, 129}, //Brun
     {320, 140, 120}, // Rouge
-    {350 ,192, 140}, // Orange
+    {655 ,553 ,248}, // Jaune
     {110, 155, 156},// Bleu
 };
 
