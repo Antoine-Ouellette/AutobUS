@@ -16,7 +16,7 @@ Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS,
 
 // TODO : ajuster pour les vraies valeurs
 int sampleIndex = 0;
-RGB couleurSample[nbSamples];
+RGBC couleurSample[nbSamples];
 
 unsigned long nextReading = 0;
 unsigned long integration_ms = 50;
@@ -26,6 +26,7 @@ void COLOR_SENSOR_init() {
         couleurSample[i].r = 0;
         couleurSample[i].g = 0;
         couleurSample[i].b = 0;
+        couleurSample[i].c = 0;
     }
 
     colorSensor.begin();
@@ -44,6 +45,7 @@ void COLOR_SENSOR_update() {
     couleurSample[sampleIndex].r = colorSensor.read16(TCS34725_RDATAL);
     couleurSample[sampleIndex].g = colorSensor.read16(TCS34725_GDATAL);
     couleurSample[sampleIndex].b = colorSensor.read16(TCS34725_BDATAL);
+    couleurSample[sampleIndex].c = colorSensor.read16(TCS34725_CDATAL);
 
     // ## Utile lors de l'ajustement des couleurs à lires ##
 
@@ -52,19 +54,22 @@ void COLOR_SENSOR_update() {
     // Serial.print(" ");
     // Serial.print(couleurSample[sampleIndex].g);
     // Serial.print(" ");
-    // Serial.println(couleurSample[sampleIndex].b);
+    // Serial.print(couleurSample[sampleIndex].b);
+    // Serial.print(" ");
+    // Serial.println(couleurSample[sampleIndex].c);
 }
 
 
 COULEURS COLOR_SENSOR_Read() {
     // Variables pour enregistrer les valeurs de couleurs
-    uint16_t r = 0, g = 0, b = 0;
+    uint16_t r = 0, g = 0, b = 0, c = 0;
 
     // Faire la moyenne
-    for (const RGB i: couleurSample) {
+    for (const RGBC i: couleurSample) {
         r += i.r / float(nbSamples);
         g += i.g / float(nbSamples);
         b += i.b / float(nbSamples);
+        c += i.c / float(nbSamples);
     }
 
     // Serial.print("Real : ");
@@ -97,10 +102,16 @@ COULEURS COLOR_SENSOR_Read() {
             continue;
         }
 
+        // if (couleursDef[i].c - incertitude_DC < c && c < couleursDef[i].c + incertitude_DC) {
+        //     // Chill rien faire
+        // } else {
+        //     continue;;
+        // }
+
 
         // // ## For Debug ##
 #if CONSOLE_DEBUG
-        // Serial.print("def ");
+        // Serial.print("[COULEUR] def ");
         // Serial.print(couleursDef[i].r);
         // Serial.print(" Color : ");
         // Serial.print(i);
@@ -111,7 +122,7 @@ COULEURS COLOR_SENSOR_Read() {
         return intToColor(i);
     }
 
-    return BLANC;
+    return NOIR;
 }
 
 

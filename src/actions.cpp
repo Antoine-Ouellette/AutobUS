@@ -47,15 +47,12 @@ void enleveClignotant() {
 void updateClignotant() {
     if (millis() < lastClignote + clignotant_delay) return;
 
-    if (clignoteG) {
-        for (int i = 0; i < 2; i++) {
-            digitalWrite(ledsClignotant[i], clignoteGauche ? HIGH : LOW);
-        }
+    for (int i = 0; i < 2; i++) {
+        digitalWrite(ledsClignotant[i], clignoteGauche ? HIGH : LOW);
     }
-    if (clignoteD) {
-        for (int i = 2; i < 4; i++) {
-            digitalWrite(ledsClignotant[i], clignoteDroit ? HIGH : LOW);
-        }
+
+    for (int i = 2; i < 4; i++) {
+        digitalWrite(ledsClignotant[i], clignoteDroit ? HIGH : LOW);
     }
 
     if (clignoteG)
@@ -106,6 +103,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b000001:
         case 0b100000:
         case 0b100001:
+            enleveClignotant();
             eteindreLedsSuiveur();
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
@@ -120,7 +118,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b100111:
         case 0b111000:
         case 0b111001:
-#if CONSOLE_DEBUG 
+#if CONSOLE_DEBUG
             Serial.print("LIGNE ARRET DETECTE :");
             Serial.println(combinaisonSensors, BIN);
             Serial.println("[ARRET]");
@@ -196,9 +194,10 @@ void suivreLigne(float VITESSE_AVANCE) {
             Serial.print("VIRAGE DETECTE : ");
             Serial.println(combinaisonSensors, BIN);
 #endif
-            Serial.println("[VIRAGE]");            
-            mouvementMoteurs(VITESSE_AVANCE, TOUR_DROIT, 90, rayonRobot+ajustVirage);
-           break;
+
+            ajouteClignotant(LEFT);
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonCourbe - rayonRobot);
+            break;
 
         // décentré de la ligne
         case 0b000000:
@@ -286,25 +285,25 @@ void suivreLigne(float VITESSE_AVANCE) {
 void contournerObstacle() {
     switch (Etat_mur) {
         case 0: {
-        mouvementMoteurs(0.25, AVANCE, 100);
-        Etat_mur = 1;
-        break;
-    }
-    case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
-    {
+            mouvementMoteurs(VitesseControunerObstacle, AVANCE, 100);
+            Etat_mur = 1;
+            break;
+        }
+        case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
+        {
             if (IR_ReadDistanceCm(FRONT) <= DistanceObstacle) {
             Etat_mur = 2;
         }
         break;
     }
 
-    case 2: // Avancer plus loin que l'obstacle
-    {
-        mouvementMoteurs(0.25, TOUR_GAUCHE, 90);
-        quatreClignotants();
-        Etat_mur = 3;
-        break;
-    }
+        case 2: // Avancer plus loin que l'obstacle
+        {
+            mouvementMoteurs(VitesseControunerObstacle, TOUR_GAUCHE, 90);
+            quatreClignotants();
+            Etat_mur = 3;
+            break;
+        }
 
         case 3: {
             if (isGoal()) {
@@ -313,35 +312,42 @@ void contournerObstacle() {
         break;
     }
         case 4: {
-        mouvementMoteurs(0.25, AVANCE, 100);
-        Etat_mur = 5;
-        break;
-    }
+            mouvementMoteurs(VitesseControunerObstacle, AVANCE, 100);
+            Etat_mur = 5;
+            break;
+        }
         case 5: {
             if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5) {
-            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
-            Etat_mur = 7;
+                mouvementMoteurs(VitesseControunerObstacle, TOUR_DROIT, 90, DistanceObstacle);
+                Etat_mur = 6;
+            }
+            break;
         }
-        break;
-    }
-        case 7: {
+        case 6: {
             if (isGoal()) {
-            Etat_mur = 8;
+                Etat_mur = 7;
+            }
+            break;
         }
-        break;
-    }
-        case 8: {
-        mouvementMoteurs(0.25, AVANCE, 100);
-        Etat_mur = 9;
-        break;
-    }
+        case 7: {
+            mouvementMoteurs(VitesseControunerObstacle, AVANCE, 100);
+            Etat_mur = 9;
+            break;
+        }
+
         case 9: {
-            if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5) {
-            mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
-            Etat_mur = 11;
+            if (IR_ReadDistanceCm(RIGHT) < DistanceObstacle + 5) {
+                Etat_mur = 10;
+                mouvementMoteurs(VitesseControunerObstacle, AVANCE, 100);
+            }
         }
-        break;
-    }
+        case 10: {
+            if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 10) {
+                mouvementMoteurs(VitesseControunerObstacle, TOUR_DROIT, 90, DistanceObstacle);
+                Etat_mur = 11;
+            }
+            break;
+        }
 
         case 11: {
             if (isGoal()) {
@@ -350,17 +356,17 @@ void contournerObstacle() {
         break;
     }
         case 12: {
-        mouvementMoteurs(0.25, AVANCE, 100);
-        Etat_mur = 13;
-        break;
-    }
-        case 13: {
-            if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111) {
-            mouvementMoteurs(0.3, TOUR_GAUCHE, 90, rayonRobot);
-            Etat_mur = 15;
+            mouvementMoteurs(VitesseControunerObstacle, AVANCE, 100);
+            Etat_mur = 13;
+            break;
         }
-        break;
-    }
+        case 13: {
+            if (SUIVEUR_Read(0) == 0b111 || SUIVEUR_Read(1) == 0b111) {
+                mouvementMoteurs(VitesseControunerObstacle, TOUR_GAUCHE, 90, rayonCourbe-rayonRobot);
+                Etat_mur = 15;
+            }
+            break;
+        }
 
         case 15: {
             if (isGoal()) {

@@ -11,31 +11,18 @@
 #include "Arduino.h"
 #include <Adafruit_TCS34725.h>
 
-
 #define CONSOLE_DEBUG 1 // Pour activer les print dans la console, 0=non, 1=oui.
 
 //Constantes qui sont spécifiques au différent robot.
-#define ROBOTA 1
-#define ROBOTB 2
-#define MODEL ROBOTB //changer entre A et B dépendant du robot utilisé
 
-#if MODEL == ROBOTB
-//Robot B
 #define  DiamDRobot  19.4
 #define  DiamGRobot  19.4
-#endif
-
-#if MODEL == ROBOTA
-//Robot A
-#define DiamDRobot 18.8
-#define DiamGRobot 19.0
-#endif
 
 #define PIN_BUTTON 49 // Pin du bouton pour demander l'arrêt à la prochaine station de bus.
 
 #define ARRET_STATION_DELAY 10000 // Nombre de millisecondes que le robot est censé rester à un arrêt de bus.
 constexpr long contourner_delay = 10000; // Temps que le robot attend avant de contourner l'obstacle;
-constexpr long clignotant_delay = 200; // Temps entre les états du clignotant
+constexpr long clignotant_delay = 300; // Temps entre les états du clignotant
 
 // Constantes
 constexpr float ppmsMax = 10; // pulse/ms max
@@ -48,18 +35,19 @@ constexpr float degToCmGauche = (PI * DiamGRobot / 360); //Ratio qui converti le
 constexpr float degToCmDroit = (PI * DiamDRobot / 360); //Ratio qui converti les degrés en cm
 
 //distance entre l'obstacle et capteur
-constexpr float DistanceObstacle = rayonRobot * 2 + 5;
+
+constexpr float DistanceObstacle = rayonRobot * 2;
 
 constexpr int leds[4] = {10, 11, 12, 13}; //DEL {bleu, rouge, verte, jaune}
-constexpr int ledsClignotant[4] = {10, 13, 11, 12}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
-constexpr int ledArretDemande = 10; // TODO : chsnger pour la bonne led
-
+constexpr int ledsClignotant[4] = {39, 41, 40, 42}; // DEL {Av.G, Ar.G, Av.D, Ar.D}
+constexpr int ledArretDemande = 43;
 extern int numero_arret;
 
-constexpr float VitesseSuivreLigne = 0.25;
+constexpr float VitesseSuivreLigne = 0.20;
+constexpr float VitesseControunerObstacle = 0.15;
 constexpr float distLigne = 21.02; // distance entre les deux lignes en cm
 constexpr float distRoueSuiveur = 5.45; // distance entre la roue et le suiveur de ligne en cm
-constexpr float ajustVirage = 9; // ajustement pour les virages en cm
+constexpr float rayonCourbe = 27.5; // Rayon de courbure des virages 90 du parcours
 /**
  * Variable pour savoir si le robot est en train de faire un déplacement
  */

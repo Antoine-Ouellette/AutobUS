@@ -7,6 +7,11 @@
 #define AUTOBUS_SUIVEUR_LIGNE_H
 #include <stdint.h>
 
+/**
+ * Affiche le seuil de lecture de chaque capteur dans l'ordre des pins
+ */
+void SUIVEUR_seuils();
+
 void SUIVEUR_init();
 
 /**

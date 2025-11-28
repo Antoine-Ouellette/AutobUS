@@ -41,6 +41,9 @@ void lireCapteurs() {
         isArret() &&
         tempsDebutTimerEtatRobot + 2000 < millis() &&
         currentEtat != CONTOURNER_OBSTACLE) {
+#if CONSOLE_DEBUG
+        Serial.println("[ARRET] début de la detection");
+#endif
         // Débuter l'état STATION_BUS.
         currentEtat = STATION_BUS;
 
@@ -52,15 +55,12 @@ void lireCapteurs() {
     }
     // Vérifier s'il y a un obstacle devant le robot.
     else if (currentEtat != CONTOURNER_OBSTACLE && IR_ReadDistanceCm(FRONT) <= DistanceObstacle) {
-        if (isMoving) {
-            arreter();
-            tempsDebutTimerContourner = millis();
-        }
-        // Si durant tout le delai d'attente d'obstacle il est resté là, on le contourne
-        else if (tempsDebutTimerContourner + contourner_delay < millis()) {
-            // Débuter l'état CONTOURNER_OBSTACLE.
-            currentEtat = CONTOURNER_OBSTACLE;
-        }
+#if CONSOLE_DEBUG
+        Serial.println("[CONTOURNE] arret et attente");
+#endif
+
+        // Débuter l'état CONTOURNER_OBSTACLE.
+        currentEtat = CONTOURNER_OBSTACLE;
     }
     // Vérifier si le bouton Arrêt demandé est appuyé.
     else if (!isArreterProchaineStation) {
@@ -76,7 +76,6 @@ void lireCapteurs() {
 void setup() {
 #if CONSOLE_DEBUG
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
-    Serial.println("Start");
 #endif
     BoardInit(); // Initialisation de la carte RobUS.
 
@@ -102,10 +101,18 @@ void setup() {
     //Fait qu'il suit la ligne
     mouvementMoteurs(VitesseSuivreLigne, SUIVRE_LA_LIGNE);
 
-    // Instanciation du capteur de couleur.
+
+#if CONSOLE_DEBUG
+    Serial.println("[Setup] finished");
+#endif
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
-    while (!ROBUS_IsBumper(REAR));
+    while (!ROBUS_IsBumper(REAR) && REMOTE_read() == 0 && digitalRead(PIN_BUTTON));
+
+#if CONSOLE_DEBUG
+    Serial.println("[Setup] starting loop");
+#endif
+    delay(1000);
     // mouvementMoteurs(0.3, AVANCE, 100);
 }
 

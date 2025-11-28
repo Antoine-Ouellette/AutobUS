@@ -10,10 +10,10 @@
 int currentArret = 0, nextArret = 0;
 Arret arrets[nbArret] = {
     Arret{"UDES", BLEU, false},
-    Arret{"410-112", ORANGE, false},
+    Arret{"Roy", BRUN, false},
+    Arret{"Panneton", VERT, false},
     Arret{"Boul J-C", ROUGE, false},
-    Arret{"Panneton", BRUN, false},
-    Arret{"Roy", GRIS, false}
+    Arret{"410-112", JAUNE, false},
 };
 bool lumiereArret = false;
 
@@ -23,11 +23,12 @@ void LumiereArret_init() {
 
 void updateLumiereArret() {
     if (!lumiereArret) {
-        if (arrets[nextArret].isDemande) {
+        if (isArreterProchaineStation) {
             digitalWrite(ledArretDemande,HIGH);
+        }else{ digitalWrite(ledArretDemande,LOW);
         }
     } else {
-        if (!arrets[nextArret].isDemande) {
+        if (!isArreterProchaineStation) {
             digitalWrite(ledArretDemande,LOW);
         }
     }
@@ -47,7 +48,6 @@ bool isArret() {
             Serial.println(arrets[i].nom);
 #endif
 
-
             return true;
         }
     }
@@ -58,8 +58,8 @@ void afficherProchainArret() {
     affichage_ecran(arrets[nextArret].nom);
 }
 
-void ajouterArretDemande(int Id) {
-    Id = Id % nbArret;
-
-    arrets[Id].isDemande = true;
-}
+// void ajouterArretDemande(int Id) {
+//     Id = Id % nbArret;
+//
+//     arrets[Id].isDemande = true;
+// }
