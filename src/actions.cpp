@@ -47,15 +47,12 @@ void enleveClignotant() {
 void updateClignotant() {
     if (millis() < lastClignote + clignotant_delay) return;
 
-    if (clignoteG) {
-        for (int i = 0; i < 2; i++) {
-            digitalWrite(ledsClignotant[i], clignoteGauche ? HIGH : LOW);
-        }
+    for (int i = 0; i < 2; i++) {
+        digitalWrite(ledsClignotant[i], clignoteGauche ? HIGH : LOW);
     }
-    if (clignoteD) {
-        for (int i = 2; i < 4; i++) {
-            digitalWrite(ledsClignotant[i], clignoteDroit ? HIGH : LOW);
-        }
+
+    for (int i = 2; i < 4; i++) {
+        digitalWrite(ledsClignotant[i], clignoteDroit ? HIGH : LOW);
     }
 
     if (clignoteG)
@@ -106,6 +103,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b000001:
         case 0b100000:
         case 0b100001:
+            enleveClignotant();
             eteindreLedsSuiveur();
             avancer(VITESSE_AVANCE);
             suivre_ligne_retroaction = 0;
@@ -120,7 +118,7 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b100111:
         case 0b111000:
         case 0b111001:
-#if CONSOLE_DEBUG 
+#if CONSOLE_DEBUG
             Serial.print("LIGNE ARRET DETECTE :");
             Serial.println(combinaisonSensors, BIN);
             Serial.println("[ARRET]");
@@ -197,7 +195,8 @@ void suivreLigne(float VITESSE_AVANCE) {
             Serial.println(combinaisonSensors, BIN);
 #endif
 
-            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonCourbe-rayonRobot);
+            ajouteClignotant(LEFT);
+            mouvementMoteurs(VITESSE_AVANCE, TOUR_GAUCHE, 90, rayonCourbe - rayonRobot);
             break;
 
         // décentré de la ligne
@@ -321,7 +320,7 @@ void contournerObstacle() {
         }
         case 5: {
             if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5) {
-                mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+                mouvementMoteurs(0.25, TOUR_DROIT, 90, DistanceObstacle);
                 Etat_mur = 7;
             }
             break;
@@ -339,7 +338,7 @@ void contournerObstacle() {
         }
         case 9: {
             if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5) {
-                mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
+                mouvementMoteurs(0.25, TOUR_DROIT, 90, DistanceObstacle);
                 Etat_mur = 11;
             }
             break;
@@ -358,7 +357,7 @@ void contournerObstacle() {
         }
         case 13: {
             if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111) {
-                mouvementMoteurs(0.3, TOUR_GAUCHE, 90, rayonRobot);
+                mouvementMoteurs(0.25, TOUR_GAUCHE, 90, rayonRobot);
                 Etat_mur = 15;
             }
             break;

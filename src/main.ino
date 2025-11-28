@@ -41,6 +41,9 @@ void lireCapteurs() {
         isArret() &&
         tempsDebutTimerEtatRobot + 2000 < millis() &&
         currentEtat != CONTOURNER_OBSTACLE) {
+#if CONSOLE_DEBUG
+        Serial.println("[ARRET] début de la detection");
+#endif
         // Débuter l'état STATION_BUS.
         currentEtat = STATION_BUS;
 
@@ -76,7 +79,6 @@ void lireCapteurs() {
 void setup() {
 #if CONSOLE_DEBUG
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
-    Serial.println("Start");
 #endif
     BoardInit(); // Initialisation de la carte RobUS.
 
@@ -102,11 +104,18 @@ void setup() {
     //Fait qu'il suit la ligne
     mouvementMoteurs(VitesseSuivreLigne, SUIVRE_LA_LIGNE);
 
-    // Instanciation du capteur de couleur.
+
+#if CONSOLE_DEBUG
+    Serial.println("[Setup] finished");
+#endif
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
-    while (!ROBUS_IsBumper(REAR) && REMOTE_read() != 0);
+    while (!ROBUS_IsBumper(REAR) && REMOTE_read() == 0 && digitalRead(PIN_BUTTON));
 
+#if CONSOLE_DEBUG
+        Serial.println("[Setup] starting loop");
+#endif
+    delay(1000);
     // mouvementMoteurs(0.3, AVANCE, 100);
 }
 
@@ -117,6 +126,7 @@ void setup() {
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
 void loop() {
+
     nbLoop++;
 
     //*** Lire les capteurs *********

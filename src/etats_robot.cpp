@@ -21,21 +21,21 @@ Fonctions
  * Sinon, il ne s'arrête pas (-> SUIVRE_LIGNE).
  */
 void reagirStation() {
-    // Si l'arrêt à cette station a été demandé ET que ça fait 5 secondes que le robot est arrêté à la station de bus.
-    // OU
     // Si l'arrêt à cette station n'a pas été demandé.
+    // OU
+    // Ça fait 5 secondes que le robot est arrêté à la station de bus.
     if (
-        !arrets[currentArret].isDemande ||
-        (arrets[currentArret].isDemande  && (millis() - tempsDebutTimerEtatRobot >= ARRET_STATION_DELAY))
+        !isArreterProchaineStation ||
+        (millis() - tempsDebutTimerEtatRobot >= ARRET_STATION_DELAY)
     ) {
         // Mettre à jour l'écran avec le nom du prochain arrêt.
         afficherProchainArret();
 
         // Réinitialiser le bouton d'arrêt demandé.
-        arrets[currentArret].isDemande  = false;
+        // arrets[currentArret].isDemande  = false;
+        isArreterProchaineStation = false;
 
         // Retourner à suivre la ligne.
         mouvementMoteurs(VitesseSuivreLigne);
     }
-    numero_arret++;
 }

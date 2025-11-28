@@ -13,13 +13,14 @@ void reagirManetteIR() {
     if (code == 0) return;
 
     // For debug
-    // #if CONSOLE_DEBUG
-    //     Serial.println(code,HEX);
-    // #endif
+    #if CONSOLE_DEBUG
+        Serial.println(code,HEX);
+    #endif
 
     for (uint32_t i = 0; i < nbCode; i++) {
         if (codes[i] == code) {
-            ajouterArretDemande(nextArret);
+            isArreterProchaineStation = true;
+            // ajouterArretDemande(nextArret);
 #if CONSOLE_DEBUG
             Serial.print("[MANETTE] : prochain arret demande = ");
             Serial.println(nextArret);

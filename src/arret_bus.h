@@ -42,11 +42,11 @@ bool isArret();
  */
 void afficherProchainArret();
 
-/**
- * Ajouter un arret demandé, pour arrêter quand on va être rendu.
- * @param Id numéro de l'arret
- */
-void ajouterArretDemande(int Id);
+// /**
+//  * Ajouter un arret demandé, pour arrêter quand on va être rendu.
+//  * @param Id numéro de l'arret
+//  */
+// void ajouterArretDemande(int Id);
 
 
 #endif //AUTOBUS_ARRET_BUS_H

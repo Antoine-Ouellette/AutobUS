@@ -18,31 +18,32 @@ constexpr int nbCouleurs = 7;
  * @brief Enum des couleurs que le capteur pourra détecter :
  * NOIR, ROUGE, VERT, BLEU, BLANC
  */
-enum COULEURS { NOIR, GRIS, BRUN, ROUGE, JAUNE, BLEU, BLANC };
+enum COULEURS { NOIR, VERT, BRUN, ROUGE, JAUNE, BLEU, BLANC };
 
-constexpr COULEURS couleurs[nbCouleurs] = {NOIR, GRIS, BRUN, ROUGE, JAUNE, BLEU, BLANC}; //Tableau pour la conversion
+constexpr COULEURS couleurs[nbCouleurs] = {NOIR, VERT, BRUN, ROUGE, JAUNE, BLEU, BLANC}; //Tableau pour la conversion
 
 typedef struct {
     uint16_t r;
     uint16_t g;
     uint16_t b;
-} RGB;
+    uint16_t c;
+} RGBC;
 
 
-constexpr int nbSamples = 4;
+constexpr int nbSamples = 5;
 extern int sampleIndex;
-extern RGB couleurSample[nbSamples];
+extern RGBC couleurSample[nbSamples];
 
-constexpr int incertitude_DC = 20; // Écart accepté (incertitude détecteur couleur)
+constexpr int incertitude_DC = 30; // Écart accepté (incertitude détecteur couleur)
 
 // TODO : ajuster pour les vraies valeurs des couleurs
-constexpr RGB couleursDef[nbCouleurs] = {
-    {0, 0, 0}, // Noir
-    {258, 314, 259}, // Gris
-    {187, 177, 129}, //Brun
-    {320, 140, 120}, // Rouge
-    {655 ,553 ,248}, // Jaune
-    {110, 155, 156},// Bleu
+constexpr RGBC couleursDef[nbCouleurs] = {
+    {96, 126, 101, 336}, // Noir
+    {124 ,180, 117, 443}, // Vert
+    {149 ,143, 107, 419}, //Brun
+    {265 ,126, 112, 507}, // Rouge
+    {472 ,422, 201, 1140}, // Jaune
+    { 93 ,146, 169, 423}, // Bleu
 };
 
 

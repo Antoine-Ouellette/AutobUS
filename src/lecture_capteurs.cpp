@@ -40,7 +40,7 @@ long lastChangeTime = 0;
  * @property blueMax: Valeur maximum de bleu pour dire que c'est cette couleur.
  */
 struct ColorDefinition {
-    const char* name;
+    const char *name;
     uint16_t redMin, redMax;
     uint16_t greenMin, greenMax;
     uint16_t blueMin, blueMax;
@@ -111,10 +111,11 @@ bool lireCapteurCouleur() {
         );
 
         // Calculer les vraies valeurs de couleur en fonction de la luminosité.
-        if (colorSensorRawBrightnessValue > 0) { // évite la division par zéro.
-            colorSensorRedValue = (float)colorSensorRawRedValue / colorSensorRawBrightnessValue;
-            colorSensorGreenValue = (float)colorSensorRawGreenValue / colorSensorRawBrightnessValue;
-            colorSensorBlueValue = (float)colorSensorRawBlueValue / colorSensorRawBrightnessValue;
+        if (colorSensorRawBrightnessValue > 0) {
+            // évite la division par zéro.
+            colorSensorRedValue = (float) colorSensorRawRedValue / colorSensorRawBrightnessValue;
+            colorSensorGreenValue = (float) colorSensorRawGreenValue / colorSensorRawBrightnessValue;
+            colorSensorBlueValue = (float) colorSensorRawBlueValue / colorSensorRawBrightnessValue;
 
             colorSensorSumR += colorSensorRedValue;
             colorSensorSumG += colorSensorGreenValue;
@@ -123,16 +124,16 @@ bool lireCapteurCouleur() {
         }
         delay(20);
     }
-    
+
     // Calculer la couleur moyenne.
     averageRed = colorSensorSumR / numberValidSamples;
     averageGreen = colorSensorSumG / numberValidSamples;
     averageBlue = colorSensorSumB / numberValidSamples;
 
     // Retourner le nom de la couleur correspondante.
-    const char* detectedColor = "Inconnue";
+    const char *detectedColor = "Inconnue";
     // foreach color in possibleColors.
-    for (auto &color : possibleColors) {
+    for (auto &color: possibleColors) {
         // Si dans le range de la couleur.
         if (
             averageRed >= color.redMin && averageRed <= color.redMax &&
@@ -186,14 +187,14 @@ void lireBoutonArretDemande() {
     // // Save the latest state for next time.
     // lastButtonState = nowButtonState;
     // Serial.print("Button state: "); Serial.println(digitalRead(PIN_BUTTON));
-    
-    if(!digitalRead(PIN_BUTTON)) {
 
-        ajouterArretDemande(nextArret);
+    if (!digitalRead(PIN_BUTTON)) {
+        isArreterProchaineStation = true;
+        // ajouterArretDemande(nextArret);
 
 #if CONSOLE_DEBUG
-        Serial.println("Arrêt demandé.");
+        Serial.print("[BOUTON] Arret demande : ");
+        Serial.println(nextArret);
 #endif
-
     }
 }
