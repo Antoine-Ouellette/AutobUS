@@ -380,5 +380,5 @@ void contournerObstacle() {
             mouvementMoteurs(VitesseSuivreLigne, SUIVRE_LA_LIGNE);
         break;
     }
-    };
+    }; 
 }

@@ -166,7 +166,7 @@ void loop() {
             break;
 
         case CONTOURNER_OBSTACLE:
-            contournerObstacle();
+            //contournerObstacle();
             break;
 
         case STATION_BUS:
