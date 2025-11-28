@@ -191,6 +191,9 @@ void lireBoutonArretDemande() {
 
         ajouterArretDemande(nextArret);
 
+#if CONSOLE_DEBUG
         Serial.println("Arrêt demandé.");
+#endif
+
     }
 }

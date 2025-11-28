@@ -40,6 +40,13 @@ bool isArret() {
         if (arrets[i].couleur == couleur) {
             currentArret = i;
             nextArret = (currentArret + 1) % nbArret;
+#if CONSOLE_DEBUG
+            Serial.print("[ARRET] lu arret : ");
+            Serial.print(i);
+            Serial.print(" = ");
+            Serial.println(arrets[i].nom);
+#endif
+
 
             return true;
         }

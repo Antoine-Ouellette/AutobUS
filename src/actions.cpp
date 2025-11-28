@@ -19,16 +19,15 @@ bool startedFollow = false;
 
 
 unsigned long lastClignote = 0;
-bool clignoteG, clignoteGauche, clignoteD,clignoteDroit;
+bool clignoteG, clignoteGauche, clignoteD, clignoteDroit;
 
-void CLIGNOTANTS_init()
-{
+void CLIGNOTANTS_init() {
     clignoteG = false;
     clignoteGauche = false;
     clignoteD = false;
     clignoteDroit = false;
 
-    for (int i = 0; i < 4; i++){
+    for (int i = 0; i < 4; i++) {
         pinMode(ledsClignotant[i],OUTPUT);
     }
 }
@@ -66,8 +65,7 @@ void updateClignotant() {
     lastClignote = millis();
 }
 
-void quatreClignotants()
-{
+void quatreClignotants() {
     ajouteClignotant(LEFT);
     ajouteClignotant(RIGHT);
 }
@@ -104,7 +102,6 @@ void suivreLigne(float VITESSE_AVANCE) {
 
     //si 1, ligne est détectée, si 0, plancher
     switch (combinaisonSensors) {
-        
         // centré entre les lignes
         case 0b000001:
         case 0b100000:
@@ -123,13 +120,19 @@ void suivreLigne(float VITESSE_AVANCE) {
         case 0b100111:
         case 0b111000:
         case 0b111001:
+#if CONSOLE_DEBUG 
             Serial.print("LIGNE ARRET DETECTE :");
             Serial.println(combinaisonSensors, BIN);
             Serial.println("[ARRET]");
+#endif
+
             arreter();
             while (SUIVEUR_Read(LEFT) != 0b111 && SUIVEUR_Read(RIGHT) != 0b111) {
+#if CONSOLE_DEBUG
                 Serial.println("[ALLIGNEMENT] : ");
                 Serial.println(combinaisonSensors, BIN);
+#endif
+
                 while (SUIVEUR_Read(LEFT) != 0b111) {
                     MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
                     MOTOR_SetSpeed(RIGHT, 0);
@@ -137,64 +140,89 @@ void suivreLigne(float VITESSE_AVANCE) {
                 while (SUIVEUR_Read(RIGHT) != 0b111) {
                     MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
                     MOTOR_SetSpeed(LEFT, 0);
-
                 }
-            } 
+            }
             digitalWrite(10, HIGH);
+#if CONSOLE_DEBUG
             Serial.println("[DELAY]");
+#endif
+
             delay(delaiArret);
+#if CONSOLE_DEBUG
             Serial.println("[FIN DELAY]");
             Serial.println("[TRAVERSE INTERSECTION]");
-            mouvementMoteurs((VITESSE_AVANCE*0.85), AVANCE, distLigne+7);
+#endif
+
+            mouvementMoteurs((VITESSE_AVANCE * 0.85), AVANCE, distLigne + 7);
             break;
 
         // corrige à gauche
         case 0b010000:
+#if CONSOLE_DEBUG
             Serial.println("CORRECTION GAUCHE");
+#endif
+
             MOTOR_SetSpeed(LEFT, VITESSE_AVANCE);
             MOTOR_SetSpeed(RIGHT, VITESSE_CORRECTION);
             suivre_ligne_retroaction++;
+#if CONSOLE_DEBUG
             Serial.print("RETROACTION CORRECTION :");
             Serial.println(suivre_ligne_retroaction);
+#endif
+
             break;
 
          // corrige à droite
         case 0b000010:
+#if CONSOLE_DEBUG
             Serial.println("CORRECTION DROITE");
+#endif
+
             MOTOR_SetSpeed(LEFT, VITESSE_CORRECTION);
             MOTOR_SetSpeed(RIGHT, VITESSE_AVANCE);
             suivre_ligne_retroaction--;
+#if CONSOLE_DEBUG
             Serial.print("RETROACTION CORRECTION : ");
             Serial.println(suivre_ligne_retroaction);
+#endif
+
             break;
 
         // virage
         case 0b110010:
         case 0b110011:
         case 0b100011:
+#if CONSOLE_DEBUG
             Serial.print("VIRAGE DETECTE : ");
             Serial.println(combinaisonSensors, BIN);
+#endif
             Serial.println("[VIRAGE]");            
             mouvementMoteurs(VITESSE_AVANCE, TOUR_DROIT, 90, rayonRobot+ajustVirage);
            break;
 
         // décentré de la ligne
         case 0b000000:
+#if CONSOLE_DEBUG
             Serial.print("RETROACTION EXECUTION :");
             Serial.println(suivre_ligne_retroaction);
+#endif
 
             eteindreLedsSuiveur();
-            if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
+            if (suivre_ligne_retroaction > 0) {
+                //dernière direction prise était à gauche
                 MOTOR_SetSpeed(LEFT, VITESSE_BANG);
-            }
-            else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
+            } else if (suivre_ligne_retroaction < 0) {
+                //dernière direction prise était à droite
                 MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
             }
             break;
 
         case 0b000100:
+#if CONSOLE_DEBUG
             Serial.print("RETROACTION EXECUTION 000100 :");
             Serial.println(suivre_ligne_retroaction);
+#endif
+
 
             eteindreLedsSuiveur();
             if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
@@ -202,16 +230,21 @@ void suivreLigne(float VITESSE_AVANCE) {
             }
             else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
                 MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
-            }
-            else if (suivre_ligne_retroaction == 0) {
+            } else if (suivre_ligne_retroaction == 0) {
+#if CONSOLE_DEBUG
                 Serial.print("PAS RETROACTION, RECENTRER");
+#endif
+
                 MOTOR_SetSpeed(LEFT, VITESSE_BANG);
             }
             break;
 
         case 0b001000:
+#if CONSOLE_DEBUG
             Serial.print("RETROACTION EXECUTION 001000 :");
             Serial.println(suivre_ligne_retroaction);
+#endif
+
 
             eteindreLedsSuiveur();
             if (suivre_ligne_retroaction > 0) { //dernière direction prise était à gauche
@@ -219,17 +252,22 @@ void suivreLigne(float VITESSE_AVANCE) {
             }
             else if (suivre_ligne_retroaction < 0) { //dernière direction prise était à droite
                 MOTOR_SetSpeed(RIGHT, VITESSE_BANG);
-            }
-            else if (suivre_ligne_retroaction == 0) {
+            } else if (suivre_ligne_retroaction == 0) {
+#if CONSOLE_DEBUG
              Serial.print("PAS RETROACTION, RECENTRER");
+#endif
+
                 MOTOR_SetSpeed(LEFT, VITESSE_BANG);
             }
             break;
 
 
         default:
+#if CONSOLE_DEBUG
             Serial.print("DEFAULT : ");
             Serial.println(combinaisonSensors, BIN);
+#endif
+
             break;
     }
 }
@@ -245,20 +283,16 @@ void suivreLigne(float VITESSE_AVANCE) {
  * L'état du robot est changé à SUIVRE_LIGNE pour avancer jusqu'au prochain défi.
  */
 
-void contournerObstacle()
-{
-    switch (Etat_mur)
-    {
-    case 0:
-    {
+void contournerObstacle() {
+    switch (Etat_mur) {
+        case 0: {
         mouvementMoteurs(0.25, AVANCE, 100);
         Etat_mur = 1;
         break;
     }
     case 1: // Le robot avance jusqu'à ce que le capteur ultrason détecte le mur à une distance de ... cm.
     {
-        if (IR_ReadDistanceCm(FRONT) <= DistanceObstacle)
-        {
+            if (IR_ReadDistanceCm(FRONT) <= DistanceObstacle) {
             Etat_mur = 2;
         }
         break;
@@ -272,92 +306,72 @@ void contournerObstacle()
         break;
     }
 
-    case 3:
-    {
-
-        if (isGoal())
-        {
+        case 3: {
+            if (isGoal()) {
             Etat_mur = 4;
         }
         break;
     }
-    case 4:
-    {
+        case 4: {
         mouvementMoteurs(0.25, AVANCE, 100);
         Etat_mur = 5;
         break;
     }
-    case 5:
-    {
-    
-        if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
-        {
+        case 5: {
+            if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5) {
             mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
             Etat_mur = 7;
         }
         break;
     }
-    case 7:
-    {
-        if (isGoal())
-        {
+        case 7: {
+            if (isGoal()) {
             Etat_mur = 8;
         }
         break;
     }
-    case 8:
-    {
+        case 8: {
         mouvementMoteurs(0.25, AVANCE, 100);
         Etat_mur = 9;
         break;
     }
-    case 9:
-    {
-        if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5)
-        {
+        case 9: {
+            if (IR_ReadDistanceCm(RIGHT) > DistanceObstacle + 5) {
             mouvementMoteurs(0.3, TOUR_DROIT, 90, DistanceObstacle);
             Etat_mur = 11;
         }
         break;
     }
 
-    case 11:
-    {
-        if (isGoal())
-        {
+        case 11: {
+            if (isGoal()) {
             Etat_mur = 12;
         }
         break;
     }
-    case 12:
-    {
+        case 12: {
         mouvementMoteurs(0.25, AVANCE, 100);
         Etat_mur = 13;
         break;
     }
-    case 13:
-    {
-        if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111)
-        {
+        case 13: {
+            if (SUIVEUR_Read(0) == 0b111 && SUIVEUR_Read(1) == 0b111) {
             mouvementMoteurs(0.3, TOUR_GAUCHE, 90, rayonRobot);
             Etat_mur = 15;
         }
         break;
     }
 
-    case 15:
-    {
-        if (isGoal())
-        {
+        case 15: {
+            if (isGoal()) {
             Etat_mur = 16;
         }
         break;
     }
-    case 16:
-    {
+        case 16: {
         enleveClignotant();
         Etat_mur = 0;
-        mouvementMoteurs(0.3, SUIVRE_LA_LIGNE);
+            mouvementMoteurs(VitesseSuivreLigne, SUIVRE_LA_LIGNE);
         break;
     }
     };

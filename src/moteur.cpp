@@ -67,33 +67,33 @@ void mouvementMoteurs(const float vitesse, const MOUVEMENT mouvement, const floa
         case TOUR_GAUCHE:
             side[RIGHT] = 1;
             GoalVitesse[RIGHT] = vitesse;
-            GoalDistance[RIGHT] = (distance * (PI * (rayon + (DiamGRobot/2)) / 180)) * cmToPulse;
+            GoalDistance[RIGHT] = (distance * (PI * (rayon + (DiamGRobot / 2)) / 180)) * cmToPulse;
 
-            if (rayon <= (DiamGRobot/2)) {
+            if (rayon <= (DiamGRobot / 2)) {
                 side[LEFT] = -1;
-                GoalDistance[LEFT] = (distance * (PI * ((DiamGRobot/2) - rayon) / 180)) * cmToPulse;
+                GoalDistance[LEFT] = (distance * (PI * ((DiamGRobot / 2) - rayon) / 180)) * cmToPulse;
             } else {
                 side[LEFT] = 1;
-                GoalDistance[LEFT] = (distance * (PI * (rayon - (DiamGRobot/2)) / 180)) * cmToPulse;
+                GoalDistance[LEFT] = (distance * (PI * (rayon - (DiamGRobot / 2)) / 180)) * cmToPulse;
             }
 
-            GoalVitesse[LEFT] = side[LEFT] * GoalVitesse[RIGHT] * ((rayon - (DiamGRobot/2)) / (rayon + (DiamGRobot/2)));
+            GoalVitesse[LEFT] = side[LEFT] * GoalVitesse[RIGHT] * ((rayon - (DiamGRobot / 2)) / (rayon + (DiamGRobot / 2)));
 
             break;
         case TOUR_DROIT:
             side[LEFT] = 1;
             GoalVitesse[LEFT] = vitesse;
-            GoalDistance[LEFT] = (distance * (PI * (rayon + (DiamDRobot/2)) / 180)) * cmToPulse;
+            GoalDistance[LEFT] = (distance * (PI * (rayon + (DiamDRobot / 2)) / 180)) * cmToPulse;
 
-            if (rayon <= (DiamDRobot/2)) {
+            if (rayon <= (DiamDRobot / 2)) {
                 side[RIGHT] = -1;
-                GoalDistance[RIGHT] = (distance * (PI * ((DiamDRobot/2) - rayon) / 180)) * cmToPulse;
+                GoalDistance[RIGHT] = (distance * (PI * ((DiamDRobot / 2) - rayon) / 180)) * cmToPulse;
             } else {
                 side[RIGHT] = 1;
-                GoalDistance[RIGHT] = (distance * (PI * (rayon - (DiamDRobot/2)) / 180)) * cmToPulse;
+                GoalDistance[RIGHT] = (distance * (PI * (rayon - (DiamDRobot / 2)) / 180)) * cmToPulse;
             }
 
-            GoalVitesse[RIGHT] = side[RIGHT] * GoalVitesse[LEFT] * ((rayon - (DiamDRobot/2)) / (rayon + (DiamDRobot/2)));
+            GoalVitesse[RIGHT] = side[RIGHT] * GoalVitesse[LEFT] * ((rayon - (DiamDRobot / 2)) / (rayon + (DiamDRobot / 2)));
 
             break;
         case AVANCE:
@@ -213,6 +213,7 @@ void ajusteVitesse() {
 
         MOTOR_SetSpeed(i, output_PID);
         //
+#if  CONSOLE_DEBUG
         // Serial.print(" P:");
         // Serial.print(k_p[i] * current_error_PID[i]);
         // Serial.print(" I:");
@@ -225,8 +226,11 @@ void ajusteVitesse() {
         // Serial.print(ENCODER_Read(i));
         // Serial.print(" GoalDistance:");
         // Serial.print(GoalDistance);
+#endif
     }
+#if  CONSOLE_DEBUG
     // Serial.println("");
+#endif
 }
 
 // TODO : will met ton code de suivre la ligne ici

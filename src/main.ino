@@ -18,6 +18,8 @@
 #include "capteurs/manette_IR.h"
 #include "capteurs/suiveur_ligne.h"
 
+int nbLoop = 0;
+
 /******************************************************************************
 Variables et #define
 accessibles seulement dans ce fichier.
@@ -33,11 +35,12 @@ Les fonctions doivent être déclarées avant d'être utilisées.
  * Change l'état du robot si nécessaire.
  * L'état n'est pas changé si les capteurs n'en indiquent pas le besoin.
  */
-void lireCapteurs()
-{
+void lireCapteurs() {
     // Vérifier si on est sur une station de bus.
-    if (currentEtat != STATION_BUS && isArret()) {
-
+    if (currentEtat != STATION_BUS &&
+        isArret() &&
+        tempsDebutTimerEtatRobot + 2000 < millis() &&
+        currentEtat != CONTOURNER_OBSTACLE) {
         // Débuter l'état STATION_BUS.
         currentEtat = STATION_BUS;
 
@@ -71,8 +74,10 @@ void lireCapteurs()
  * Initialise les capteurs et prépare ce qui doit être prêt avant la loop().
  */
 void setup() {
+#if CONSOLE_DEBUG
     Serial.begin(9600); // Initialisation de la communication série pour le débogage.
     Serial.println("Start");
+#endif
     BoardInit(); // Initialisation de la carte RobUS.
 
 
@@ -95,14 +100,13 @@ void setup() {
     pinMode(13, OUTPUT); // LED jaune
 
     //Fait qu'il suit la ligne
-    mouvementMoteurs(0.3,SUIVRE_LA_LIGNE);
+    mouvementMoteurs(VitesseSuivreLigne, SUIVRE_LA_LIGNE);
 
     // Instanciation du capteur de couleur.
 
     // Tant que le bouton arrière n'est pas appuyé, vérifier si le bouton arrière est appuyé.
-    while (!ROBUS_IsBumper(REAR)){
-        currentEtat = SUIVRE_LIGNE;
-    }
+    while (!ROBUS_IsBumper(REAR));
+    // mouvementMoteurs(0.3, AVANCE, 100);
 }
 
 /**
@@ -112,6 +116,8 @@ void setup() {
  * @note: Ne pas ajouter de delay() dans cette boucle.
  */
 void loop() {
+    nbLoop++;
+
     //*** Lire les capteurs *********
     // Doit être effectué à toutes les loops.
     lireCapteurs();
@@ -120,13 +126,19 @@ void loop() {
     COLOR_SENSOR_update();
 
     //*** Update l'état des clignotants du bus *********
-    updateClignotant();
+    if (nbLoop % 4 == 0) {
+        updateClignotant();
+    }
 
     // Réagi à la lecture fait par la manette
-    reagirManetteIR();
+    if (nbLoop % 2 == 0) {
+        reagirManetteIR();
+    }
 
     // Met a jour l'état de la lumière de demande d'arret
-    updateLumiereArret();
+    if (nbLoop % 6 == 0) {
+        updateLumiereArret();
+    }
 
     //*** Ajuster la vitesse pour le mouvement *********
     if (isMoving) {
@@ -143,7 +155,7 @@ void loop() {
         case SUIVRE_LIGNE:
             // Ne rien faire de plus le PID s'en occupe.
             if (!isMoving)
-                suivreLigne(0.2);
+                suivreLigne(VitesseSuivreLigne);
             break;
 
         case CONTOURNER_OBSTACLE:
