@@ -44,6 +44,7 @@ constexpr int ledArretDemande = 43;
 extern int numero_arret;
 
 constexpr float VitesseSuivreLigne = 0.20;
+constexpr float VitesseControunerObstacle = 0.15;
 constexpr float distLigne = 21.02; // distance entre les deux lignes en cm
 constexpr float distRoueSuiveur = 5.45; // distance entre la roue et le suiveur de ligne en cm
 constexpr float rayonCourbe = 27.5; // Rayon de courbure des virages 90 du parcours
